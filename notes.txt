@@ -1,0 +1,10 @@
+https://dbdesign.online/model/f9nj4l8x8Q1Q
+
+отзывы и триггер
+
+
+в дбвизуалайзер только определенные таблицы
+
+rating - число, лайк +1, диз -1
+
+profile, status - 1 к 1????
