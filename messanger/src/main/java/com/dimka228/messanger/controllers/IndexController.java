@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Controller
-@RequestMapping("say")
+@RequestMapping("/")
 public class IndexController {
-    @GetMapping(value = "hello")
+    @GetMapping(value = "index")
     public String sayHello () {
         return
                 "index" ;
     }
+
 }

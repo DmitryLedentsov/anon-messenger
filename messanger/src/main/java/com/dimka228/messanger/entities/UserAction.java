@@ -9,6 +9,7 @@ import java.time.Instant;
         @Index(name = "m_user_action_user_id_idx", columnList = "user_id")
 })
 public class UserAction {
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

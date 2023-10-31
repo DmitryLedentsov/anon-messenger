@@ -7,6 +7,7 @@ import jakarta.persistence.*;
         @Index(name = "m_user_profile_user_id_key", columnList = "user_id", unique = true)
 })
 public class UserProfile {
+    @Id
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

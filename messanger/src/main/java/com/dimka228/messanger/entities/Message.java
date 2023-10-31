@@ -18,7 +18,7 @@ public class Message {
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 
-    @Lob
+
     @Column(name = "data", nullable = false)
     private String data;
 

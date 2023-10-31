@@ -7,10 +7,12 @@ import jakarta.persistence.*;
         @Index(name = "m_user_in_chat_user_id_idx", columnList = "user_id")
 })
 public class UserInChat {
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;

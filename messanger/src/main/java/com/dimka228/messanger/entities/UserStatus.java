@@ -8,6 +8,7 @@ import jakarta.persistence.*;
         @Index(name = "m_user_status_name_key", columnList = "name", unique = true)
 })
 public class UserStatus {
+    @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
