@@ -15,16 +15,18 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.formLogin(form -> form
-                        .loginPage("login")
-                        .failureUrl("login-error")
+        http.authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/", "/index","/error").permitAll()
+                .anyRequest().authenticated()
+        ).formLogin(form -> form
+                        .loginPage("/auth/login")
                         .permitAll()
-                );
+        ).logout((logout) -> logout.permitAll());;
         return http.build();
         // ...
     }
-    @Bean
+    /*@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/auth*");
-    }
+    }*/
 }

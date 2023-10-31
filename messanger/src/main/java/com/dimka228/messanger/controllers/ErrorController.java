@@ -1,20 +1,19 @@
 package com.dimka228.messanger.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice
-public class ErrorController {
+@Controller
+public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
 
-    @ExceptionHandler(Throwable.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String exception(final Throwable throwable, final Model model) {
-        String errorMessage = (throwable != null ? throwable.getMessage() : "Unknown error");
-        model.addAttribute("errorMessage", errorMessage);
+    @RequestMapping("/error")
+    public String handleError() {
+        //do something like logging
         return "error";
     }
-
 }
