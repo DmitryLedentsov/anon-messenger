@@ -11,9 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,6 +48,21 @@ public class IndexController {
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
         model.addAttribute("messages", messages);
         return "chat";
+    }
+
+    @GetMapping("chat/create")
+    public String createView (Model model) {
+        User user = getCurrentUser();
+        //TODO: aa
+        user = userService.getUser("aboba");
+        model.addAttribute("user",user);
+        return
+                "chat-create" ;
+    }
+
+    @PostMapping("chat/create")
+    public String signupUser(@ModelAttribute User user, Model model) {
+        return null;
     }
 
     private User getCurrentUser(){

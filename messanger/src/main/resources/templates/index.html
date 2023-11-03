@@ -7,8 +7,13 @@
 <body>
 <span th:text="${user.login}"></span>
 <br>
+<br>
+<a th:href="@{/chat/create}">create chat</a>
+<br> <br> <br>
+List of chats:
 <div th:each="chat : ${chats}">
     <a th:if="${chat}" th:text="${chat?.name}" th:href="@{'/chat/' + ${chat?.id}}"></a>
+    <br>
 </div>
 </body>
 </html>

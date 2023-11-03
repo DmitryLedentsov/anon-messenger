@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/chat/create}" method="post">
+<div>
+    <span>Chat Name:</span><input type="text" name="login" placeholder="..."/>
+</div>
+<div>
+    <span>User names separated by comma:</span><input type="password" name="password" placeholder="..."/>
+</div>
+    <input type="submit" value="create!" />
+</form>
+</body>
+</html>

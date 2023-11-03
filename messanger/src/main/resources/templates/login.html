@@ -16,8 +16,11 @@
     <div>
         <input type="password" name="password" placeholder="Password" th:value="${user?.password}"/>
     </div>
+    <br>
     <input type="submit" value="Log in" />
+    <br>
     <span> not registered? </span>
+    <br>
     <a th:href="@{/auth/register}"> Register Here</a>
 </form>
 </body>
