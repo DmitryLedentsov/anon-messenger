@@ -39,11 +39,12 @@ public class AuthController {
         if (userService.checkUser(user.getLogin())) {
             signupError = "The username already exists.";
         }
+        model.addAttribute("user", user.clone());
 
         if (signupError == null) {
             try {
                 userService.registerUser(user);
-                return "auth/login";
+                //"auth/login";
             }
             catch (UserExistsException e) {
                 signupError = "There was an error signing you up. Please try again.";
@@ -52,8 +53,9 @@ public class AuthController {
 
         if (signupError == null) {
             model.addAttribute("signupSuccess", true);
+            return "login";
         } else {
-            model.addAttribute("signupError", signupError);
+            model.addAttribute("error", signupError);
         }
 
         return "register";

@@ -5,6 +5,10 @@
     <title>Title</title>
 </head>
 <body>
-абоба
+<span th:text="${user.login}"></span>
+<br>
+<div th:each="chat : ${chats}">
+    <a th:if="${chat}" th:text="${chat?.name}" th:href="@{'/chat/' + ${chat?.id}}"></a>
+</div>
 </body>
 </html>

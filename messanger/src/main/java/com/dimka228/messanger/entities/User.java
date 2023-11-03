@@ -1,12 +1,16 @@
 package com.dimka228.messanger.entities;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 @Entity
 @Table(name = "m_user", indexes = {
         @Index(name = "m_user_login_key", columnList = "login", unique = true)
 })
-public class User {
+public class User implements UserDetails,Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -40,5 +44,44 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    //для совместимости
+
+    public User clone(){
+        User newUser = new User();
+        newUser.setPassword(getPassword());
+        newUser.setLogin(getLogin());
+        newUser.setId(getId());
+        return  newUser;
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return getLogin();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

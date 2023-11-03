@@ -80,6 +80,7 @@ public class SecurityConfig {
                         logout -> logout
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                 .invalidateHttpSession(true)        // set invalidation state when logout
+                                .logoutSuccessUrl("/auth/login")
                                 .deleteCookies("JSESSIONID")
                                 .permitAll()
                 );
