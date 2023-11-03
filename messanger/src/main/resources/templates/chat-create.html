@@ -7,10 +7,10 @@
 <body>
 <form th:action="@{/chat/create}" method="post">
 <div>
-    <span>Chat Name:</span><input type="text" name="login" placeholder="..."/>
+    <span>Chat Name:</span><input type="text" name="name" placeholder="..."/>
 </div>
 <div>
-    <span>User names separated by comma:</span><input type="password" name="password" placeholder="..."/>
+    <span>User names separated by comma:</span><input type="text" name="users" placeholder="..."/>
 </div>
     <input type="submit" value="create!" />
 </form>

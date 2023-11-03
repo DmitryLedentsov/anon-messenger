@@ -13,7 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Controller
@@ -25,7 +27,7 @@ public class IndexController {
     public String index (Model model) {
         User user = getCurrentUser();
         //TODO: aa
-        user = userService.getUser("aboba");
+        //user = userService.getUser("aboba");
         model.addAttribute("user",user);
         List<Chat> chats = chatService.getChatsForUser(user);
         model.addAttribute("chats", chats);
@@ -38,8 +40,8 @@ public class IndexController {
         User user = getCurrentUser();
 
         //TODO: aa
-        user = userService.getUser("aboba");
-        id = 1;
+        /*user = userService.getUser("aboba");
+        id = 1;*/
 
         model.addAttribute("user",user);
 
@@ -61,8 +63,18 @@ public class IndexController {
     }
 
     @PostMapping("chat/create")
-    public String signupUser(@ModelAttribute User user, Model model) {
-        return null;
+    public String createChat(@ModelAttribute("name") String name,@ModelAttribute("users") String userLoginsListString, Model model) {
+        User user = getCurrentUser();
+        Chat chat = chatService.addChat(name);
+        chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
+
+        List<String> logins = parseLogins(userLoginsListString);
+        logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
+        List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
+        for(User cur: users){
+            chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
+        }
+        return "redirect:/chat/" + chat.getId().toString();
     }
 
     private User getCurrentUser(){
@@ -72,6 +84,10 @@ public class IndexController {
             throw new UserNotFoundException(login);
         }
         return user;
+    }
+
+    private List<String> parseLogins(String s){
+        return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());
     }
 
     //TODO: переименовать в ChatController /chat

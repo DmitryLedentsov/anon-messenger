@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface MessageInfoRepository extends JpaRepository<Message,Long> {
+public interface MessageRepository extends JpaRepository<Message,Long> {
     @Query(nativeQuery = true, value = "select sender_id as senderId, sender, message from get_messages_for_user_in_chat(:_user_id, :_chat_id)")
     List<MessageInfo> getMessagesForUserInChat(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
 }

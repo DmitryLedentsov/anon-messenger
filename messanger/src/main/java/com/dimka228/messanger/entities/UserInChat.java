@@ -51,4 +51,10 @@ public class UserInChat {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public static class Roles{
+        public static final String CREATOR = "CREATOR";
+        public static final String REGULAR = "REGULAR";
+        public static final String ADMIN = "ADMIN";
+    }
 }

@@ -7,7 +7,7 @@ import com.dimka228.messanger.exceptions.ChatNotFoundException;
 import com.dimka228.messanger.exceptions.UserNotInChatException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.repositories.ChatRepository;
-import com.dimka228.messanger.repositories.MessageInfoRepository;
+import com.dimka228.messanger.repositories.MessageRepository;
 import com.dimka228.messanger.repositories.UserInChatRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatService {
     private final ChatRepository chatRepository;
-    private final MessageInfoRepository messageRepository;
+    private final MessageRepository messageRepository;
     private final UserInChatRepository userInChatRepository;
     public List<Chat> getChatsForUser(User user){
         return chatRepository.getChatsForUser(user.getId());
@@ -37,11 +37,25 @@ public class ChatService {
         }
     }
 
+    public  Chat addChat(String name){
+        Chat chat = new Chat();
+        chat.setName(name);
+        return chatRepository.save(chat);
+    }
+
     public UserInChat getUserInChat(Integer userId, Integer chatId){
         try {
             return userInChatRepository.findByUserIdAndChatId(userId,chatId).orElseThrow(() -> new UserNotInChatException(chatId, userId));
         }catch (EntityNotFoundException e){
             throw new UserNotInChatException(chatId, userId);
         }
+    }
+
+    public void addUserInChat(User user, Chat chat, String role) {
+        UserInChat userInChat = new UserInChat();
+        userInChat.setUser(user);
+        userInChat.setChat(chat);
+        userInChat.setRole("REGULAR");
+        userInChatRepository.save(userInChat);
     }
 }
