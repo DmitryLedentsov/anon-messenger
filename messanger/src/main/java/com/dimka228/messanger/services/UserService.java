@@ -22,7 +22,7 @@ public class UserService {
     }
 
     public  boolean checkUser(String login){
-        return repository.findById(login).isPresent();
+        return repository.findByLogin(login).isPresent();
     }
 
     public List<User> allUsers() {
@@ -35,12 +35,12 @@ public class UserService {
 
     public User getUser(String login) {
         try {
-            return repository.findById(login).orElseThrow(() -> new UserNotFoundException(login));
+            return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
         }catch (EntityNotFoundException e){
             throw new UserNotFoundException(login);
         }
     }
-    public void deleteUser(String login) {
-        repository.deleteById(login);
+    public void deleteUser(Long id) {
+        repository.deleteById(id);
     }
 }
