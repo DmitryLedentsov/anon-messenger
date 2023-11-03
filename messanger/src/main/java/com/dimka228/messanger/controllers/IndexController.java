@@ -2,7 +2,9 @@ package com.dimka228.messanger.controllers;
 
 import com.dimka228.messanger.entities.Chat;
 import com.dimka228.messanger.entities.User;
+import com.dimka228.messanger.entities.UserInChat;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
+import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
 import lombok.AllArgsConstructor;
@@ -12,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,10 +25,9 @@ public class IndexController {
     private  final UserService userService;
     @GetMapping(value = "index")
     public String index (Model model) {
-        User user = userService.getUser(SecurityContextHolder.getContext().getAuthentication().getName());
-        if(user == null){
-            throw new UserNotFoundException("");
-        }
+        User user = getCurrentUser();
+        //TODO: aa
+        user = userService.getUser("aboba");
         model.addAttribute("user",user);
         List<Chat> chats = chatService.getChatsForUser(user);
         model.addAttribute("chats", chats);
@@ -36,9 +36,35 @@ public class IndexController {
     }
 
     @GetMapping("/chat/{id}")
-    public String chat(@PathVariable int id){
+    public String chat(@PathVariable Integer id, Model model ){
+        User user = getCurrentUser();
 
+        //TODO: aa
+        user = userService.getUser("aboba");
+        id = 1;
+
+        model.addAttribute("user",user);
+
+        Chat chat = chatService.getChat(id);
+        UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
+        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+        model.addAttribute("messages", messages);
         return "chat";
     }
+
+    private User getCurrentUser(){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUser(login);
+        if(user == null){
+            throw new UserNotFoundException(login);
+        }
+        return user;
+    }
+
+    //TODO: переименовать в ChatController /chat
+    //переи
+
+
+
 
 }

@@ -2,11 +2,19 @@ package com.dimka228.messanger.entities;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "m_user_in_chat", indexes = {
         @Index(name = "m_user_in_chat_user_id_idx", columnList = "user_id")
 })
+@IdClass(UserInChat.ID.class)
 public class UserInChat {
+    public static class ID implements Serializable {
+        private User user;
+        private Chat chat;
+    }
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
