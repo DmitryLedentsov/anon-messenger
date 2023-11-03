@@ -66,8 +66,11 @@ public class SecurityConfig {
                                 //.requestMatchers("/index").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/users").hasRole("ADMIN")
+                                .anyRequest().authenticated()
                 ).formLogin(
                         form -> form
+                                .usernameParameter("login")
+                                .passwordParameter("password")
                                 .loginPage("/auth/login")
                                 .loginProcessingUrl("/auth/login")
                                 .defaultSuccessUrl("/index")
@@ -76,6 +79,8 @@ public class SecurityConfig {
                 ).logout(
                         logout -> logout
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                                .invalidateHttpSession(true)        // set invalidation state when logout
+                                .deleteCookies("JSESSIONID")
                                 .permitAll()
                 );
         return http.build();

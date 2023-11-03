@@ -5,7 +5,7 @@ DROP FUNCTION IF EXISTS register, login, get_messages_for_user_in_chat, get_chat
 CREATE TABLE M_USER
 (
     ID    serial PRIMARY KEY,
-    PASSWORD        VARCHAR(20) NOT NULL,
+    PASSWORD        TEXT NOT NULL,
 	LOGIN        VARCHAR(20) NOT NULL UNIQUE
 );
 

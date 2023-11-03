@@ -25,11 +25,17 @@ public class UserService {
         return repository.findByLogin(login).isPresent();
     }
 
+
     public List<User> allUsers() {
         return repository.findAll();
     }
     public User addUser(User newUser) {
         if(checkUser(newUser.getLogin())) throw  new UserExistsException(newUser.getLogin());
+        return repository.save(newUser);
+    }
+    public User registerUser(User newUser) {
+        if(checkUser(newUser.getLogin())) throw  new UserExistsException(newUser.getLogin());
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         return repository.save(newUser);
     }
 
