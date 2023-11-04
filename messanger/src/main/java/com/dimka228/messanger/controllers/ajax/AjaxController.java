@@ -1,4 +1,4 @@
-package com.dimka228.messanger.controllers;
+package com.dimka228.messanger.controllers.ajax;
 
 import com.dimka228.messanger.models.MessageInfo;
 import lombok.AllArgsConstructor;

@@ -62,11 +62,11 @@ public class ChatService {
         userInChat.setRole("REGULAR");
         userInChatRepository.save(userInChat);
     }
-    public void addMessage(User sender, Chat chat, String text){
+    public Message addMessage(User sender, Chat chat, String text){
         Message message = new Message();
         message.setChat(chat);
         message.setSender(sender);
         message.setData(text);
-        messageRepository.save(message);
+        return messageRepository.save(message);
     }
 }

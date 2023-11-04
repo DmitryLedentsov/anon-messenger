@@ -1,4 +1,4 @@
-package com.dimka228.messanger.controllers;
+package com.dimka228.messanger.controllers.socket;
 
 import com.dimka228.messanger.dto.MessageDTO;
 import com.dimka228.messanger.entities.Chat;
@@ -41,9 +41,10 @@ public class MessageController {
         User user = userService.getUser(chatMessage.getSenderId());
         Chat chat = chatService.getChat(id);
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
-        chatService.addMessage(user,chat,chatMessage.getMessage());
 
-        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", chatMessage);
+        Message added = chatService.addMessage(user,chat,chatMessage.getMessage());
+        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin());
+        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", fullMsg);
         return chatMessage;
     }
 
@@ -67,6 +68,10 @@ public class MessageController {
 
     @EventListener
     public void handleSessionConnectEvent(SessionConnectEvent event) {
+        //при подключении высылаем список сообщений
+        //UPD: сделал через thmyleaf
+        User user = userService.getUser(event.getUser().getName());
+
         System.out.println("Session Connect Event");
     }
 

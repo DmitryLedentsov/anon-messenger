@@ -11,7 +11,7 @@ client.onConnect = (frame) => {
     console.log('Connected: ' + frame);
 
     client.subscribe(urlListenForNewMessages, (m) => {
-        showMessages(JSON.parse(m.body));
+        handleNewIncomingMessage(JSON.parse(m.body));
     });
 
     sendMsg({senderId:userId, message:"aaaa"});
@@ -47,7 +47,7 @@ function setConnected(connected) {
 
 function connect() {
     client.activate();
-    console.log("connected");
+    console.log("Connected");
 }
 
 function disconnect() {
@@ -55,15 +55,9 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    client.publish({
-        destination: "/app/hello",
-        body: JSON.stringify({'name': $("#name").val()})
-    });
-}
-
-function showMessages(messages) {
-   console.log(messages);
+function handleNewIncomingMessage(message) {
+   console.log(message);
+   messages.push(message);
 }
 
 $(function () {
@@ -73,3 +67,8 @@ $(function () {
     $( "#send" ).click(() => sendName());*/
     connect();
 });
+
+
+function renderMessages(){
+
+}
