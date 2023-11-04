@@ -11,5 +11,6 @@ public interface MessageInfo {
     public Integer getSenderId();
     public String getSender();
     public String getMessage();
+    public Integer getId();
 
 }

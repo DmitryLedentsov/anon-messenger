@@ -91,6 +91,17 @@ public class IndexController {
         return new ResponseEntity<String>("send", HttpStatus.OK);
     }
 
+    @GetMapping("chat/{id}/messages")
+    @ResponseBody
+    List<MessageInfo> messages(@PathVariable Integer id) {
+        User user = getCurrentUser();
+
+        Chat chat = chatService.getChat(id);
+        UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
+        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+        return messages;
+    }
+
     private User getCurrentUser(){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUser(login);
