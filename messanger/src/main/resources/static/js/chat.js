@@ -4,11 +4,13 @@ const client = new StompJs.Client({
 
 const urlSendMessage = "/app/chat/"+chatId+"/send";
 const urlListenForNewMessages = '/topic/chat/'+chatId+'/messages';
+
+
 client.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
 
-    client.subscribe(urlSendMessage, (m) => {
+    client.subscribe(urlListenForNewMessages, (m) => {
         showMessages(JSON.parse(m.body));
     });
 
@@ -17,7 +19,7 @@ client.onConnect = (frame) => {
 
 function sendMsg(msg){
     client.publish({
-        destination: urlListenForNewMessages,
+        destination: urlSendMessage,
         body: JSON.stringify(msg)
     });
 }
@@ -49,8 +51,7 @@ function connect() {
 }
 
 function disconnect() {
-    client.deactivate();
-    setConnected(false);
+    client.deactivate().then(r =>  setConnected(false));
     console.log("Disconnected");
 }
 
