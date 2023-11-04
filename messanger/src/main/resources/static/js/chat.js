@@ -2,10 +2,13 @@ const client = new StompJs.Client({
     brokerURL: 'ws://localhost:9087/ws'
 });
 
+const urlSendMessage = "/app/chat/"+chatId+"/send";
+const urlListenForNewMessages = '/topic/chat/'+chatId+'/messages';
 client.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    client.subscribe('/topic/chat/'+chatId+'/messages', (m) => {
+
+    client.subscribe(urlSendMessage, (m) => {
         showMessages(JSON.parse(m.body));
     });
 
@@ -14,7 +17,7 @@ client.onConnect = (frame) => {
 
 function sendMsg(msg){
     client.publish({
-        destination: "/app/chat/"+chatId+"/send",
+        destination: urlListenForNewMessages,
         body: JSON.stringify(msg)
     });
 }
@@ -42,6 +45,7 @@ function setConnected(connected) {
 
 function connect() {
     client.activate();
+    console.log("connected");
 }
 
 function disconnect() {
