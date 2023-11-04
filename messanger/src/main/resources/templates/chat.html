@@ -23,13 +23,16 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
 
+    var loginUserName = /*[[${user.login}]]*/ 'User Name';
     var chatId = [[${chat.id}]];
+    var userId = [[${user.id}]];
     console.log("chatId: "  + chatId);
 
     /*]]>*/
 </script>
 <script type="text/javascript" th:src="@{/js/jQuery.js}"></script>
 <script type="text/javascript" th:src="@{/js/form-control.js}"></script>
-<script type="text/javascript" th:src="@{/js/update-messages.js}"></script>
+<script type="text/javascript" th:src="@{/js/stomp.js}"></script>
+<script type="text/javascript" th:src="@{/js/chat.js}"></script>
 </body>
 </html>

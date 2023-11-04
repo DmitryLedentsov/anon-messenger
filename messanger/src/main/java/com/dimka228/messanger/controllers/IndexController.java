@@ -102,7 +102,7 @@ public class IndexController {
         return messages;
     }
 
-    private User getCurrentUser(){
+    public User getCurrentUser(){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUser(login);
         if(user == null){
@@ -110,6 +110,7 @@ public class IndexController {
         }
         return user;
     }
+
 
     private List<String> parseLogins(String s){
         return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());

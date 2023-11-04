@@ -6,6 +6,7 @@ import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,14 @@ public class UserService {
             throw new UserNotFoundException(login);
         }
     }
-    public void deleteUser(Long id) {
+    public User getUser(Integer id) {
+        try {
+            return repository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
+        }catch (EntityNotFoundException e){
+            throw new UserNotFoundException(id.toString());
+        }
+    }
+    public void deleteUser(Integer id) {
         repository.deleteById(id);
     }
 }

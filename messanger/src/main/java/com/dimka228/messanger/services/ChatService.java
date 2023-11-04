@@ -29,6 +29,9 @@ public class ChatService {
     public  List<MessageInfo> getMessagesForUserInChat(User user, Chat chat){
         return messageRepository.getMessagesForUserInChat(user.getId(),chat.getId());
     }
+    public  List<MessageInfo> getMessagesFromChat(Chat chat){
+        return messageRepository.getMessagesFromChat(chat.getId());
+    }
 
     public Chat getChat(Integer id){
         try {
@@ -48,7 +51,7 @@ public class ChatService {
         try {
             return userInChatRepository.findByUserIdAndChatId(userId,chatId).orElseThrow(() -> new UserNotInChatException(chatId, userId));
         }catch (EntityNotFoundException e){
-            throw new UserNotInChatException(chatId, userId);
+            throw new UserNotInChatException(userId, chatId);
         }
     }
 
