@@ -8,11 +8,14 @@ import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +52,7 @@ public class IndexController {
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
         model.addAttribute("messages", messages);
+        model.addAttribute("chat", chat);
         return "chat";
     }
 
@@ -72,9 +76,19 @@ public class IndexController {
         logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
         List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
         for(User cur: users){
-            chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
+            chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
         }
         return "redirect:/chat/" + chat.getId().toString();
+    }
+
+    @PostMapping("chat/{id}/send")
+    @ResponseBody
+    public ResponseEntity<?> sendMsg(@ModelAttribute("text") String text, @PathVariable("id") Integer id, Model model) {
+        User user = getCurrentUser();
+        Chat chat = chatService.getChat(id);
+        UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
+        chatService.addMessage(user,chat,text);
+        return new ResponseEntity<String>("send", HttpStatus.OK);
     }
 
     private User getCurrentUser(){
@@ -89,6 +103,7 @@ public class IndexController {
     private List<String> parseLogins(String s){
         return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());
     }
+
 
     //TODO: переименовать в ChatController /chat
     //переи

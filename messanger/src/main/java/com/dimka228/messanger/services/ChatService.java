@@ -1,6 +1,7 @@
 package com.dimka228.messanger.services;
 
 import com.dimka228.messanger.entities.Chat;
+import com.dimka228.messanger.entities.Message;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserInChat;
 import com.dimka228.messanger.exceptions.ChatNotFoundException;
@@ -57,5 +58,12 @@ public class ChatService {
         userInChat.setChat(chat);
         userInChat.setRole("REGULAR");
         userInChatRepository.save(userInChat);
+    }
+    public void addMessage(User sender, Chat chat, String text){
+        Message message = new Message();
+        message.setChat(chat);
+        message.setSender(sender);
+        message.setData(text);
+        messageRepository.save(message);
     }
 }
