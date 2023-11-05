@@ -78,8 +78,7 @@ var $msgList = $("#messages .list");
 function renderMessage(msg){
     $msgList.append(
         `<li class = "message">
-<span>${msg.sender}</span>
-<span>${msg.message}</span>
+<span>user: ${msg.sender}</span>   &#160 &#160 &#160<span>message: ${msg.message}</span>
 </li>`);
 }
 function renderMessages(){

@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpResponse;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,10 +27,10 @@ import java.util.stream.Collectors;
 public class IndexController {
     private final ChatService chatService;
     private  final UserService userService;
-    @GetMapping(value = "index")
-    public String index (Model model) {
-        User user = getCurrentUser();
-        //TODO: aa
+    @GetMapping("/")
+    public String index (Model model, Principal principal) {
+        User user = userService.getUser(principal.getName());
+        //TODO: remove getCurrUser
         //user = userService.getUser("aboba");
         model.addAttribute("user",user);
         List<Chat> chats = chatService.getChatsForUser(user);
