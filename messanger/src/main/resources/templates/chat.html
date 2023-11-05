@@ -7,15 +7,18 @@
 <body>
 
 <br>
-<div th:each="message : ${messages}">
-    <span th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></span>
+<div id="messages">
+    <ul class="list"></ul>
+<!--<ul class="list" th:each="message : ${messages}">
+    <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
+</ul>-->
 </div>
-
 <br>
 <br>
-<form class="ajax-form" th:action="@{'/chat/' + ${chat?.id}} + '/send'" method="post">
+<form class = "socket-form" th:action="@{'/app/chat/' + ${chat.id}} + '/send'" method="post">
     <div>
-        <span>write msg:</span><input type="text" name="text" placeholder="..."/>
+        <span>write msg:</span><input type="text" name="message" placeholder="..."/>
+        <input type="hidden" name="senderId" th:value="${user.id}"/>
         <input type="submit" value="send" />
     </div>
 
@@ -31,9 +34,8 @@
 
     /*]]>*/
 </script>
-<script type="text/javascript" th:src="@{/js/jQuery.js}"></script>
-<script type="text/javascript" th:src="@{/js/form-control.js}"></script>
-<script type="text/javascript" th:src="@{/js/stomp.js}"></script>
+<div th:insert="fragments :: include-js-libs"></div>
+<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
 <script type="text/javascript" th:src="@{/js/chat.js}"></script>
 </body>
 </html>

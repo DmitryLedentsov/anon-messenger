@@ -14,7 +14,7 @@ client.onConnect = (frame) => {
         handleNewIncomingMessage(JSON.parse(m.body));
     });
 
-    sendMsg({senderId:userId, message:"aaaa"});
+    //sendMsg({senderId:userId, message:"aaaa"});
 };
 
 function sendMsg(msg){
@@ -58,6 +58,8 @@ function disconnect() {
 function handleNewIncomingMessage(message) {
    console.log(message);
    messages.push(message);
+   //TODO:
+   renderMessage(message);
 }
 
 $(function () {
@@ -66,9 +68,43 @@ $(function () {
     $( "#disconnect" ).click(() => disconnect());
     $( "#send" ).click(() => sendName());*/
     connect();
+    renderMessages();
 });
 
+//отправка сообщений
 
-function renderMessages(){
-
+//делаем динамический рендеринг на основе списка сообщений
+var $msgList = $("#messages .list");
+function renderMessage(msg){
+    $msgList.append(
+        `<li class = "message">
+<span>${msg.sender}</span>
+<span>${msg.message}</span>
+</li>`);
 }
+function renderMessages(){
+    messages.forEach(msg=>{
+        renderMessage(msg);
+    });
+}
+function clearMessages(){
+    $( ".message" ).remove();
+}
+
+/*
+var viewModel = function (items) {
+    var self = this;
+    self.items = ko.observableArray(items);
+    self.selectedItemId = ko.observable();
+    self.item = ko.observable();
+    self.selectItem = function (item) {
+        for (var i = 0; i < self.items().length; i++) {
+            if (self.items()[i].Id === self.selectedItemId()) {
+                self.item(self.items()[i]);
+                break;
+            }
+        }
+    };
+};
+
+ko.applyBindings(new viewModel(items));*/
