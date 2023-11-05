@@ -9,6 +9,10 @@ import jakarta.persistence.*;
 })
 public class UserStatus {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -42,4 +46,15 @@ public class UserStatus {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public static final String ONLINE =  "ONLINE";
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 }

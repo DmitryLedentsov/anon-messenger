@@ -1,10 +1,7 @@
 package com.dimka228.messanger.controllers.socket;
 
 import com.dimka228.messanger.dto.MessageDTO;
-import com.dimka228.messanger.entities.Chat;
-import com.dimka228.messanger.entities.Message;
-import com.dimka228.messanger.entities.User;
-import com.dimka228.messanger.entities.UserInChat;
+import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
@@ -71,13 +68,16 @@ public class MessageController {
         //при подключении высылаем список сообщений
         //UPD: сделал через thmyleaf
         User user = userService.getUser(event.getUser().getName());
+        userService.addUserStatus(user, UserStatus.ONLINE);
 
-        System.out.println("Session Connect Event");
+        System.out.println("new session for user: " + user.getLogin());
     }
 
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
-        System.out.println("Session Disconnect Event");
+        User user = userService.getUser(event.getUser().getName());
+        userService.removeUserStatus(user, UserStatus.ONLINE);
+        System.out.println("session disconnected user: " + user.getLogin());
     }
 
 

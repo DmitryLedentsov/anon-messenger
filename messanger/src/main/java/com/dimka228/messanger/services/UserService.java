@@ -1,29 +1,33 @@
 package com.dimka228.messanger.services;
 
 import com.dimka228.messanger.entities.User;
+import com.dimka228.messanger.entities.UserStatus;
 import com.dimka228.messanger.exceptions.UserExistsException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.repositories.UserRepository;
+import com.dimka228.messanger.repositories.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserRepository repository;
     private  final  BCryptPasswordEncoder passwordEncoder;
-    @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
-        this.repository = userRepository;
-        this.passwordEncoder = encoder;
-    }
+    private final UserStatusRepository statusRepository;
 
     public  boolean checkUser(String login){
         return repository.findByLogin(login).isPresent();
+    }
+    public  boolean checkUser(Integer id){
+        return repository.findById(id).isPresent();
     }
 
 
@@ -56,5 +60,22 @@ public class UserService {
     }
     public void deleteUser(Integer id) {
         repository.deleteById(id);
+    }
+
+    public List<UserStatus> getUserStatusList(Integer id){
+        if(!checkUser(id)) throw new UserNotFoundException(id.toString());
+        return statusRepository.findAllByUserId(id).orElse(Collections.emptyList());
+    }
+    public boolean checkUserStatus(Integer id, String status){
+        return getUserStatusList(id).stream().anyMatch(s->s.getName().equals(status));
+    }
+    public void addUserStatus(User u, String s){
+        UserStatus status = new UserStatus();
+        status.setName(s);
+        status.setUser(u);
+        statusRepository.save(status);
+    }
+    public void removeUserStatus(User u, String s){
+        statusRepository.deleteByUserId(u.getId());
     }
 }
