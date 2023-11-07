@@ -1,5 +1,6 @@
 package com.dimka228.messanger.controllers;
 
+import com.dimka228.messanger.dto.ChatDTO;
 import com.dimka228.messanger.entities.Chat;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserInChat;
@@ -7,9 +8,11 @@ import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
+import com.dimka228.messanger.utils.LoginParser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 public class IndexController {
     private final ChatService chatService;
     private  final UserService userService;
+    private final SimpMessagingTemplate msgTemplate;
     @GetMapping("/")
     public String index (Model model, Principal principal) {
         User user = userService.getUser(principal.getName());
@@ -73,11 +77,16 @@ public class IndexController {
         Chat chat = chatService.addChat(name);
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
 
-        List<String> logins = parseLogins(userLoginsListString);
+        List<String> logins = LoginParser.parseLogins(userLoginsListString);
         logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
         List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
         for(User cur: users){
             chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
+        }
+
+        ChatDTO chatDTO = new ChatDTO(user.getId(),chat.getName(),null,null);
+        for(User cur: users){
+            msgTemplate.convertAndSend("/topic/user/"+cur.getId()+"/chat/list", chatDTO);
         }
         return "redirect:/chat/" + chat.getId().toString();
     }
@@ -113,9 +122,6 @@ public class IndexController {
     }
 
 
-    private List<String> parseLogins(String s){
-        return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());
-    }
 
 
     //TODO: переименовать в ChatController /chat

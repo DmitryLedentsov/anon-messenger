@@ -11,27 +11,7 @@ function sendMsg(msg){
 }
 
 
-function setConnected(connected) {
-    $("#connect").prop("disabled", connected);
-    $("#disconnect").prop("disabled", !connected);
-    if (connected) {
-        $("#conversation").show();
-    }
-    else {
-        $("#conversation").hide();
-    }
-    $("#greetings").html("");
-}
 
-function connect() {
-    client.activate();
-    console.log("Connected");
-}
-
-function disconnect() {
-    client.deactivate().then(r =>  setConnected(false));
-    console.log("Disconnected");
-}
 
 function handleNewIncomingMessage(message) {
    console.log(message);

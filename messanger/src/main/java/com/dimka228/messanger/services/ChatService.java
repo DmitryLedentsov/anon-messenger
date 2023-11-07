@@ -1,5 +1,6 @@
 package com.dimka228.messanger.services;
 
+import com.dimka228.messanger.dto.ChatDTO;
 import com.dimka228.messanger.entities.Chat;
 import com.dimka228.messanger.entities.Message;
 import com.dimka228.messanger.entities.User;
@@ -32,6 +33,9 @@ public class ChatService {
     public  List<MessageInfo> getMessagesFromChat(Chat chat){
         return messageRepository.getMessagesFromChat(chat.getId());
     }
+    public  List<ChatDTO> getChatListForUser(User usr){
+        return null;//TODO: chatRepository.get(chat.getId());
+    }
 
     public Chat getChat(Integer id){
         try {
@@ -59,7 +63,7 @@ public class ChatService {
         UserInChat userInChat = new UserInChat();
         userInChat.setUser(user);
         userInChat.setChat(chat);
-        userInChat.setRole("REGULAR");
+        userInChat.setRole(role);
         userInChatRepository.save(userInChat);
     }
     public Message addMessage(User sender, Chat chat, String text){

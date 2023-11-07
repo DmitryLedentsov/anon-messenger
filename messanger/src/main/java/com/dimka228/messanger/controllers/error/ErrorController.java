@@ -1,4 +1,4 @@
-package com.dimka228.messanger.controllers;
+package com.dimka228.messanger.controllers.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

@@ -19,3 +19,13 @@ profile, status - 1 к 1????
 добавить страницу с пользователем?
 
 добавить время отправки сообщения
+
+
+@ControllerAdvice
+public class RestResponseEntityExceptionHandler
+    extends ResponseEntityExceptionHandler {
+
+  @ExceptionHandler(value = {
+      NotLoggedInException.class
+  })
+  protected ResponseEntity<Object> handleNotLoggedIn(

@@ -1,11 +1,13 @@
 package com.dimka228.messanger.controllers.socket;
 
+import com.dimka228.messanger.dto.ChatDTO;
 import com.dimka228.messanger.dto.MessageDTO;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
+import com.dimka228.messanger.utils.LoginParser;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,34 +27,41 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @AllArgsConstructor
-public class MessageController {
+public class ChatController {
     private final SimpMessagingTemplate msgTemplate;
     private UserService userService;
     private ChatService chatService;
-    @MessageMapping("/chat/{id}/send")
+    @MessageMapping("/user/{id}/chat/create")
     //@SendTo("/topic/public")
-    public MessageDTO sendMessage(@DestinationVariable Integer id, @Payload MessageDTO chatMessage) {
-        User user = userService.getUser(chatMessage.getSenderId());
-        Chat chat = chatService.getChat(id);
-        UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
+    public ChatDTO sendMessage(@DestinationVariable Integer id, @Payload ChatDTO chatDTO) {
+        User user = userService.getUser(id);
+        Chat chat = chatService.addChat(chatDTO.getName());
+        chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
 
-        Message added = chatService.addMessage(user,chat,chatMessage.getMessage());
-        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin());
-        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", fullMsg);
-        return chatMessage;
+        List<String> logins = chatDTO.getUsers();
+        logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
+        List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
+        for(User cur: users){
+            chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
+        }
+        //return "redirect:/chat/" + chat.getId().toString();
+        msgTemplate.convertAndSend("/topic/user/"+id+"chat/list", chatDTO);
+        return chatDTO;
     }
 
-
-    @MessageMapping("chat/{id}/messages")
+/*
+    @MessageMapping("user/{id}/chat/list")
     @ResponseBody
     List<MessageInfo> messages(@DestinationVariable Integer id) {
-        Chat chat = chatService.getChat(id);
-        List<MessageInfo> messages = chatService.getMessagesFromChat(chat);
+        User user = userService.getUser(id);
+        List<Chat> chats = chatService.getChatsForUser(user);
+        List<ChatDTO> messages = chatService.getMessagesFromChat(chat);
         return messages;
-    }
+    }*/
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")
     public MessageInfo addUser(@Payload MessageInfo chatMessage,
@@ -61,9 +70,6 @@ public class MessageController {
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
     }*/
-
-
-
 
 
 }
