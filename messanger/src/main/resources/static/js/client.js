@@ -27,6 +27,9 @@ function setEventHandlers() {
             $cur.trigger('msgReceive', JSON.parse(m.body));
         });
     });
+    client.subscribe("/topic/error", (m) => {
+        console.log(JSON.parse(m.body));
+    });
 }
 
 function connect() {
@@ -48,4 +51,11 @@ function setConnected(connected) {
         $("#conversation").hide();
     }
     $("#greetings").html("");
+}
+
+function sendMsg(msg, url){
+    client.publish({
+        destination: url,
+        body: JSON.stringify(msg)
+    });
 }

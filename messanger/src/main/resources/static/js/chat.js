@@ -2,17 +2,6 @@
 const urlSendMessage = "/app/chat/"+chatId+"/send";
 const urlListenForNewMessages = '/topic/chat/'+chatId+'/messages';
 
-
-function sendMsg(msg){
-    client.publish({
-        destination: urlSendMessage,
-        body: JSON.stringify(msg)
-    });
-}
-
-
-
-
 function handleNewIncomingMessage(message) {
    console.log(message);
    messages.push(message);

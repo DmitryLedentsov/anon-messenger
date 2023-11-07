@@ -81,7 +81,7 @@ public class IndexController {
         logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
         List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
         for(User cur: users){
-            chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
+            chatService.addUserInChat(cur,chat, UserInChat.Roles.REGULAR);
         }
 
         ChatDTO chatDTO = new ChatDTO(user.getId(),chat.getName(),null,null);
