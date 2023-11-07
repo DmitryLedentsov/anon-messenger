@@ -84,7 +84,7 @@ public class IndexController {
             chatService.addUserInChat(cur,chat, UserInChat.Roles.REGULAR);
         }
 
-        ChatDTO chatDTO = new ChatDTO(user.getId(),chat.getName(),null,null);
+        ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null);
         for(User cur: users){
             msgTemplate.convertAndSend("/topic/user/"+cur.getId()+"/chat/list", chatDTO);
         }

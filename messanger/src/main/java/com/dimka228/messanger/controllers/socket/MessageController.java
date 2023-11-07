@@ -34,8 +34,8 @@ public class MessageController {
     private ChatService chatService;
     @MessageMapping("/chat/{id}/send")
     //@SendTo("/topic/public")
-    public MessageDTO sendMessage(@DestinationVariable Integer id, @Payload MessageDTO chatMessage) {
-        User user = userService.getUser(chatMessage.getSenderId());
+    public MessageDTO sendMessage(@DestinationVariable Integer id, @Payload MessageDTO chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        User user = userService.getUser(headerAccessor.getUser().getName());
         Chat chat = chatService.getChat(id);
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
 

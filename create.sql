@@ -223,7 +223,9 @@ RETURNS trigger AS
 $$   
 BEGIN  
    INSERT INTO M_USER_ACTION(USER_ID, NAME, STATUS, TIME, DESCRIPTION)
-   VALUES(OLD.USER_ID, CASE WHEN (OLD.ROLE='CREATOR') then 'leave and delete' else 'leave chat' end, 'OK', NOW()::TIMESTAMP, 'chat id: ' || OLD.CHAT_ID);
+   SELECT OLD.USER_ID, CASE WHEN (OLD.ROLE='CREATOR') then 'leave and delete' else 'leave chat' end, 'OK', NOW()::TIMESTAMP, 'chat id: ' || OLD.CHAT_ID
+   WHERE EXISTS (SELECT * FROM M_USER 
+                   WHERE M_USER.ID = OLD.USER_ID);
 	RETURN OLD;
 END;  
 $$ language plpgsql ; 
@@ -273,7 +275,7 @@ VALUES(3,1,'и тебе привет');
 INSERT INTO M_MESSAGE(SENDER_ID, CHAT_ID, DATA)
 VALUES(1,1,'aboba...');
 
-
+DELETE FROM M_USER WHERE M_USER.ID=2;
 
 
 SELECT CHAT.NAME,SENDER,MESSAGE

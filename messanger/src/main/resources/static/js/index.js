@@ -4,7 +4,8 @@ function handleNewIncomingMessage(chat) {
     console.log(chat);
     chats.push(chat);
     //TODO:
-    renderChat(chat);
+    clearChats();
+    renderChats();
 }
 
 $('#chat-list').on('msgReceive', function (e, data) {
