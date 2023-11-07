@@ -1,21 +1,7 @@
-const client = new StompJs.Client({
-    brokerURL: 'ws://localhost:9087/ws'
-});
 
 const urlSendMessage = "/app/chat/"+chatId+"/send";
 const urlListenForNewMessages = '/topic/chat/'+chatId+'/messages';
 
-
-client.onConnect = (frame) => {
-    setConnected(true);
-    console.log('Connected: ' + frame);
-
-    client.subscribe(urlListenForNewMessages, (m) => {
-        handleNewIncomingMessage(JSON.parse(m.body));
-    });
-
-    //sendMsg({senderId:userId, message:"aaaa"});
-};
 
 function sendMsg(msg){
     client.publish({
@@ -24,14 +10,6 @@ function sendMsg(msg){
     });
 }
 
-client.onWebSocketError = (error) => {
-    console.error('Error with websocket', error);
-};
-
-client.onStompError = (frame) => {
-    console.error('Broker reported error: ' + frame.headers['message']);
-    console.error('Additional details: ' + frame.body);
-};
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
@@ -61,6 +39,10 @@ function handleNewIncomingMessage(message) {
    //TODO:
    renderMessage(message);
 }
+
+$('#msg-list').on('msgReceive', function (e, data) {
+    handleNewIncomingMessage(data);
+})
 
 $(function () {
    /* $("form").on('submit', (e) => e.preventDefault());

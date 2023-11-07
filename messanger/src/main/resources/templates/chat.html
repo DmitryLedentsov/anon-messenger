@@ -10,7 +10,7 @@
 
 <br>
 <div id="messages">
-    <ul class="list"></ul>
+    <ul class="list data-elem"  id="msg-list" th:data-url="@{'/topic/chat/' + ${chat.id}} + '/messages'"></ul>
 <!--<ul class="list" th:each="message : ${messages}">
     <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
 </ul>-->
@@ -38,6 +38,7 @@
 </script>
 <div th:insert="fragments :: include-js-libs"></div>
 <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
+<script type="text/javascript" th:src="@{/js/data-update.js}"></script>
 <script type="text/javascript" th:src="@{/js/chat.js}"></script>
 </body>
 </html>
