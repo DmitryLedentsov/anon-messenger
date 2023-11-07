@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS M_MESSAGE, M_USER, M_USER_IN_CHAT, M_CHAT, M_USER_ACTION, M_USER_PROFILE, M_USER_ROLE, M_USER_STATUS, M_LOG CASCADE;
 
-DROP FUNCTION IF EXISTS register, login, get_messages_for_user_in_chat, get_chats_for_user, register_action, vote_on_user,
+DROP FUNCTION IF EXISTS register, login,get_messages_from_chat, get_messages_for_user_in_chat, get_chats_for_user, register_action, vote_on_user,
 	add_message_action, add_chat_action, leave_chat_action, join_chat_action;
 CREATE TABLE M_USER
 (
@@ -120,6 +120,24 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION GET_MESSAGES_FOR_USER_IN_CHAT(_user_id int, _chat int)  
+returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(20), MESSAGE TEXT)  
+language plpgsql  
+as  
+$$   
+BEGIN  
+   RETURN QUERY
+   SELECT M_MESSAGE.ID,SENDER.ID,SENDER.LOGIN, M_MESSAGE.DATA
+	FROM M_USER CUR_USER
+	JOIN M_MESSAGE ON (M_MESSAGE.CHAT_ID = _chat)-- AND M_MESSAGE.SENDER_ID <> CUR_USER.ID)
+	JOIN M_USER SENDER ON M_MESSAGE.SENDER_ID = SENDER.ID
+	WHERE CUR_USER.ID = _user_id
+	ORDER BY M_MESSAGE.ID;
+	
+END;  
+$$;  
+
+
+CREATE OR REPLACE FUNCTION GET_MESSAGES_FROM_CHAT(_chat int)  
 returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(20), MESSAGE TEXT)  
 language plpgsql  
 as  
