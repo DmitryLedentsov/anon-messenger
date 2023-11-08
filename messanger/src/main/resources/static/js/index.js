@@ -6,6 +6,10 @@ function handleNewIncomingMessage(chat) {
     data = chat.data;
     if(op==="ADD") chats.push(data);
     else if(op==="DELETE") chats = chats.filter((e)=>e.id!=data.id);
+    else if(op==="UPDATE") {
+        let idx = chats.map(o => o.id).indexOf(data.id);
+        chats[idx]=data;
+    }
 
     //TODO:
     clearChats();
@@ -33,6 +37,7 @@ function renderChat(chat){
 <a href="/chat/${chat.id}">${chat.name}</a> 
 <button class="socket-action" data-url="/app/user/${userId}/chat/delete/${chat.id}">${chat.role==="CREATOR"? "delete":"leave"}</button> 
 </li>`);
+    //<span> ${chat.lastMessage?"last message: "+chat.lastMessage.message:""}</span>
 }
 function renderChats(){
     chats.forEach(c=>{

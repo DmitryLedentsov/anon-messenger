@@ -7,7 +7,7 @@
     <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
 </head>
 <body>
-<span th:text="${user?.login}"></span>
+<h3 th:text="'User: '+${user?.login}"></h3>
 <br>
 <br>
 <a th:href="@{/chat/create}">create chat</a>
