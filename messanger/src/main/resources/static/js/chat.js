@@ -3,15 +3,15 @@ const urlSendMessage = "/app/chat/"+chatId+"/send";
 const urlListenForNewMessages = '/topic/chat/'+chatId+'/messages';
 
 function handleNewIncomingMessage(message) {
-   console.log(message);
-   messages.push(message);
+    console.log(message);
+    op = message.operation;
+    data = message.data;
+    if(op==="ADD") messages.push(data);
+    else if(op==="DELETE") messages = messages.filter((e)=>e.id!=data.id);
    //TODO:
-   renderMessage(message);
+    clearMessages();
+    renderMessages();
 }
-
-$('#msg-list').on('msgReceive', function (e, data) {
-    handleNewIncomingMessage(data);
-})
 
 $(function () {
    /* $("form").on('submit', (e) => e.preventDefault());
@@ -20,16 +20,23 @@ $(function () {
     $( "#send" ).click(() => sendName());*/
     connect();
     renderMessages();
+
+    $('#msg-list').on('msgReceive', function (e, data) {
+        handleNewIncomingMessage(data);
+    })
+    $('#msg-list').on('click','.socket-action',handleActions);
+
 });
 
 //отправка сообщений
 
 //делаем динамический рендеринг на основе списка сообщений
-var $msgList = $("#messages .list");
+var $msgList = $("#msg-list");
 function renderMessage(msg){
     $msgList.append(
         `<li class = "message">
 <span>user: ${msg.sender}</span>   &#160 &#160 &#160<span>message: ${msg.message}</span>
+<button class="socket-action" data-url="/app/chat/${chatId}/delete/${msg.id}" data-data="${msg.message}">delete</button> 
 </li>`);
 }
 function renderMessages(){

@@ -27,8 +27,9 @@ function setEventHandlers() {
             $cur.trigger('msgReceive', JSON.parse(m.body));
         });
     });
-    client.subscribe("/topic/error", (m) => {
-        console.log(JSON.parse(m.body));
+
+    client.subscribe(`/topic/user/${userId}/error`, (m) => {
+        alert(JSON.parse(m.body).message);
     });
 }
 

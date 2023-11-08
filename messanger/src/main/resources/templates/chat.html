@@ -17,7 +17,7 @@
 </div>
 <br>
 <br>
-<form class = "socket-form" th:action="@{'/app/chat/' + ${chat.id}} + '/send'" method="post">
+<form class = "socket-form" th:data-url="@{'/app/chat/' + ${chat.id}} + '/send'" method="post">
     <div>
         <span>write msg:</span><input type="text" name="message" placeholder="..."/>
         <input type="hidden" name="senderId" th:value="${user.id}"/>
@@ -37,8 +37,10 @@
     /*]]>*/
 </script>
 <div th:insert="fragments :: include-js-libs"></div>
-<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
 <script type="text/javascript" th:src="@{/js/client.js}"></script>
 <script type="text/javascript" th:src="@{/js/chat.js}"></script>
+<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
+<script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
+
 </body>
 </html>

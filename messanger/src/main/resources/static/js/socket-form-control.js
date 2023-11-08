@@ -6,7 +6,7 @@ $(function() {
         console.log("click");
         //console.log($form.serializeJSON());
         client.publish({
-            destination: $form.attr('action'),
+            destination: $form.attr('data-url'),
             body: JSON.stringify($form.serializeJSON())
         });
     });

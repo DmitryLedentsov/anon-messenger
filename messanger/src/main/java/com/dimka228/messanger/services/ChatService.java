@@ -5,8 +5,7 @@ import com.dimka228.messanger.entities.Chat;
 import com.dimka228.messanger.entities.Message;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserInChat;
-import com.dimka228.messanger.exceptions.ChatNotFoundException;
-import com.dimka228.messanger.exceptions.UserNotInChatException;
+import com.dimka228.messanger.exceptions.*;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.repositories.ChatRepository;
 import com.dimka228.messanger.repositories.MessageRepository;
@@ -51,6 +50,13 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
+    public Message getMessage(Integer id){
+        try {
+            return messageRepository.findById(id).orElseThrow(() -> new MessageNotFoundException(id));
+        }catch (EntityNotFoundException e){
+            throw new MessageNotFoundException(id);
+        }
+    }
     public UserInChat getUserInChat(Integer userId, Integer chatId){
         try {
             return userInChatRepository.findByUserIdAndChatId(userId,chatId).orElseThrow(() -> new UserNotInChatException(chatId, userId));
@@ -72,5 +78,17 @@ public class ChatService {
         message.setSender(sender);
         message.setData(text);
         return messageRepository.save(message);
+    }
+    private void deleteMessage(Integer id){
+        messageRepository.deleteById(id);
+    }
+    public void deleteMessageFromUserInChat(User user, Chat chat, Message msg){
+        if(user.getId()!=msg.getSender().getId()){
+            throw new MessageNotFromUserException(msg.getId(),user.getId());
+        }
+        if(chat.getId()!=msg.getChat().getId()){
+            throw new MessageNotInChat(msg.getId(),chat.getId());
+        }
+        deleteMessage(msg.getId());
     }
 }
