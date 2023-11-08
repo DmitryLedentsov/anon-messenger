@@ -31,7 +31,7 @@ function renderChat(chat){
     $chatList.append(
         `<li class = "chat">
 <a href="/chat/${chat.id}">${chat.name}</a> 
-<button class="socket-action" data-url="/app/user/${userId}/chat/delete/${chat.id}">delete</button> 
+<button class="socket-action" data-url="/app/user/${userId}/chat/delete/${chat.id}">${chat.role==="CREATOR"? "delete":"leave"}</button> 
 </li>`);
 }
 function renderChats(){

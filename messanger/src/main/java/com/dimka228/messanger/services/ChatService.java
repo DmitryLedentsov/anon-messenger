@@ -32,6 +32,10 @@ public class ChatService {
     public  List<MessageInfo> getMessagesFromChat(Chat chat){
         return messageRepository.getMessagesFromChat(chat.getId());
     }
+    public MessageInfo getLastMessageFromChat(Chat chat){
+        List<MessageInfo> msgs = getMessagesFromChat(chat);
+        return msgs.isEmpty()?null:msgs.get(msgs.size()-1);
+    }
     public  List<ChatDTO> getChatListForUser(User usr){
         return null;//TODO: chatRepository.get(chat.getId());
     }

@@ -60,7 +60,7 @@ public class ChatController {
         User user = userService.getUser(id);
         Chat chat = chatService.getChat(chatId);
         //return "redirect:/chat/" + chat.getId().toString();
-        ChatDTO chatDTO = new ChatDTO(chatId,chat.getName(),null,null);
+        ChatDTO chatDTO = new ChatDTO(chatId,chat.getName(),null,null,null);
         OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.DELETE);
         if(chatService.getUserRoleInChat(user,chat).equals(UserInChat.Roles.CREATOR)){
 

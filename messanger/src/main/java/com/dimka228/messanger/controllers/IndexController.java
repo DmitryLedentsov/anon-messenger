@@ -3,6 +3,7 @@ package com.dimka228.messanger.controllers;
 import com.dimka228.messanger.dto.ChatDTO;
 import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.Chat;
+import com.dimka228.messanger.entities.Message;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserInChat;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
@@ -38,7 +39,7 @@ public class IndexController {
         //TODO: remove getCurrUser
         //user = userService.getUser("aboba");
         model.addAttribute("user",user);
-        List<Chat> chats = chatService.getChatsForUser(user);
+        List<ChatDTO> chats = chatService.getChatsForUser(user).stream().map(chat -> new ChatDTO(chat.getId(),chat.getName(),chatService.getUserRoleInChat(user,chat),chatService.getLastMessageFromChat(chat),null)).collect(Collectors.toList());
         model.addAttribute("chats", chats);
         return
                 "index" ;
@@ -85,9 +86,10 @@ public class IndexController {
             chatService.addUserInChat(cur,chat, UserInChat.Roles.REGULAR);
         }
 
-        ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null);
-        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
+
         for(User cur: users){
+            ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),chatService.getUserRoleInChat(cur,chat),chatService.getLastMessageFromChat(chat),null);
+            OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
             msgTemplate.convertAndSend("/topic/user/"+cur.getId()+"/chats", data);
         }
         return "redirect:/chat/" + chat.getId().toString();
