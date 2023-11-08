@@ -74,8 +74,8 @@ public class IndexController {
     }
 
     @PostMapping("chat/create")
-    public String createChat(@ModelAttribute("name") String name,@ModelAttribute("users") String userLoginsListString, Model model) {
-        User user = getCurrentUser();
+    public String createChat(@ModelAttribute("name") String name,@ModelAttribute("users") String userLoginsListString, Principal principal, Model model) {
+        User user = userService.getUser(principal.getName());
         Chat chat = chatService.addChat(name);
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
 
@@ -97,8 +97,8 @@ public class IndexController {
 
     @PostMapping("chat/{id}/send")
     @ResponseBody
-    public ResponseEntity<?> sendMsg(@ModelAttribute("text") String text, @PathVariable("id") Integer id, Model model) {
-        User user = getCurrentUser();
+    public ResponseEntity<?> sendMsg(@ModelAttribute("text") String text, @PathVariable("id") Integer id,Principal principal, Model model) {
+        User user = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(id);
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
         chatService.addMessage(user,chat,text);
@@ -107,8 +107,8 @@ public class IndexController {
 
     @GetMapping("chat/{id}/messages")
     @ResponseBody
-    List<MessageInfo> messages(@PathVariable Integer id) {
-        User user = getCurrentUser();
+    List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
+        User user = userService.getUser(principal.getName());
 
         Chat chat = chatService.getChat(id);
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
