@@ -1,9 +1,11 @@
 package com.dimka228.messanger.services;
 
 import com.dimka228.messanger.entities.User;
+import com.dimka228.messanger.entities.UserAction;
 import com.dimka228.messanger.entities.UserStatus;
 import com.dimka228.messanger.exceptions.UserExistsException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
+import com.dimka228.messanger.repositories.UserActionRepository;
 import com.dimka228.messanger.repositories.UserRepository;
 import com.dimka228.messanger.repositories.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,7 +24,7 @@ public class UserService {
     private final UserRepository repository;
     private  final  BCryptPasswordEncoder passwordEncoder;
     private final UserStatusRepository statusRepository;
-
+    private final UserActionRepository actionRepository;
     public  boolean checkUser(String login){
         return repository.findByLogin(login).isPresent();
     }
@@ -77,5 +79,11 @@ public class UserService {
     }
     public void removeUserStatus(User u, String s){
         statusRepository.deleteByUserId(u.getId());
+    }
+
+
+    public List<UserAction> getUserActionList(Integer id){
+        if(!checkUser(id)) throw new UserNotFoundException(id.toString());
+        return actionRepository.findAllByUserId(id).orElse(Collections.emptyList());
     }
 }
