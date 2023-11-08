@@ -72,14 +72,6 @@ public class MessageController {
         return messages;
     }
 
-    @MessageExceptionHandler
-    public void handle(Principal principal, AppException e) {
-        User user = userService.getUser(principal.getName());
-        ErrorDTO errorMsg = new ErrorDTO(e);
-        msgTemplate.convertAndSend("/topic/user/"+user.getId()+"/error", errorMsg);
-
-        // Nothing to do
-    }
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")
     public MessageInfo addUser(@Payload MessageInfo chatMessage,
