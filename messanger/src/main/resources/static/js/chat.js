@@ -8,7 +8,6 @@ function handleNewIncomingMessage(message) {
     data = message.data;
     if(op==="ADD") messages.push(data);
     else if(op==="DELETE") messages = messages.filter((e)=>e.id!=data.id);
-   //TODO:
     clearMessages();
     renderMessages();
 }

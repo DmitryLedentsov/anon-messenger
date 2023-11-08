@@ -1,8 +1,8 @@
-$(function() {
+/*$(function() {
 
     let $el = $('.socket-action');
     $el.click(handleActions);
-});
+});*/
 function handleActions(e) {
     e.preventDefault();
     /*e.stopPropagation();

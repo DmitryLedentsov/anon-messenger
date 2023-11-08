@@ -1,6 +1,7 @@
 package com.dimka228.messanger.controllers;
 
 import com.dimka228.messanger.dto.ChatDTO;
+import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.Chat;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserInChat;
@@ -85,8 +86,9 @@ public class IndexController {
         }
 
         ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null);
+        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
         for(User cur: users){
-            msgTemplate.convertAndSend("/topic/user/"+cur.getId()+"/chat/list", chatDTO);
+            msgTemplate.convertAndSend("/topic/user/"+cur.getId()+"/chats", data);
         }
         return "redirect:/chat/" + chat.getId().toString();
     }

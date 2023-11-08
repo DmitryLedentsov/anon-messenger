@@ -18,7 +18,7 @@ List of chats:
     <br>
 </div>-->
 <div id="chats">
-    <ul class="list data-elem"  id="chat-list" th:data-url="@{'/topic/user/' + ${user.id}} + '/chat/list'"></ul>
+    <ul class="list data-elem"  id="chat-list" th:data-url="@{'/topic/user/' + ${user.id}} + '/chats'"></ul>
     <!--<ul class="list" th:each="message : ${messages}">
         <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
     </ul>-->
@@ -33,8 +33,9 @@ List of chats:
     /*]]>*/
 </script>
 <div th:insert="fragments :: include-js-libs"></div>
-<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
 <script type="text/javascript" th:src="@{/js/client.js}"></script>
 <script type="text/javascript" th:src="@{/js/index.js}"></script>
+<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
+<script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
 </body>
 </html>

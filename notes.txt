@@ -29,3 +29,6 @@ public class RestResponseEntityExceptionHandler
       NotLoggedInException.class
   })
   protected ResponseEntity<Object> handleNotLoggedIn(
+
+
+сделать чтобы Message(UserInChat,TEXT)

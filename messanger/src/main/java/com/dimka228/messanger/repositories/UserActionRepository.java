@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserActionRepository extends JpaRepository<UserAction,Integer> {
+public interface UserActionRepository extends JpaRepository<UserAction,Long> {
     Optional<List<UserAction>> findAllByUserId(Integer id);
 }

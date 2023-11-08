@@ -2,6 +2,7 @@ package com.dimka228.messanger.controllers.socket;
 
 import com.dimka228.messanger.dto.ChatDTO;
 import com.dimka228.messanger.dto.MessageDTO;
+import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
@@ -37,7 +38,7 @@ public class ChatController {
     private ChatService chatService;
     @MessageMapping("/user/{id}/chat/create")
     //@SendTo("/topic/public")
-    public ChatDTO sendMessage(@DestinationVariable Integer id, @Payload ChatDTO chatDTO) {
+    public ChatDTO sendChat(@DestinationVariable Integer id, @Payload ChatDTO chatDTO) {
         User user = userService.getUser(id);
         Chat chat = chatService.addChat(chatDTO.getName());
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
@@ -49,7 +50,32 @@ public class ChatController {
             chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
         }
         //return "redirect:/chat/" + chat.getId().toString();
-        msgTemplate.convertAndSend("/topic/user/"+id+"chat/list", chatDTO);
+        msgTemplate.convertAndSend("/topic/user/"+id+"chats", chatDTO);
+        return chatDTO;
+    }
+
+    @MessageMapping("/user/{id}/chat/delete/{chatId}")
+    //@SendTo("/topic/public")
+    public ChatDTO deleteChat(@DestinationVariable Integer id, @DestinationVariable Integer chatId) {
+        User user = userService.getUser(id);
+        Chat chat = chatService.getChat(chatId);
+        //return "redirect:/chat/" + chat.getId().toString();
+        ChatDTO chatDTO = new ChatDTO(chatId,chat.getName(),null,null);
+        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.DELETE);
+        if(chatService.getUserRoleInChat(user,chat).equals(UserInChat.Roles.CREATOR)){
+
+            List<UserInChat> users = chatService.getUsersInChat(chat);
+            System.out.println(users.get(0).getUser().getId());
+            chatService.deleteOrLeaveChat(user,chat);
+            for(UserInChat cur: users){
+                msgTemplate.convertAndSend("/topic/user/"+cur.getUser().getId()+"/chats", data);
+            }
+        }
+        else{
+            chatService.deleteOrLeaveChat(user,chat);
+            msgTemplate.convertAndSend("/topic/user/"+id+"/chats", data);
+        }
+
         return chatDTO;
     }
 

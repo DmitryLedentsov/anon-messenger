@@ -1,10 +1,7 @@
 package com.dimka228.messanger.services;
 
 import com.dimka228.messanger.dto.ChatDTO;
-import com.dimka228.messanger.entities.Chat;
-import com.dimka228.messanger.entities.Message;
-import com.dimka228.messanger.entities.User;
-import com.dimka228.messanger.entities.UserInChat;
+import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.*;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.repositories.ChatRepository;
@@ -13,8 +10,11 @@ import com.dimka228.messanger.repositories.UserInChatRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -59,7 +59,7 @@ public class ChatService {
     }
     public UserInChat getUserInChat(Integer userId, Integer chatId){
         try {
-            return userInChatRepository.findByUserIdAndChatId(userId,chatId).orElseThrow(() -> new UserNotInChatException(chatId, userId));
+            return userInChatRepository.findByUserIdAndChatId(userId,chatId).orElseThrow(() -> new UserNotInChatException(userId, chatId));
         }catch (EntityNotFoundException e){
             throw new UserNotInChatException(userId, chatId);
         }
@@ -90,5 +90,21 @@ public class ChatService {
             throw new MessageNotInChat(msg.getId(),chat.getId());
         }
         deleteMessage(msg.getId());
+    }
+
+    public String getUserRoleInChat(User user, Chat chat){
+        return getUserInChat(user.getId(),chat.getId()).getRole();
+    }
+    public void deleteOrLeaveChat(User user, Chat chat){
+        UserInChat userInChat = getUserInChat(user.getId(),chat.getId());
+        if(Objects.equals(userInChat.getRole(), UserInChat.Roles.CREATOR)){
+            chatRepository.deleteById(chat.getId());
+        } else {
+            userInChatRepository.delete(userInChat);
+        }
+    }
+
+    public List<UserInChat> getUsersInChat(Chat chat){
+        return userInChatRepository.findAllByChatId(chat.getId()).orElse(Collections.emptyList());
     }
 }
