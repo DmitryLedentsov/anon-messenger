@@ -34,7 +34,7 @@ var $msgList = $("#msg-list");
 function renderMessage(msg){
     $msgList.append(
         `<li class = "message">
-<span>user: ${msg.sender}</span>   &#160 &#160 &#160<span>message: ${msg.message}</span>
+<span>user: <a href="/users/profile/${msg.senderId}"> ${msg.sender} </a></span>   &#160 &#160 &#160<span>message: ${msg.message}</span>
 <button class="socket-action" data-url="/app/chat/${chatId}/delete/${msg.id}" data-data="${msg.message}">delete</button> 
 </li>`);
 }

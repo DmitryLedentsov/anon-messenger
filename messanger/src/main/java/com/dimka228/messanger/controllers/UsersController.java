@@ -1,8 +1,7 @@
 package com.dimka228.messanger.controllers;
 
-import com.dimka228.messanger.entities.Chat;
-import com.dimka228.messanger.entities.User;
-import com.dimka228.messanger.entities.UserInChat;
+import com.dimka228.messanger.dto.UserProfileDTO;
+import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.UserService;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Controller
@@ -25,8 +25,12 @@ public class UsersController {
         /*user = userService.getUser("aboba");
         id = 1;*/
 
+        User user = userService.getUser(id);
+        UserProfile profile = userService.getUserProfile(user);
+        List<String> userStatuses = userService.getUserStatusList(user).stream().map(s->s.getName()).collect(Collectors.toList());
+        UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(),profile.getRating(),userStatuses);
 
-        model.addAttribute("profile", null);
+        model.addAttribute("profile", profileDTO);
         return "profile";
     }
 }

@@ -32,3 +32,6 @@ public class RestResponseEntityExceptionHandler
 
 
 сделать чтобы Message(UserInChat,TEXT)
+
+
+добавить общие каналы

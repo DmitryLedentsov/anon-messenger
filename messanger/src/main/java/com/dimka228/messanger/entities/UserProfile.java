@@ -6,10 +6,14 @@ import jakarta.persistence.*;
 @Table(name = "m_user_profile", indexes = {
         @Index(name = "m_user_profile_user_id_key", columnList = "user_id", unique = true)
 })
+
 public class UserProfile {
     @Id
+    @Column(name="user_id")
+    private Integer userId;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @PrimaryKeyJoinColumn
     private User user;
 
     @Column(name = "rating")

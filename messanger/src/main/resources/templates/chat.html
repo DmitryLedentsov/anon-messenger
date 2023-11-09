@@ -7,7 +7,7 @@
     <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
 </head>
 <body>
-
+<h3 th:text="'User: '+${user?.login}"></h3>
 <br>
 <div id="messages">
     <ul class="list data-elem"  id="msg-list" th:data-url="@{'/topic/chat/' + ${chat.id}} + '/messages'"></ul>
