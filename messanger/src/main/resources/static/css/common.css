@@ -147,6 +147,11 @@ button{
     color: white;
 
 }
+input[type="submit"]:hover,
+button:hover{
+    cursor: pointer;
+    border-color: #6CBDEC;
+}
 
 input[type="text"]:focus,
 input[type="email"]:focus,
