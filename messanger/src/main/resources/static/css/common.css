@@ -129,3 +129,27 @@ ol {display: table; margin-left: 0; margin-right: auto; list-style-position: ins
 .topp {padding-top: 10px;}
 .left {padding-left: 30px}
 .mediumsize {font-size: 19px;}
+
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="submit"],
+button{
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: #B5E853;
+    outline: 0;
+
+    background: #3D3D3D;
+    border-color: #bbb;
+    color: white;
+
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #888;
+}

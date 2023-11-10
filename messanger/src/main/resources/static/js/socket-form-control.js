@@ -5,9 +5,12 @@ $(function() {
         e.preventDefault();
         console.log("click");
         //console.log($form.serializeJSON());
-        client.publish({
-            destination: $form.attr('data-url'),
-            body: JSON.stringify($form.serializeJSON())
-        });
+        let $cur = $(this);
+        if($cur.valid()) {
+            client.publish({
+                destination: $cur.attr('data-url'),
+                body: JSON.stringify($cur.serializeJSON())
+            });
+        }
     });
 });

@@ -18,8 +18,8 @@
 </div>
 <br>
 <br>
-<form class = "socket-form" th:data-url="@{'/app/chat/' + ${chat.id}} + '/send'" method="post">
-    <div>
+<form name="message-send" class = "socket-form" th:data-url="@{'/app/chat/' + ${chat.id}} + '/send'" method="post">
+    <div id="message-send-container">
         <span>write msg:</span><input type="text" name="message" placeholder="..."/>
         <input type="hidden" name="senderId" th:value="${user.id}"/>
         <input type="submit" value="send" />

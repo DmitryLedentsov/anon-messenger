@@ -11,7 +11,7 @@
 <div class="login">
 <h1 class="login-header" >Please Log In</h1>
 
-<form class="login-container" th:action="@{/auth/login}" method="post">
+<form name="login" class="login-container" th:action="@{/auth/login}" method="post">
     <span class="error" th:if="${param.error}">
     Invalid username and password.</span>
     <span class="error" th:if="${param.logout}">
@@ -30,5 +30,6 @@
     <a th:href="@{/auth/register}"> Register Here</a>
 </form>
 </div>
+<div th:insert="fragments :: include-validation-js-libs"></div>
 </body>
 </html>
