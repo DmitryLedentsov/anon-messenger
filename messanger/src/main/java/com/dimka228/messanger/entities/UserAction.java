@@ -69,4 +69,7 @@ public class UserAction {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public static String MESSAGE_SENT = "message sent";
+    public static String REGISTER = "user registered";
 }

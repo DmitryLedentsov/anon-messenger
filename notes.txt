@@ -34,3 +34,6 @@ public class RestResponseEntityExceptionHandler
 сделать чтобы Message(UserInChat,TEXT)
 добавить общие каналы
 шифровать сообщения
+добавить рейтинг +-. для этого надо еще таблицу UserReview
+добавить время отправки сообщения. для этого в UserAction добавить ObjID. сделать получение времени сообщения так же
+

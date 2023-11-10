@@ -11,4 +11,5 @@ public class UserProfileDTO {
     String login;
     Integer rating;
     List<String> statusList;
+    String registrationTime;
 }

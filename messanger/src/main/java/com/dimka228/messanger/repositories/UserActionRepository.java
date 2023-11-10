@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface UserActionRepository extends JpaRepository<UserAction,Long> {
     Optional<List<UserAction>> findAllByUserId(Integer id);
+    Optional<UserAction> findFirstByUserIdAndNameOrderByTimeDesc(Integer id,String name);
 }

@@ -4,6 +4,7 @@ import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.entities.UserAction;
 import com.dimka228.messanger.entities.UserProfile;
 import com.dimka228.messanger.entities.UserStatus;
+import com.dimka228.messanger.exceptions.ActionNotFoundException;
 import com.dimka228.messanger.exceptions.UserExistsException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.repositories.UserActionRepository;
@@ -12,11 +13,10 @@ import com.dimka228.messanger.repositories.UserRepository;
 import com.dimka228.messanger.repositories.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,5 +91,13 @@ public class UserService {
 
     public UserProfile getUserProfile(User user){
         return profileRepository.findByUserId(user.getId());
+    }
+
+    public Instant getLastUserActionTime(User user, String name){
+        try {
+            return actionRepository.findFirstByUserIdAndNameOrderByTimeDesc(user.getId(),name).orElseThrow(() -> new ActionNotFoundException(name)).getTime();
+        }catch (EntityNotFoundException e){
+            throw new ActionNotFoundException(name);
+        }
     }
 }
