@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface UserStatusRepository extends JpaRepository<UserStatus, Long> {
+public interface UserStatusRepository extends JpaRepository<UserStatus, Integer> {
     Optional<List<UserStatus>> findAllByUserId(Integer id);
     void deleteByUserId(Integer id);
 }

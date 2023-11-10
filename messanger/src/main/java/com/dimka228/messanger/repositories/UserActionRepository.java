@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserActionRepository extends JpaRepository<UserAction,Long> {
+public interface UserActionRepository extends JpaRepository<UserAction,Integer> {
     Optional<List<UserAction>> findAllByUserId(Integer id);
     Optional<UserAction> findFirstByUserIdAndNameOrderByTimeDesc(Integer id,String name);
 }

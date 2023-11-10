@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MessangerApplication<messanger>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.dimka228.messanger.MessangerApplication",
+            "projectName": "messanger",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
