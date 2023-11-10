@@ -74,13 +74,15 @@ public class UserService {
         return getUserStatusList(user).stream().anyMatch(s->s.getName().equals(status));
     }
     public void addUserStatus(User u, String s){
+        if(statusRepository.existsByUserIdAndName(u.getId(),s)) return;
         UserStatus status = new UserStatus();
         status.setName(s);
         status.setUser(u);
         statusRepository.save(status);
     }
     public void removeUserStatus(User u, String s){
-        statusRepository.deleteByUserId(u.getId());
+        if(!statusRepository.existsByUserIdAndName(u.getId(),s)) return;
+        statusRepository.deleteByUserIdAndName(u.getId(),s);
     }
 
 

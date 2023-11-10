@@ -13,5 +13,7 @@ import java.util.Optional;
 @Transactional
 public interface UserStatusRepository extends JpaRepository<UserStatus, Integer> {
     Optional<List<UserStatus>> findAllByUserId(Integer id);
-    void deleteByUserId(Integer id);
+    @Transactional
+    void deleteByUserIdAndName(Integer id,String s);
+    boolean existsByUserIdAndName(Integer id, String name);
 }

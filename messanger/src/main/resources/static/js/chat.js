@@ -32,11 +32,7 @@ $(function () {
 //делаем динамический рендеринг на основе списка сообщений
 var $msgList = $("#msg-list");
 function renderMessage(msg){
-    $msgList.append(
-        `<li class = "message">
-<span>user: <a href="/users/profile/${msg.senderId}"> ${msg.sender} </a></span>   &#160 &#160 &#160<span>message: ${msg.message}</span>
-<button class="socket-action" data-url="/app/chat/${chatId}/delete/${msg.id}" data-data="${msg.message}">delete</button> 
-</li>`);
+    $msgList.append(msgTemplate(msg));
 }
 function renderMessages(){
     messages.forEach(msg=>{
