@@ -20,6 +20,19 @@ p {
     font-size: 15px;
     font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
 }
+
+.error{
+    color: red;
+    font-size: 15px;
+    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+}
+
+
+span {
+    color: #FFFFFF;
+    font-size: 15px;
+    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+}
 .hr {
     border: 0;
     border-top: 2px dashed #B5E853;

@@ -7,10 +7,11 @@ body {
     width: 400px;
     margin: 16px auto;
     font-size: 16px;
+    background: #3D3D3D;
 }
 /* Reset top and bottom margins from certain elements */
 .login-header,
-.login p {
+.login p,span,a {
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -22,6 +23,7 @@ body {
     text-align: center;
     color:  #B5E853;
 }
+
 .login-container {
     background: #3D3D3D;
     padding: 12px;
@@ -72,4 +74,4 @@ body {
     color: #B5E853;
     opacity: 1; /* Firefox */
 }
-.linkk {color: #6CBDEC;}
+a {color: #6CBDEC;}
