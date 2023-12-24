@@ -42,17 +42,6 @@ function disconnect() {
     client.deactivate().then(r =>  setConnected(false));
     console.log("Disconnected");
 }
-function setConnected(connected) {
-    $("#connect").prop("disabled", connected);
-    $("#disconnect").prop("disabled", !connected);
-    if (connected) {
-        $("#conversation").show();
-    }
-    else {
-        $("#conversation").hide();
-    }
-    $("#greetings").html("");
-}
 
 function sendMsg(msg, url){
     client.publish({

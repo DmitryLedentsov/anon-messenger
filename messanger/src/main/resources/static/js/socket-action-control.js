@@ -7,7 +7,7 @@ function handleActions(e) {
     e.preventDefault();
     /*e.stopPropagation();
     e.stopImmediatePropagation();*/
-    cur = $(this);
+    let cur = $(this);
     console.log("click: " + cur.attr('data-url'));
     //console.log($form.serializeJSON());
     client.publish({
