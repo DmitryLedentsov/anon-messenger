@@ -12,5 +12,6 @@ public interface MessageInfo {
     public String getSender();
     public String getMessage();
     public Integer getId();
+    public String getSendTime();
 
 }

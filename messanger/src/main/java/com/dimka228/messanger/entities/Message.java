@@ -1,5 +1,7 @@
 package com.dimka228.messanger.entities;
 
+import java.time.Instant;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +23,17 @@ public class Message {
 
     @Column(name = "data", nullable = false)
     private String data;
+
+    @Column(name = "send_time")
+    private Instant sendTime;
+
+    public Instant getSendTime() {
+        return sendTime;
+    }
+
+    public void setTime(Instant sendTime) {
+        this.sendTime = sendTime;
+    }
 
     public String getData() {
         return data;
