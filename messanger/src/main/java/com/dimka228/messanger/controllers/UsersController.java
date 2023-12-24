@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class UsersController {
     private final UserService userService;
     @GetMapping("/profile/{id}")
-    public String chat(@PathVariable Integer id, Model model ){
+    public String profile(@PathVariable Integer id, Model model ){
         //TODO: aa
         /*user = userService.getUser("aboba");
         id = 1;*/
