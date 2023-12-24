@@ -37,3 +37,4 @@ public class RestResponseEntityExceptionHandler
 добавить рейтинг +-. для этого надо еще таблицу UserReview
 добавить время отправки сообщения. для этого в UserAction добавить ObjID. сделать получение времени сообщения так же
 
+фронт на https://pointjs.org/

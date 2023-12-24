@@ -3,6 +3,9 @@ package com.dimka228.messanger.controllers;
 import com.dimka228.messanger.entities.User;
 import com.dimka228.messanger.exceptions.UserExistsException;
 import com.dimka228.messanger.services.UserService;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,13 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@AllArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
     private  final UserService userService;
-    @Autowired
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping(value = "login")
     public String login () {

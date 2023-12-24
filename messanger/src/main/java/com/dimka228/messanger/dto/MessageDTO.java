@@ -11,4 +11,5 @@ public class MessageDTO implements MessageInfo {
     private String message;
     private Integer senderId;
     private String sender;
+    private String sendTime;
 }

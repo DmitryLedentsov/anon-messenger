@@ -79,15 +79,14 @@ public class ChatController {
         return chatDTO;
     }
 
-/*
-    @MessageMapping("user/{id}/chat/list")
+
+    @MessageMapping("user/{id}/chats")
     @ResponseBody
-    List<MessageInfo> messages(@DestinationVariable Integer id) {
+    List<Chat> messages(@DestinationVariable Integer id) {
         User user = userService.getUser(id);
         List<Chat> chats = chatService.getChatsForUser(user);
-        List<ChatDTO> messages = chatService.getMessagesFromChat(chat);
-        return messages;
-    }*/
+        return chats;
+    }
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")
     public MessageInfo addUser(@Payload MessageInfo chatMessage,

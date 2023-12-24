@@ -41,7 +41,7 @@ public class MessageController {
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
 
         Message added = chatService.addMessage(user,chat,chatMessage.getMessage());
-        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin());
+        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin(),Instant.now().toString());
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
         msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
         return chatMessage;
@@ -56,7 +56,7 @@ public class MessageController {
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
         chatService.deleteMessageFromUserInChat(user,chat, msg);
 
-        MessageDTO fullMsg = new MessageDTO(msgId,"aa",user.getId(),user.getLogin());
+        MessageDTO fullMsg = new MessageDTO(msgId,"aa",user.getId(),user.getLogin(), Instant.now().toString());
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg,OperationDTO.DELETE);
         msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
         return fullMsg;

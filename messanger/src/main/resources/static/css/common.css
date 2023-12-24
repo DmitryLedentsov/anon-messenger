@@ -1,5 +1,17 @@
 /* version 1.0.1 */
 
+:root {
+    color-scheme: dark;
+}
+body {
+    height: 100%;
+    overflow-y: hidden;
+ }
+ .list {
+    height: 500px;
+    overflow-y: auto;
+    width: 500px;
+ }
 body {
     margin: 0;
     padding: 0;

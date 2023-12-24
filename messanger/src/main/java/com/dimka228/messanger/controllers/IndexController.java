@@ -46,8 +46,8 @@ public class IndexController {
     }
 
     @GetMapping("/chat/{id}")
-    public String chat(@PathVariable Integer id, Model model ){
-        User user = getCurrentUser();
+    public String chat(@PathVariable Integer id, Model model, Principal principal ){
+        User user = userService.getUser(principal.getName());
 
         //TODO: aa
         /*user = userService.getUser("aboba");
@@ -64,8 +64,8 @@ public class IndexController {
     }
 
     @GetMapping("chat/create")
-    public String createView (Model model) {
-        User user = getCurrentUser();
+    public String createView (Model model, Principal principal) {
+        User user = userService.getUser(principal.getName());
         //TODO: aa
         user = userService.getUser("aboba");
         model.addAttribute("user",user);
@@ -115,17 +115,6 @@ public class IndexController {
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
         return messages;
     }
-
-    public User getCurrentUser(){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUser(login);
-        if(user == null){
-            throw new UserNotFoundException(login);
-        }
-        return user;
-    }
-
-
 
 
     //TODO: переименовать в ChatController /chat
