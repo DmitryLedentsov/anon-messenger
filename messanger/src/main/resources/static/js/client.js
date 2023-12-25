@@ -3,7 +3,6 @@ const client = new StompJs.Client({
     brokerURL: 'ws://localhost:9087/ws'
 });
 client.onConnect = (frame) => {
-    setConnected(true);
     console.log('Connected: ' + frame);
     setEventHandlers();
     //sendMsg({senderId:userId, message:"aaaa"});
@@ -39,7 +38,7 @@ function connect() {
 }
 
 function disconnect() {
-    client.deactivate().then(r =>  setConnected(false));
+    client.deactivate();//.then(r =>  setConnected(false));
     console.log("Disconnected");
 }
 
