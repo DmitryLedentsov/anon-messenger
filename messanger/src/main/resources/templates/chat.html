@@ -11,9 +11,23 @@
 <h3 th:text="'User: '+${user?.login}"></h3>
 <br>
 <div id="messages">
-    <ul class="list data-elem"  id="msg-list" th:data-url="@{'/topic/chat/' + ${chat.id}} + '/messages'"></ul>
+    <ul data-bind="foreach: messages" class="list data-elem"  id="msg-list" th:data-url="@{'/topic/chat/' + ${chat.id}} + '/messages'">
+        <!--<li point-component="messages" class = "message">
+            <span>user: <a href="/users/profile/${msg.senderId}"> {{sender}} </a> </span> 
+            <span>time: {{sendTime}}</span> 
+            <span>message: {{message}}</span>
+            <button class="socket-action" th:data-url="@{'/app/chat/' + ${chat.id}} + '/delete'" data-data="aboba">delete</button> 
+        </li> -->
+        <li class = "message">
+            <a data-bind="text: sender, attr: { href: `/users/profile/${senderId}`} "> </a>
+            <span data-bind="text: sendTime"></span> 
+            <span data-bind="text: message"></span>
+            <button class="socket-action"  data-data="aboba" data-bind="attr: { 'data-url' : `/app/chat/${chatId}/delete/${id}`} ">delete</button> 
+        </li>
+    </ul>
 <!--<ul class="list" th:each="message : ${messages}">
     <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
+    @{'/app/chat/' + ${chat.id}} + '/delete/'+{{id}} th:data-url="@{'/app/chat/' + ${chat.id}} + '/delete'"
 </ul>-->
 </div>
 <br>

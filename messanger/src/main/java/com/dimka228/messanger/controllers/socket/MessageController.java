@@ -9,6 +9,8 @@ import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
+import com.dimka228.messanger.utils.DateConverter;
+
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.*;
@@ -41,7 +43,7 @@ public class MessageController {
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
 
         Message added = chatService.addMessage(user,chat,chatMessage.getMessage());
-        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin(),Instant.now().toString());
+        MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin(), DateConverter.format(Instant.now()));
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
         msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
         return chatMessage;

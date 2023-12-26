@@ -10,7 +10,7 @@ body {
  .list {
     height: 500px;
     overflow-y: auto;
-    width: 500px;
+    /*width: 500px;*/
  }
 body {
     margin: 0;
