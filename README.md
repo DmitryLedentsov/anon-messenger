@@ -47,7 +47,6 @@
 Backend: Spring+PostgreSQL
 Frontend: Js(Jquery) + Websockets
 
-
 ## Этапы рефакторинга
 * внедрение шифрования по алгоритму ГОСТ
 * переделать под SPA(все на одной странице)
