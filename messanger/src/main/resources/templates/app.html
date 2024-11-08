@@ -10,27 +10,27 @@
 <body>
 <br>
 <br>
-<a th:href="@{/chat/create}">create chat</a>
 <br> <br> <br>
 <span> List of chats: <span>
 <!--<div th:each="chat : ${chats}">
     <a th:if="${chat}" th:text="${chat?.name}" th:href="@{'/chat/' + ${chat?.id}}"></a>
     <br>
 </div>-->
-<div id="chats">
-    <ul class="list data-elem"  id="chat-list" th:data-url="@{'/topic/user/' + ${user.id}} + '/chats'"></ul>
-    <!--<ul class="list" th:each="message : ${messages}">
-        <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
-    </ul>-->
-</div>
-<script th:inline="javascript">
 
-</script>
+
 <div th:insert="fragments :: include-js-libs"></div>
 <script type="text/javascript" th:src="@{/js/templates.js}"></script>
 <script type="text/javascript" th:src="@{/js/client.js}"></script>
-<script type="text/javascript" th:src="@{/js/index.js}"></script>
+
 <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
 <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
+
+
+<script th:inline="javascript">
+    $(()=>{
+       connect();
+       sendMsg('/app/chat/' + 1+ '/send');
+    });
+   </script>
 </body>
 </html>

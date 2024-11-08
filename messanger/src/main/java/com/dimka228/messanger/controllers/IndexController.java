@@ -45,6 +45,13 @@ public class IndexController {
                 "index" ;
     }
 
+    @GetMapping("app")
+    public String app (Model model, Principal principal) {
+       
+        return
+                "app" ;
+    }
+
     @GetMapping("/chat/{id}")
     public String chat(@PathVariable Integer id, Model model, Principal principal ){
         User user = userService.getUser(principal.getName());

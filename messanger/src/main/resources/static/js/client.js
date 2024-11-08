@@ -1,6 +1,10 @@
 
 const client = new StompJs.Client({
-    brokerURL: 'ws://localhost:9087/ws'
+    brokerURL: 'ws://localhost:9087/ws',
+    connectHeaders: {
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJwYXNzd29yZCI6ImFib2JhIiwibG9naW4iOiJhYm9iYTEiLCJzdWIiOiJhYm9iYTEiLCJpYXQiOjE3MzEwMzQzNTUsImV4cCI6MTczMTE3ODM1NX0.d3X93EMNVknIXIv-Glm4eujBCL3B25KHnIb4r6O-Lak",
+
+    },
 });
 client.onConnect = (frame) => {
     console.log('Connected: ' + frame);

@@ -17,6 +17,7 @@ public class WebSocketEventListener {
     public void handleSessionConnectEvent(SessionConnectEvent event) {
         //при подключении высылаем список сообщений
         //UPD: сделал через thmyleaf
+        if(event.getUser()==null) return;
         User user = userService.getUser(event.getUser().getName());
         userService.addUserStatus(user, UserStatus.ONLINE);
 
@@ -25,6 +26,7 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
+        if(event.getUser()==null) return;
         User user = userService.getUser(event.getUser().getName());
         userService.removeUserStatus(user, UserStatus.ONLINE);
         System.out.println("session disconnected user: " + user.getLogin());
