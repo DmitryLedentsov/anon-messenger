@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/oldauth")
 public class AuthController {
     private  final UserService userService;
 

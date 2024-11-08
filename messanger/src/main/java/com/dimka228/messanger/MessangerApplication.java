@@ -16,4 +16,5 @@ public class MessangerApplication {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
 }

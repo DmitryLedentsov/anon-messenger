@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -50,6 +51,9 @@ public class UserService {
     }
 
     public User getUser(String login) {
+        return getUserByLogin(login);
+    }
+    public User getUserByLogin(String login) {
         try {
             return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
         }catch (EntityNotFoundException e){
@@ -102,4 +106,5 @@ public class UserService {
             throw new ActionNotFoundException(name);
         }
     }
+
 }
