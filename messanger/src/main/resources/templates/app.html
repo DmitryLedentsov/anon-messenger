@@ -20,17 +20,23 @@
 
 <div th:insert="fragments :: include-js-libs"></div>
 <script type="text/javascript" th:src="@{/js/templates.js}"></script>
-<script type="text/javascript" th:src="@{/js/client.js}"></script>
+<script type="text/javascript" th:src="@{/js/api.js}"></script>
 
 <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
 <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
 
 
-<script th:inline="javascript">
-    $(()=>{
-       connect();
-       sendMsg('/app/chat/' + 1+ '/send');
-    });
+    <script th:inline="javascript">
+        var api = window.api || null;
+        $(()=>{
+           api = new MessengerApi({serverUrl: 'http://localhost:9087', brokerUrl:'ws://localhost:9087/ws', onConnect: (m)=>{
+            api.subscribeOnChats();
+           }});
+           token = api.authUser({"login": "aboba1", "password": "aboba"});
+           api.initSocketClient(token);
+           api.socketClientConnect();
+           
+        });
    </script>
 </body>
 </html>

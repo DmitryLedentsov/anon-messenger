@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dimka228.messanger.dto.TokenDTO;
 import com.dimka228.messanger.dto.UserDto;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.AppException;
@@ -52,9 +53,9 @@ public class JwtAuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signIn(@RequestBody UserDto userDto) {
+    public ResponseEntity<TokenDTO> signIn(@RequestBody UserDto userDto) {
 
-        if(!userService.checkUser(userDto.getLogin())) throw new UserNotFoundException(userDto.getLogin());
+        User user = userService.getUser(userDto.getLogin());
         try{
            
             final Authentication authentication = authenticationManager.authenticate(
@@ -65,7 +66,7 @@ public class JwtAuthController {
             );
             //SecurityContextHolder.getContext().setAuthentication(authentication);
             final String token = jwtTokenUtil.generateToken(userDto.getUser());
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
         } catch (Exception e){
             throw new WronPasswordException();
         }

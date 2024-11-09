@@ -29,6 +29,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +62,21 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
                 return super.handleClientMessageProcessingError(clientMessage, ex.getCause());
+            }
+
+     
+
+            private Message<byte[]> prepareErrorMessage(Message<byte[]> clientMessage, AppException apiError, String errorCode)
+            {
+                String message = apiError.getMessage();
+            
+                StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
+            
+          
+                accessor.setMessage(errorCode);
+                accessor.setLeaveMutable(true);
+            
+                return MessageBuilder.createMessage(message != null ? message.getBytes() : "".getBytes(), accessor.getMessageHeaders());
             }
         });
     }

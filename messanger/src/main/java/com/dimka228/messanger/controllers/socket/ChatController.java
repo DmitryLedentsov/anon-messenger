@@ -49,8 +49,19 @@ public class ChatController {
         for(User cur: users){
             chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
         }
+
+        List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
+        System.out.println(usersInChat.get(0).getUser().getId());
+       
+        chatDTO.getUsers().add(user.getLogin());//добавляем нашего
+        chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null,chatDTO.getUsers());
+        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
+        for(UserInChat cur: usersInChat){
+            msgTemplate.convertAndSend("/topic/user/"+cur.getUser().getId()+"/chats", data);
+        }
+        
         //return "redirect:/chat/" + chat.getId().toString();
-        msgTemplate.convertAndSend("/topic/user/"+id+"chats", chatDTO);
+        //msgTemplate.convertAndSend("/topic/user/"+id+"chats", data);
         return chatDTO;
     }
 
