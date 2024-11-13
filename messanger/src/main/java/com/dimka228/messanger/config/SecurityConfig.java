@@ -1,6 +1,7 @@
 package com.dimka228.messanger.config;
 
 
+import com.dimka228.messanger.crypt.GostPasswordEncoder;
 import com.dimka228.messanger.services.UserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @AllArgsConstructor
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
-    private  final  BCryptPasswordEncoder passwordEncoder;
+    private  final  GostPasswordEncoder passwordEncoder;
     /*@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests

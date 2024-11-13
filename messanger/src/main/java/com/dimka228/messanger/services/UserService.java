@@ -14,6 +14,7 @@ import com.dimka228.messanger.repositories.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository repository;
-    private  final  BCryptPasswordEncoder passwordEncoder;
+    private  final  PasswordEncoder passwordEncoder;
     private final UserStatusRepository statusRepository;
     private final UserActionRepository actionRepository;
     private final UserProfileRepository profileRepository;
