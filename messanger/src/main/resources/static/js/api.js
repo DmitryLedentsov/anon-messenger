@@ -5,9 +5,12 @@ function MessengerApi(options){
     const signUpUrl = `/auth/signup`;
 
     const topicUrl='/topic';
-    const publishUrl='/app'
+    const publishUrl='/app';
+
+    let ajaxHeaders = [];
     this.authUser = function (user){
         response = this.query('post',signInUrl, user);
+        this.setAuth(response);
         return response;
     }
 
@@ -16,6 +19,11 @@ function MessengerApi(options){
     }
     
 
+    this.setAuth = (login)=>{
+        ajaxHeaders = {
+            Authorization: `Bearer ${login.token}`
+        }
+    }
 
     this.query = function(method, path, data, async=false){
         let response = null;
@@ -23,6 +31,7 @@ function MessengerApi(options){
         $.ajax({
             url: `${options.serverUrl}${path}`,         /* Куда отправить запрос */
             method: method,             /* Метод запроса (post или get) */
+            headers: ajaxHeaders,
             dataType: 'json',          /* Тип данных в ответе (xml, json, script, html). */
             data: JSON.stringify(data),     /* Данные передаваемые в массиве */
             async: async,
@@ -32,7 +41,8 @@ function MessengerApi(options){
                  response = data;
             },
             error: function (xhr, ajaxOptions, thrownError){   /* функция которая будет выполнена после успешного запроса.  */
-                console.log([xnr, ajaxOptions, thrownError])
+                console.log([xhr, ajaxOptions, thrownError])
+                options.onError && options.onError(xhr.responseText);
                 throw new Error(xhr.responseText);
             }
         });
@@ -40,6 +50,7 @@ function MessengerApi(options){
     }
     
     this.initSocketClient = (login)=>{
+        this.setAuth(login);
         console.log('client init with token '+ login.token);
         this.client = new StompJs.Client({
             brokerURL:  options.brokerUrl,
@@ -106,6 +117,7 @@ function MessengerApi(options){
             url = publishUrl + url;
             console.log('publish '+url);
             msg&& console.log(msg);
+            if(!msg) msg = {aboba:'aboba'};
             this.client.publish({
                 destination: url,
                 body: JSON.stringify(msg)
@@ -129,13 +141,28 @@ function MessengerApi(options){
                     this.unsubscribeOnMessagesInChat(data.id);
                 }
                 else if(op==="UPDATE") {
-                    let idx = this.chats.map(o => o.id).indexOf(data.id);
-                    let messages = chats[idx].messages;
-                    chats[idx]=data;
-                    chats[idx].messages = messages;
+                    this.updateChat(data.id,data);
                 }
             })
         }
+
+        this.updateChat = (id,data)=>{
+            let idx = this.chats.map(o => o.id).indexOf(data.id);
+            let messages = chats[idx].messages;
+            chats[idx]=data;
+            chats[idx].messages = messages;
+        }
+        this.updateOrCreateChat = (id,data)=>{
+            let idx = this.chats.map(o => o.id).indexOf(data.id);
+            if(idx==-1){
+                this.chats.push(data);
+                return;
+            }
+            let messages = chats[idx].messages;
+            chats[idx]=data;
+            chats[idx].messages = messages;
+        }
+
 
 
         this.unsubscribeOnMessagesInChat = (chatId)=>{
@@ -153,17 +180,44 @@ function MessengerApi(options){
             });
         }
 
+       // this.getChats = ()=>{
+       //     this.publishSocketMessage(`/chats`);
+//
+       // }
         this.createChat = (chat)=>{
-            this.publishSocketMessage(`/user/${userId}/chat/create`,chat);
+            this.publishSocketMessage(`/chat/create`,chat);
 
         }
         this.deleteChat = (chatId)=>{
-            this.publishSocketMessage(`/user/${userId}/chat/delete/${chatId}`);
+            this.publishSocketMessage(`/chat/delete/${chatId}`);
 
         }
         this.sendMessageToChat = (chatId,msg)=>{
             msg.senderId=userId;
             this.publishSocketMessage(`/chat/${chatId}/send`,msg);
+        }
+
+        this.getChats = ()=>{
+            
+            let response = this.query('get',`/chats`);
+            if(response) {
+                response.forEach(el => {
+                    this.updateOrCreateChat(el.id,el);
+
+                });
+            };
+            return response;
+        }
+        this.subscribeOnMessagesInChats = ()=>{
+            this.chats.forEach(el => {
+                this.subscribeOnMessagesInChat(el.id);
+            });
+        }
+        this.getMessagesFromChat = (chatId)=>{
+            let chat = this.findChatById(chatId);
+            messages = this.query('get',`/chat/${chatId}/messages`);
+            if(chat) chat.messages = messages;
+            return messages;
         }
 
 

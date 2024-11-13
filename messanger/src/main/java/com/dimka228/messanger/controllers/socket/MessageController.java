@@ -17,8 +17,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -27,7 +29,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @AllArgsConstructor
 public class MessageController {
     private final SimpMessagingTemplate msgTemplate;
@@ -64,11 +66,19 @@ public class MessageController {
 
 
 
-    @MessageMapping("chat/{id}/messages")
-    @ResponseBody
-    List<MessageInfo> messages(@DestinationVariable Integer id) {
+    @GetMapping("chat/{id}/messages")
+    
+    List<MessageInfo> messages(@PathVariable Integer id,Principal principal) {
         Chat chat = chatService.getChat(id);
-        List<MessageInfo> messages = chatService.getMessagesFromChat(chat);
+        User user = userService.getUser(principal.getName());
+        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user,chat);
+
+        /*for (MessageInfo msg : messages) {
+            MessageDTO fullMsg = new MessageDTO(msg.getId(),msg.getMessage(),msg.getSenderId(),msg.getSender(), msg.getSendTime());
+            OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg,OperationDTO.ADD);
+            msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
+            msgTemplate.convertAndSend("/topic/user/"+user.getId()+"/chat/", data);
+        }*/
         return messages;
     }
 

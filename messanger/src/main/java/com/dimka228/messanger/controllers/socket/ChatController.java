@@ -20,26 +20,30 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @AllArgsConstructor
 public class ChatController {
     private final SimpMessagingTemplate msgTemplate;
     private UserService userService;
     private ChatService chatService;
-    @MessageMapping("/user/{id}/chat/create")
+    @MessageMapping("/chat/create")
     //@SendTo("/topic/public")
-    public ChatDTO sendChat(@DestinationVariable Integer id, @Payload ChatDTO chatDTO) {
-        User user = userService.getUser(id);
+    public ChatDTO sendChat(@Payload ChatDTO chatDTO, Principal principal) {
+        User user = userService.getUser(principal.getName());
         Chat chat = chatService.addChat(chatDTO.getName());
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
 
@@ -65,10 +69,10 @@ public class ChatController {
         return chatDTO;
     }
 
-    @MessageMapping("/user/{id}/chat/delete/{chatId}")
+    @MessageMapping("/chat/delete/{chatId}")
     //@SendTo("/topic/public")
-    public ChatDTO deleteChat(@DestinationVariable Integer id, @DestinationVariable Integer chatId) {
-        User user = userService.getUser(id);
+    public ChatDTO deleteChat( @DestinationVariable Integer chatId,  Principal principal) {
+        User user = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(chatId);
         //return "redirect:/chat/" + chat.getId().toString();
         ChatDTO chatDTO = new ChatDTO(chatId,chat.getName(),null,null,null);
@@ -84,18 +88,18 @@ public class ChatController {
         }
         else{
             chatService.deleteOrLeaveChat(user,chat);
-            msgTemplate.convertAndSend("/topic/user/"+id+"/chats", data);
+            msgTemplate.convertAndSend("/topic/user/"+user.getId()+"/chats", data);
         }
 
         return chatDTO;
     }
 
 
-    @MessageMapping("user/{id}/chats")
-    @ResponseBody
-    List<Chat> messages(@DestinationVariable Integer id) {
-        User user = userService.getUser(id);
+    @GetMapping("/chats")
+    List<Chat> messages( Principal principal) {
+        User user = userService.getUser(principal.getName());
         List<Chat> chats = chatService.getChatsForUser(user);
+
         return chats;
     }
     /*@MessageMapping("/chat/.addUser")

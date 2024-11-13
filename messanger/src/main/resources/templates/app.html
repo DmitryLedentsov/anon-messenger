@@ -6,6 +6,7 @@
     <link  th:href = "@{/css/bootstrap.min.css}" rel="stylesheet">
     <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
     <link  th:href = "@{/css/common.css}" rel="stylesheet">
+    
 </head>
 <body>
 <br>
@@ -30,7 +31,9 @@
         var api = window.api || null;
         $(()=>{
            api = new MessengerApi({serverUrl: 'http://localhost:9087', brokerUrl:'ws://localhost:9087/ws', onConnect: (m)=>{
+            api.getChats();
             api.subscribeOnChats();
+            api.subscribeOnMessagesInChats();
            }});
            token = api.authUser({"login": "aboba1", "password": "aboba"});
            api.initSocketClient(token);

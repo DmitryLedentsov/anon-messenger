@@ -112,7 +112,7 @@ public class IndexController {
         return new ResponseEntity<String>("send", HttpStatus.OK);
     }
 
-    @GetMapping("chat/{id}/messages")
+   /* @GetMapping("chat/{id}/messages")
     @ResponseBody
     List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
         User user = userService.getUser(principal.getName());
@@ -121,7 +121,7 @@ public class IndexController {
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
         return messages;
-    }
+    }*/
 
 
     //TODO: переименовать в ChatController /chat
