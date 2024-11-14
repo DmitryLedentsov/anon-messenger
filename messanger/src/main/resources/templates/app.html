@@ -6,17 +6,54 @@
     <link  th:href = "@{/css/bootstrap.min.css}" rel="stylesheet">
     <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
     <link  th:href = "@{/css/common.css}" rel="stylesheet">
+    <style>
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+        .chat-list, .chat-messages {
+            padding: 1rem;
+        }
+        .chat-list {
+            width: 30%;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        .chat-messages {
+            width: 70%;
+            overflow-y: auto;
+        }
+        fade.in {
+        opacity: 1; }
+       
+ .fade.show {
+            opacity: 1;
+        }
     
+        .modal.in .modal-dialog {
+        transform: translate(0, 0); }
+       
+ .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+         .modal-backdrop.in {
+        opacity: 0.5; }
+       
+ .modal-backdrop.show {
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
 <br>
 <br>
 <br> <br> <br>
-<span> List of chats: <span>
+<span> List of chats: </span>
 <!--<div th:each="chat : ${chats}">
     <a th:if="${chat}" th:text="${chat?.name}" th:href="@{'/chat/' + ${chat?.id}}"></a>
     <br>
 </div>-->
+
 
 
 <div th:insert="fragments :: include-js-libs"></div>
@@ -27,17 +64,105 @@
 <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
 
 
+
     <script th:inline="javascript">
         var api = window.api || null;
+        var app = window.app || null;
+        function App(){
+            this.chats = [];
+            this.updateChat = (id,data)=>{
+                let idx = this.chats.map(o => o.id).indexOf(data.id);
+                let messages = chats[idx].messages;
+                this.chats[idx]=data;
+                this.chats[idx].messages = messages;
+            }
+            this.updateOrCreateChat = (id,data)=>{
+                let idx = this.chats.map(o => o.id).indexOf(data.id);
+                if(idx==-1){
+                    this.chats.push(data);
+                    return;
+                }
+                let messages = chats[idx].messages;
+                this.chats[idx]=data;
+                this.chats[idx].messages = messages;
+            }
+            this.findChatById = (id)=>{
+                return this.chats.find(chat=>chat.id == id);
+            }
+            this.addChat = (chat)=>{
+                this.chats.push(chat);
+            }
+
+            this.deleteChat = (id)=>{
+                this.chats = this.chats.filter((e)=>e.id!=data.id);
+            }
+            
+
+            this.addMsg = (chat,m)=>{
+                chat.messages.push(data)
+            }
+            this.updateMsg=(chat,m)=>{
+                
+            }
+            this.removeMsg=(chat,m)=>{
+               
+                chat.messages = chat.messages.filter((e)=>e.id!=data.id);
+            }
+
+            this.receiveMsg = (chatId, m)=>{
+                let op = m.operation;
+                let data = m.data;
+                let chat = this.findChatById(chatId);
+                chat.messages = chat.messages || [];
+                if(op==="ADD") {
+                    this.addMsg(chat,data);
+                  
+                }
+                else if(op==="DELETE") {
+                    this.deleteMsg(chat,data);
+                }
+                else if(op==="UPDATE") {
+                    this.updateMsg(chat,data);
+                }
+            }
+
+
+            this.init = ()=>{
+                
+                this.api = new MessengerApi({serverUrl: 'http://localhost:9087', brokerUrl:'ws://localhost:9087/ws', onConnect: (m)=>{
+                this.chats = this.api.getChats();
+               
+                this.chats.forEach(el => {
+                    this.api.subscribeOnMessagesInChat(el.id,(msg)=>this.receiveMsg(el.id,msg));
+                });
+                this.api.subscribeOnChats((m)=>{
+                    let op = m.operation;
+                    let data = m.data;
+                    if(op==="ADD") {
+                        this.addChat(data);
+                        this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
+                    }
+                    else if(op==="DELETE") {
+                        this.deleteChat(data.id);
+                    }
+                    else if(op==="UPDATE") {
+                        this.updateChat(data.id,data);
+                    }
+                 });
+
+                }});
+         
+                this.token = this.api.authUser({"login": "aboba1", "password": "aboba"});
+                this.api.initSocketClient(this.token);
+                this.api.socketClientConnect();
+           
+        
+            }
+
+        }
         $(()=>{
-           api = new MessengerApi({serverUrl: 'http://localhost:9087', brokerUrl:'ws://localhost:9087/ws', onConnect: (m)=>{
-            api.getChats();
-            api.subscribeOnChats();
-            api.subscribeOnMessagesInChats();
-           }});
-           token = api.authUser({"login": "aboba1", "password": "aboba"});
-           api.initSocketClient(token);
-           api.socketClientConnect();
+           app = new App();
+           app.init();
            
         });
    </script>

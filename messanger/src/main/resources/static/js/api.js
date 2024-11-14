@@ -131,36 +131,18 @@ function MessengerApi(options){
         this.chats = [];
      
 
-        this.subscribeOnChats = ()=>{
+        this.subscribeOnChats = (onReceive, onReceiveMsg)=>{
             this.socketClientSubscribe(`/user/${userId}/chats`, (m)=>{
                 let op = m.operation;
                 let data = m.data;
-                if(op==="ADD") this.chats.push(data);
-                else if(op==="DELETE") {
-                    this.chats = this.chats.filter((e)=>e.id!=data.id);
+               
+                if(op==="DELETE") {
                     this.unsubscribeOnMessagesInChat(data.id);
+                }else if(op=="ADD"){
+                   // this.subscribeOnMessagesInChat(data.id, onReceiveMsg)
                 }
-                else if(op==="UPDATE") {
-                    this.updateChat(data.id,data);
-                }
+                onReceive && onReceive(m);
             })
-        }
-
-        this.updateChat = (id,data)=>{
-            let idx = this.chats.map(o => o.id).indexOf(data.id);
-            let messages = chats[idx].messages;
-            chats[idx]=data;
-            chats[idx].messages = messages;
-        }
-        this.updateOrCreateChat = (id,data)=>{
-            let idx = this.chats.map(o => o.id).indexOf(data.id);
-            if(idx==-1){
-                this.chats.push(data);
-                return;
-            }
-            let messages = chats[idx].messages;
-            chats[idx]=data;
-            chats[idx].messages = messages;
         }
 
 
@@ -168,15 +150,10 @@ function MessengerApi(options){
         this.unsubscribeOnMessagesInChat = (chatId)=>{
             this.socketClientUnSubscribe(`/chat/${chatId}/messages`);
         };
-        this.subscribeOnMessagesInChat = (chatId)=>{
+        this.subscribeOnMessagesInChat = (chatId,onReceive)=>{
             this.socketClientSubscribe(`/chat/${chatId}/messages`, (m)=>{
                 //console.log(m);
-                let op = m.operation;
-                let data = m.data;
-                let chat = this.findChatById(chatId);
-                chat.messages = chat.messages || [];
-                if(op==="ADD") chat.messages.push(data)
-                else if(op==="DELETE") chat.messages = chat.messages.filter((e)=>e.id!=data.id);
+               onReceive && onReceive(m);
             });
         }
 
@@ -200,31 +177,23 @@ function MessengerApi(options){
         this.getChats = ()=>{
             
             let response = this.query('get',`/chats`);
-            if(response) {
-                response.forEach(el => {
-                    this.updateOrCreateChat(el.id,el);
-
-                });
-            };
             return response;
         }
-        this.subscribeOnMessagesInChats = ()=>{
-            this.chats.forEach(el => {
-                this.subscribeOnMessagesInChat(el.id);
+        this.subscribeOnMessagesInChats = (ids,onReceive)=>{
+            ids.forEach(el => {
+
+                this.subscribeOnMessagesInChat(el,onReceive);
             });
         }
         this.getMessagesFromChat = (chatId)=>{
-            let chat = this.findChatById(chatId);
-            messages = this.query('get',`/chat/${chatId}/messages`);
-            if(chat) chat.messages = messages;
+            let messages = this.query('get',`/chat/${chatId}/messages`);
+
             return messages;
         }
 
 
 
-        this.findChatById = (id)=>{
-            return this.chats.find(chat=>chat.id == id);
-        }
+     
         
         
     }
