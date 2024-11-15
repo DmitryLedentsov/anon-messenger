@@ -10,7 +10,7 @@ function MessengerApi(options){
     let ajaxHeaders = [];
     this.authUser = function (user){
         response = this.query('post',signInUrl, user);
-        this.setAuth(response);
+        if(response) this.setAuth(response);
         return response;
     }
 
@@ -42,7 +42,8 @@ function MessengerApi(options){
             },
             error: function (xhr, ajaxOptions, thrownError){   /* функция которая будет выполнена после успешного запроса.  */
                 console.log([xhr, ajaxOptions, thrownError])
-                options.onError && options.onError(xhr.responseText);
+            
+                options.onError && options.onError(xhr.responseJSON || xhr.responseText);
                 throw new Error(xhr.responseText);
             }
         });
@@ -171,7 +172,7 @@ function MessengerApi(options){
         }
         this.sendMessageToChat = (chatId,msg)=>{
             msg.senderId=userId;
-            this.publishSocketMessage(`/chat/${chatId}/send`,msg);
+            this.publishSocketMessage(`/chat/${chatId}/send`,{message:msg});
         }
 
         this.getChats = ()=>{

@@ -1,6 +1,7 @@
 package com.dimka228.messanger.controllers.socket;
 
 import com.dimka228.messanger.dto.ChatDTO;
+import com.dimka228.messanger.dto.ChatDtoRequest;
 import com.dimka228.messanger.dto.MessageDTO;
 import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.*;
@@ -42,12 +43,12 @@ public class ChatController {
     private ChatService chatService;
     @MessageMapping("/chat/create")
     //@SendTo("/topic/public")
-    public ChatDTO sendChat(@Payload ChatDTO chatDTO, Principal principal) {
+    public ChatDTO sendChat(@Payload ChatDtoRequest chatDtoRequest, Principal principal) {
         User user = userService.getUser(principal.getName());
-        Chat chat = chatService.addChat(chatDTO.getName());
+        Chat chat = chatService.addChat(chatDtoRequest.getName());
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
 
-        List<String> logins = chatDTO.getUsers();
+        List<String> logins = chatDtoRequest.getUsers();
         logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
         List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
         for(User cur: users){
@@ -57,8 +58,8 @@ public class ChatController {
         List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
         System.out.println(usersInChat.get(0).getUser().getId());
        
-        chatDTO.getUsers().add(user.getLogin());//добавляем нашего
-        chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null,chatDTO.getUsers());
+        chatDtoRequest.getUsers().add(user.getLogin());//добавляем нашего
+        ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null,chatDtoRequest.getUsers());
         OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
         for(UserInChat cur: usersInChat){
             msgTemplate.convertAndSend("/topic/user/"+cur.getUser().getId()+"/chats", data);
