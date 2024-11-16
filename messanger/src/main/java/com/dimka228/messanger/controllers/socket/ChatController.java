@@ -21,9 +21,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -41,9 +43,9 @@ public class ChatController {
     private final SimpMessagingTemplate msgTemplate;
     private UserService userService;
     private ChatService chatService;
-    @MessageMapping("/chat/create")
+    @PostMapping("/chat")
     //@SendTo("/topic/public")
-    public ChatDTO sendChat(@Payload ChatDtoRequest chatDtoRequest, Principal principal) {
+    public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
         User user = userService.getUser(principal.getName());
         Chat chat = chatService.addChat(chatDtoRequest.getName());
         chatService.addUserInChat(user,chat, UserInChat.Roles.CREATOR);
@@ -70,9 +72,9 @@ public class ChatController {
         return chatDTO;
     }
 
-    @MessageMapping("/chat/delete/{chatId}")
+    @DeleteMapping("/chat/{chatId}")
     //@SendTo("/topic/public")
-    public ChatDTO deleteChat( @DestinationVariable Integer chatId,  Principal principal) {
+    public ChatDTO deleteChat( @PathVariable Integer chatId,  Principal principal) {
         User user = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(chatId);
         //return "redirect:/chat/" + chat.getId().toString();

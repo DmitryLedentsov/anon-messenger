@@ -220,13 +220,13 @@
         
             
 
-            this.addMsg = (chat,data)=>{
+            this.onAddMsg = (chat,data)=>{
                 chat.messages.push(data)
             }
-            this.updateMsg=(chat,data)=>{
+            this.onUpdateMsg=(chat,data)=>{
                 
             }
-            this.removeMsg=(chat,data)=>{
+            this.onDeleteMsg=(chat,data)=>{
                
                 chat.messages = chat.messages.filter((e)=>e.id!=data.id);
             }
@@ -254,14 +254,14 @@
                 let chat = this.findChatById(chatId);
                 chat.messages = chat.messages || [];
                 if(op==="ADD") {
-                    this.addMsg(chat,data);
+                    this.onAddMsg(chat,data);
                   
                 }
                 else if(op==="DELETE") {
-                    this.deleteMsg(chat,data);
+                    this.onDeleteMsg(chat,data);
                 }
                 else if(op==="UPDATE") {
-                    this.updateMsg(chat,data);
+                    this.onUpdateMsg(chat,data);
                 }
                 if(chatId==this.currentChatId){
                     this.renderMessages(chatId);
@@ -339,6 +339,10 @@
 
             this.deleteChat = (id) =>{
                 this.api.deleteChat(id);
+            }
+
+            this.deleteMsg = (id) =>{
+                this.api.deleteMessage(this.currentChatId, id);
             }
             this.renderChats = ()=>{
                 const template = $('#chat-template').html();

@@ -17,8 +17,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -31,13 +35,14 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("chat")
 public class MessageController {
     private final SimpMessagingTemplate msgTemplate;
     private UserService userService;
     private ChatService chatService;
-    @MessageMapping("/chat/{id}/send")
+    @PostMapping("/{id}/send")
     //@SendTo("/topic/public")
-    public MessageDTO sendMessage(@DestinationVariable Integer id, @Payload MessageDTO chatMessage, Principal principal) {
+    public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
         User user = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(id);
         UserInChat userInChat = chatService.getUserInChat(user.getId(),chat.getId());
@@ -49,9 +54,9 @@ public class MessageController {
         return chatMessage;
     }
 
-    @MessageMapping("/chat/{id}/delete/{msgId}")
+    @DeleteMapping("/{id}/message/{msgId}")
     //@SendTo("/topic/public")
-    public MessageDTO deleteMessage(@DestinationVariable Integer id, @DestinationVariable Integer msgId, Principal principal) {
+    public MessageDTO deleteMessage(@PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
         User user = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(id);
         Message msg = chatService.getMessage(msgId);
@@ -66,7 +71,7 @@ public class MessageController {
 
 
 
-    @GetMapping("chat/{id}/messages")
+    @GetMapping("/{id}/messages")
     
     List<MessageInfo> messages(@PathVariable Integer id,Principal principal) {
         Chat chat = chatService.getChat(id);

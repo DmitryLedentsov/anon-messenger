@@ -163,16 +163,20 @@ function MessengerApi(options){
 //
        // }
         this.createChat = (chat)=>{
-            this.publishSocketMessage(`/chat/create`,chat);
+            return this.query('post',`/chats`,chat);
 
         }
         this.deleteChat = (chatId)=>{
-            this.publishSocketMessage(`/chat/delete/${chatId}`);
+            return this.query('delete',`/chat/${chatId}`);
+
+        }
+        this.deleteMessage = (chatId, msgId)=>{
+            return this.query('delete',`/chat/${chatId}/message/${msgId}`);
 
         }
         this.sendMessageToChat = (chatId,msg)=>{
             msg.senderId=userId;
-            this.publishSocketMessage(`/chat/${chatId}/send`,{message:msg});
+            return this.query('post',`/chat/${chatId}/send`,{message:msg});
         }
 
         this.getChats = ()=>{
