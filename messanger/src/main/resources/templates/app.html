@@ -112,6 +112,7 @@
                         <input type="password" class="form-control" id="password" required>
                     </div>
                     <button  class="btn btn-primary" onclick="app.auth()">Войти</button>
+                    <button  class="btn btn-primary" onclick="app.register()">Зарегистрироваться</button>
                 </form>
             </div>
         </div>
@@ -180,7 +181,7 @@
         <h5>Чат</h5>
         <script id="message-template" type="x-tmpl-mustache">
             <div>
-                <span>{{sender}}: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});">-</span> {{/isOwned}}</span>
+                <span>{{sender}} <span class="remove-btn" onclick="app.banUser({{senderId}});">-</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});">-</span> {{/isOwned}}</span>
                 <span class="message-time">{{sendTime}}</span>
             </div>
         </script>
@@ -301,10 +302,11 @@
                         
                         this.chats = this.chats.filter((e)=>e.id!=data.id);
                         if(this.currentChatId==data.id){
-                            this.currentChatId = 1;
+                            this.currentChatId = this.chats[0].id;
                             let chat = this.findChatById(this.currentChatId);
-                            this.renderMessages(chat.messages || []);
+                            this.renderMessages(chat?.messages || []);
                         }
+                        
                     }
                     else if(op==="UPDATE") {
                         this.updateChat(data.id,data);
@@ -336,6 +338,13 @@
                 
             }
 
+            this.register = ()=>{
+                let data = {"login": $('#login').val(), "password": $('#password').val()};
+                this.api.registerUser(data);
+                this.auth();
+                
+            }
+
 
             this.deleteChat = (id) =>{
                 this.api.deleteChat(id);
@@ -343,6 +352,10 @@
 
             this.deleteMsg = (id) =>{
                 this.api.deleteMessage(this.currentChatId, id);
+            }
+
+            this.banUser = (id)=>{
+                this.api.banUserFromChat(id, this.currentChatId);
             }
             this.renderChats = ()=>{
                 const template = $('#chat-template').html();

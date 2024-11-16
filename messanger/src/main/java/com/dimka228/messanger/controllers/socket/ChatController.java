@@ -5,6 +5,7 @@ import com.dimka228.messanger.dto.ChatDtoRequest;
 import com.dimka228.messanger.dto.MessageDTO;
 import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.*;
+import com.dimka228.messanger.exceptions.CannotBanSelfException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.exceptions.WronPasswordException;
 import com.dimka228.messanger.exceptions.WrongPrivilegesException;
@@ -57,22 +58,23 @@ public class ChatController {
         logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
         List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
         for(User cur: users){
-            chatService.addUserInChat(cur,chat, UserInChat.Roles.CREATOR);
+            chatService.addUserInChat(cur,chat, UserInChat.Roles.REGULAR);
         }
 
         List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
         System.out.println(usersInChat.get(0).getUser().getId());
        
         chatDtoRequest.getUsers().add(user.getLogin());//добавляем нашего
-        ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null,chatDtoRequest.getUsers());
-        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
+       
         for(UserInChat cur: usersInChat){
+            ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),cur.getRole(),null,chatDtoRequest.getUsers());
+            OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
             socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
         }
         
         //return "redirect:/chat/" + chat.getId().toString();
         //msgTemplate.convertAndSend("/topic/user/"+id+"chats", data);
-        return chatDTO;
+        return new ChatDTO(chat.getId(),chat.getName(),chatService.getUserRoleInChat(user, chat),null,chatDtoRequest.getUsers());
     }
 
     @DeleteMapping("/chat/{chatId}")
@@ -109,14 +111,28 @@ public class ChatController {
         return chats;
     }
 
-    @DeleteMapping("/chat/{chatId}/{userId}")
-    void banUser( @PathVariable Integer chatId,@PathVariable Integer userId,  Principal principal){
+    @DeleteMapping("/chat/{chatId}/ban/{userId}")
+    public void banUser( @PathVariable Integer chatId,@PathVariable Integer userId,  Principal principal){
         User cur = userService.getUser(principal.getName());
         Chat chat = chatService.getChat(chatId);
         User user = userService.getUser(userId);
-        UserInChat userInChat = chatService.getUserInChat(user,chat);
+        UserInChat userInChat = chatService.getUserInChat(cur,chat);
+
         if(!userInChat.getRole().equals(UserInChat.Roles.CREATOR)) throw new WrongPrivilegesException();
-        chatService.deleteUserFromChat(userInChat);
+        if(user.getId()==cur.getId()) throw new CannotBanSelfException();
+        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user,chat);
+
+        socketMessagingService.sendChatOperationToUser(userId, new OperationDTO<ChatDTO>(
+            new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
+        chatService.deleteOrLeaveChat(user,chat);
+        for (MessageInfo messageInfo : messages) {
+            MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(), null);
+            OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
+            socketMessagingService.sendMessageOperationToChat(chatId,op);
+
+        }
+       
+        
     }
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")

@@ -27,7 +27,7 @@ function MessengerApi(options){
 
     this.query = function(method, path, data, async=false){
         let response = null;
-        console.log(`sending request on ${options.serverUrl}${path}`);
+        console.log(`sending ${method} request on ${options.serverUrl}${path}`);
         $.ajax({
             url: `${options.serverUrl}${path}`,         /* Куда отправить запрос */
             method: method,             /* Метод запроса (post или get) */
@@ -37,14 +37,15 @@ function MessengerApi(options){
             async: async,
             contentType : 'application/json',
             success: function(data){   /* функция которая будет выполнена после успешного запроса.  */
-                 console.log(data); /* В переменной data содержится ответ от index.php. */
-                 response = data;
+                 console.log(data||{}); /* В переменной data содержится ответ от index.php. */
+                 response = data||{};
             },
             error: function (xhr, ajaxOptions, thrownError){   /* функция которая будет выполнена после успешного запроса.  */
+                if (xhr.status == 200) return xhr.responseText;
                 console.log([xhr, ajaxOptions, thrownError])
             
                 options.onError && options.onError(xhr.responseJSON || xhr.responseText);
-                throw new Error(xhr.responseText);
+                throw new Error(xhr.responseJSON || xhr.responseText || 'connection error');
             }
         });
         return response;
@@ -132,17 +133,18 @@ function MessengerApi(options){
         this.chats = [];
      
 
-        this.subscribeOnChats = (onReceive, onReceiveMsg)=>{
+        this.subscribeOnChats = (onReceive)=>{
             this.socketClientSubscribe(`/user/${userId}/chats`, (m)=>{
                 let op = m.operation;
                 let data = m.data;
                
+                onReceive && onReceive(m);
                 if(op==="DELETE") {
                     this.unsubscribeOnMessagesInChat(data.id);
                 }else if(op=="ADD"){
                    // this.subscribeOnMessagesInChat(data.id, onReceiveMsg)
                 }
-                onReceive && onReceive(m);
+                
             })
         }
 
@@ -163,7 +165,7 @@ function MessengerApi(options){
 //
        // }
         this.createChat = (chat)=>{
-            return this.query('post',`/chats`,chat);
+            return this.query('post',`/chat`,chat);
 
         }
         this.deleteChat = (chatId)=>{
@@ -172,7 +174,9 @@ function MessengerApi(options){
         }
         this.deleteMessage = (chatId, msgId)=>{
             return this.query('delete',`/chat/${chatId}/message/${msgId}`);
-
+        }
+        this.banUserFromChat = (userId, chatId)=>{
+            return this.query('delete',`/chat/${chatId}/ban/${userId}`)
         }
         this.sendMessageToChat = (chatId,msg)=>{
             msg.senderId=userId;
