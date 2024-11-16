@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/","/app","/ws/**").permitAll()
+                        .requestMatchers("/","/test","/app","/ws/**").permitAll()
                         
                         .requestMatchers("/js/**","/css/**","favicon.ico").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()

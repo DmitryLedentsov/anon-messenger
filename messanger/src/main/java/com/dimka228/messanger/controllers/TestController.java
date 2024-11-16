@@ -20,13 +20,19 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/test")
+
 public class TestController {
     @GetMapping("/test")
     public String test( ){
         //TODO: aa
         /*user = userService.getUser("aboba");
         id = 1;*/
+        try {
+            Thread.sleep(100) ;
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+           
+        }
 
         return "test";
     }
