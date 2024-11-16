@@ -8,6 +8,7 @@ import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
+import com.dimka228.messanger.services.SocketMessagingService;
 import com.dimka228.messanger.services.UserService;
 import com.dimka228.messanger.utils.LoginParser;
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 @RestController
 @AllArgsConstructor
 public class ChatController {
-    private final SimpMessagingTemplate msgTemplate;
+    private SocketMessagingService socketMessagingService;
     private UserService userService;
     private ChatService chatService;
     @PostMapping("/chat")
@@ -64,7 +65,7 @@ public class ChatController {
         ChatDTO chatDTO = new ChatDTO(chat.getId(),chat.getName(),null,null,chatDtoRequest.getUsers());
         OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO,OperationDTO.ADD);
         for(UserInChat cur: usersInChat){
-            msgTemplate.convertAndSend("/topic/user/"+cur.getUser().getId()+"/chats", data);
+            socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
         }
         
         //return "redirect:/chat/" + chat.getId().toString();
@@ -86,12 +87,12 @@ public class ChatController {
             System.out.println(users.get(0).getUser().getId());
             chatService.deleteOrLeaveChat(user,chat);
             for(UserInChat cur: users){
-                msgTemplate.convertAndSend("/topic/user/"+cur.getUser().getId()+"/chats", data);
+                socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
             }
         }
         else{
             chatService.deleteOrLeaveChat(user,chat);
-            msgTemplate.convertAndSend("/topic/user/"+user.getId()+"/chats", data);
+            socketMessagingService.sendChatOperationToUser(user.getId(), data);
         }
 
         return chatDTO;

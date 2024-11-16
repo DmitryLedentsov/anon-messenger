@@ -8,6 +8,7 @@ import com.dimka228.messanger.exceptions.AppException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
+import com.dimka228.messanger.services.SocketMessagingService;
 import com.dimka228.messanger.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -37,7 +38,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping("chat")
 public class MessageController {
-    private final SimpMessagingTemplate msgTemplate;
+    private SocketMessagingService socketMessagingService;
     private UserService userService;
     private ChatService chatService;
     @PostMapping("/{id}/send")
@@ -50,7 +51,7 @@ public class MessageController {
         Message added = chatService.addMessage(user,chat,chatMessage.getMessage());
         MessageDTO fullMsg = new MessageDTO(added.getId(),added.getData(),user.getId(),user.getLogin(),Instant.now().toString());
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
-        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
+        socketMessagingService.sendMessageOperationToChat(id, data);
         return chatMessage;
     }
 
@@ -65,7 +66,7 @@ public class MessageController {
 
         MessageDTO fullMsg = new MessageDTO(msgId,"aa",user.getId(),user.getLogin(), Instant.now().toString());
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg,OperationDTO.DELETE);
-        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
+        socketMessagingService.sendMessageOperationToChat(id, data);
         return fullMsg;
     }
 
