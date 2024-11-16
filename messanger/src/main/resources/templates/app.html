@@ -180,12 +180,12 @@
     <div class="chat-messages">
         <h5>Чат</h5>
         <script id="message-template" type="x-tmpl-mustache">
-            <div>
+            <div class="message-item" data-id="{{id}}">
                 <span>{{sender}} <span class="remove-btn" onclick="app.banUser({{senderId}});">-</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});">-</span> {{/isOwned}}</span>
                 <span class="message-time">{{sendTime}}</span>
             </div>
         </script>
-        <div id="messagesContainer"></div>
+        <div class="message-list"></div>
         <div class="input-group mt-3">
             <input type="text" id="messageInput" class="form-control" placeholder="Напишите сообщение...">
             <div class="btn btn-primary" onclick="app.sendMessage()">Отправить</button>
@@ -222,7 +222,10 @@
             
 
             this.onAddMsg = (chat,data)=>{
-                chat.messages.push(data)
+                chat.messages.push(data);
+
+                $msgList = $('.message-list');
+                $msgList.append(this.renderMsgTemplate(data));
             }
             this.onUpdateMsg=(chat,data)=>{
                 
@@ -230,6 +233,8 @@
             this.onDeleteMsg=(chat,data)=>{
                
                 chat.messages = chat.messages.filter((e)=>e.id!=data.id);
+                $(`.message-item[data-id=${data.id}]`).remove();
+
             }
 
             this.openChat = (id) => {
@@ -254,6 +259,8 @@
                 let data = m.data;
                 let chat = this.findChatById(chatId);
                 chat.messages = chat.messages || [];
+
+                if(chatId!=this.currentChatId) return;
                 if(op==="ADD") {
                     this.onAddMsg(chat,data);
                   
@@ -297,21 +304,23 @@
                     if(op==="ADD") {
                         this.chats.push(data);
                         this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
+                        
+                        $(".chat-list").append(this.renderChatTemplate(data));
                     }
                     else if(op==="DELETE") {
                         
                         this.chats = this.chats.filter((e)=>e.id!=data.id);
-                        if(this.currentChatId==data.id){
-                            this.currentChatId = this.chats[0].id;
-                            let chat = this.findChatById(this.currentChatId);
-                            this.renderMessages(chat?.messages || []);
+                        $(`.chat-item[data-id=${data.id}]`).remove();
+                        if(data.id == this.currentChatId){
+                            $('.message-list').empty();
                         }
+
                         
                     }
                     else if(op==="UPDATE") {
                         this.updateChat(data.id,data);
                     }
-                    this.renderChats();
+                    //this.renderChats();
                  });
 
                  this.renderChats();
@@ -376,7 +385,7 @@
                 console.log('rendering chat '+ chatId);
                 let chat = this.findChatById(chatId);
                 chat.messages = this.api.getMessagesFromChat(chatId);
-                $msgList = $('#messagesContainer');
+                $msgList = $('.message-list');
                 $msgList.empty();
                 chat.messages&& $.each(chat.messages, function(index, el) {
                     el.isOwned = userId==el.senderId;
@@ -385,6 +394,17 @@
                     $msgList.append(rendered);
       
                 });
+            }
+
+            this.renderChatTemplate = (chat)=>{
+                const template = $('#chat-template').html();
+                const rendered = Mustache.render(template, chat);
+                return rendered;
+            }
+            this.renderMsgTemplate = (msg)=>{
+                const template = $('#message-template').html();
+                const rendered = Mustache.render(template, msg);
+                return rendered;
             }
 
             this.sendMessage = ()=>{

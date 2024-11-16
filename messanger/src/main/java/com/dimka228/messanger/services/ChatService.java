@@ -102,20 +102,21 @@ public class ChatService {
     public String getUserRoleInChat(User user, Chat chat){
         return getUserInChat(user.getId(),chat.getId()).getRole();
     }
-    @Transactional
+    
     public void deleteOrLeaveChat(User user, Chat chat){
         UserInChat userInChat = getUserInChat(user.getId(),chat.getId());
-        if(Objects.equals(userInChat.getRole(), UserInChat.Roles.CREATOR)){
+        if(userInChat.getRole().equals(UserInChat.Roles.CREATOR)){
 
-            userInChatRepository.delete(userInChat);
-            chatRepository.deleteById(chat.getId());
+            deleteChat(chat.getId());
+            System.out.println("deleting chat");
+            
         } else {
             userInChatRepository.delete(userInChat);
         }
     }
 
     public void deleteChat(Integer id){
-        chatRepository.deleteById(id);
+        chatRepository.deleteByIdCascading(id);
     }
     public void deleteUserFromChat(UserInChat userInChat){
         userInChatRepository.delete(userInChat);

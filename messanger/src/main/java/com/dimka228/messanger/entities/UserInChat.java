@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Table(name = "m_user_in_chat", indexes = {
         @Index(name = "m_user_in_chat_user_id_idx", columnList = "user_id")
@@ -18,11 +21,14 @@ public class UserInChat {
     @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    //https://stackoverflow.com/questions/7197181/jpa-unidirectional-many-to-one-and-cascading-delete
     @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "chat_id", nullable = false)
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     private Chat chat;
 
     @Column(name = "role", nullable = false, length = 20)
@@ -52,6 +58,10 @@ public class UserInChat {
         this.user = user;
     }
 
+    public void clear(){
+        this.user = null;
+        this.chat = null;
+    }
     public static class Roles{
         public static final String CREATOR = "CREATOR";
         public static final String REGULAR = "REGULAR";
