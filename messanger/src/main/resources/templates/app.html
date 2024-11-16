@@ -11,7 +11,7 @@
             display: flex;
             height: 100vh;
         }
-        .chat-list, .chat-messages {
+        .chat-list, .chat-messages-section {
             padding: 1rem;
         }
         .chats-section {
@@ -21,7 +21,7 @@
             overflow-y: auto;
             color: blue;
         }
-        .chat-messages {
+        .chat-messages-section {
             width: 70%;
             overflow-y: auto;
             color: blue;
@@ -177,7 +177,7 @@
     </div>
 
     <!-- Сообщения чата -->
-    <div class="chat-messages">
+    <div class="chat-messages-section">
         <h5>Чат</h5>
         <script id="message-template" type="x-tmpl-mustache">
             <div class="message-item" data-id="{{id}}">
@@ -235,6 +235,19 @@
                 chat.messages = chat.messages.filter((e)=>e.id!=data.id);
                 $(`.message-item[data-id=${data.id}]`).remove();
 
+            }
+
+            this.onAddChat = (data)=>{
+                $(".chat-list").append(this.renderChatTemplate(data));
+            }
+            this.onDeleteChat = (data)=>{
+                $(`.chat-item[data-id=${data.id}]`).remove();
+                if(data.id == this.currentChatId){
+                    $('.message-list').empty();
+                }
+            }
+            this.onUpdateChat = (data)=>{
+                
             }
 
             this.openChat = (id) => {
@@ -304,21 +317,18 @@
                     if(op==="ADD") {
                         this.chats.push(data);
                         this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
-                        
-                        $(".chat-list").append(this.renderChatTemplate(data));
+                        this.onAddChat(data);
                     }
                     else if(op==="DELETE") {
                         
                         this.chats = this.chats.filter((e)=>e.id!=data.id);
-                        $(`.chat-item[data-id=${data.id}]`).remove();
-                        if(data.id == this.currentChatId){
-                            $('.message-list').empty();
-                        }
+                        this.onDeleteChat(data)
 
                         
                     }
                     else if(op==="UPDATE") {
                         this.updateChat(data.id,data);
+                        this.onUpdateChat(data);
                     }
                     //this.renderChats();
                  });
