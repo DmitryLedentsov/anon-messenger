@@ -102,6 +102,7 @@ public class ChatService {
     public String getUserRoleInChat(User user, Chat chat){
         return getUserInChat(user.getId(),chat.getId()).getRole();
     }
+    @Transactional
     public void deleteOrLeaveChat(User user, Chat chat){
         UserInChat userInChat = getUserInChat(user.getId(),chat.getId());
         if(Objects.equals(userInChat.getRole(), UserInChat.Roles.CREATOR)){
