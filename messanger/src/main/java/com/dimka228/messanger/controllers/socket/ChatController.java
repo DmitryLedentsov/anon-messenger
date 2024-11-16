@@ -6,6 +6,8 @@ import com.dimka228.messanger.dto.MessageDTO;
 import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
+import com.dimka228.messanger.exceptions.WronPasswordException;
+import com.dimka228.messanger.exceptions.WrongPrivilegesException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.SocketMessagingService;
@@ -105,6 +107,16 @@ public class ChatController {
         List<Chat> chats = chatService.getChatsForUser(user);
 
         return chats;
+    }
+
+    @DeleteMapping("/chat/{chatId}/{userId}")
+    void banUser( @PathVariable Integer chatId,@PathVariable Integer userId,  Principal principal){
+        User cur = userService.getUser(principal.getName());
+        Chat chat = chatService.getChat(chatId);
+        User user = userService.getUser(userId);
+        UserInChat userInChat = chatService.getUserInChat(user,chat);
+        if(!userInChat.getRole().equals(UserInChat.Roles.CREATOR)) throw new WrongPrivilegesException();
+        chatService.deleteUserFromChat(userInChat);
     }
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")

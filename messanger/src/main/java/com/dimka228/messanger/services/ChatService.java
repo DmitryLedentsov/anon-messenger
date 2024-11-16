@@ -68,6 +68,9 @@ public class ChatService {
             throw new UserNotInChatException(userId, chatId);
         }
     }
+    public UserInChat getUserInChat(User user, Chat chat){
+        return getUserInChat(user.getId(), chat.getId());
+    }
 
     public void addUserInChat(User user, Chat chat, String role) {
         UserInChat userInChat = new UserInChat();
@@ -106,6 +109,13 @@ public class ChatService {
         } else {
             userInChatRepository.delete(userInChat);
         }
+    }
+
+    public void deleteChat(Integer id){
+        chatRepository.deleteById(id);
+    }
+    public void deleteUserFromChat(UserInChat userInChat){
+        userInChatRepository.delete(userInChat);
     }
 
     public List<UserInChat> getUsersInChat(Chat chat){
