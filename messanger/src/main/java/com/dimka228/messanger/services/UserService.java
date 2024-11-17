@@ -41,11 +41,11 @@ public class UserService {
         return repository.findAll();
     }
     public User addUser(User newUser) {
-        if(checkUser(newUser.getLogin())) throw  new UserExistsException(newUser.getLogin());
+        if(checkUser(newUser.getLogin())) throw  new UserExistsException();
         return repository.save(newUser);
     }
     public User registerUser(User newUser) {
-        if(checkUser(newUser.getLogin())) throw  new UserExistsException(newUser.getLogin());
+        if(checkUser(newUser.getLogin())) throw  new UserExistsException();
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         return repository.save(newUser);
     }
@@ -55,16 +55,16 @@ public class UserService {
     }
     public User getUserByLogin(String login) {
         try {
-            return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
+            return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
         }catch (EntityNotFoundException e){
             throw new UserNotFoundException(login);
         }
     }
     public User getUser(Integer id) {
         try {
-            return repository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
+            return repository.findById(id).orElseThrow(() -> new UserNotFoundException());
         }catch (EntityNotFoundException e){
-            throw new UserNotFoundException(id.toString());
+            throw new UserNotFoundException();
         }
     }
     public void deleteUser(Integer id) {
@@ -91,7 +91,7 @@ public class UserService {
 
 
     public List<UserAction> getUserActionList(Integer id){
-        if(!checkUser(id)) throw new UserNotFoundException(id.toString());
+        if(!checkUser(id)) throw new UserNotFoundException();
         return actionRepository.findAllByUserId(id).orElse(Collections.emptyList());
     }
 

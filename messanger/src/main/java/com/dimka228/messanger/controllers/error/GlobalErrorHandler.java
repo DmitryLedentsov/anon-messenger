@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -110,6 +111,14 @@ public class GlobalErrorHandler{
     ){
         return createExceptionMessage(e.getMessage(), HttpStatus.BAD_REQUEST, webRequest);
     }
+
+    /*@ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleAppException(
+        HttpMessageNotReadableException e, WebRequest webRequest
+    ){
+        return createExceptionMessage("bad request data", HttpStatus.BAD_REQUEST, webRequest);
+    }*/
 
 
 

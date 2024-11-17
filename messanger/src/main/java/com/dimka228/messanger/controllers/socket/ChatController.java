@@ -7,7 +7,7 @@ import com.dimka228.messanger.dto.OperationDTO;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.CannotBanSelfException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
-import com.dimka228.messanger.exceptions.WronPasswordException;
+import com.dimka228.messanger.exceptions.WrongPasswordException;
 import com.dimka228.messanger.exceptions.WrongPrivilegesException;
 import com.dimka228.messanger.models.MessageInfo;
 import com.dimka228.messanger.services.ChatService;

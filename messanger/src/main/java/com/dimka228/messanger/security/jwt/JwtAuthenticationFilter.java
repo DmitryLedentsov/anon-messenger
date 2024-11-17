@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 
-import com.dimka228.messanger.exceptions.WronPasswordException;
+import com.dimka228.messanger.exceptions.WrongPasswordException;
 import com.dimka228.messanger.exceptions.WrongTokenException;
 import com.dimka228.messanger.security.UserDetailsServiceImpl;
 import com.dimka228.messanger.services.UserDetailsService;

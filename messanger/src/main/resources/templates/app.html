@@ -359,8 +359,8 @@
 
             this.register = ()=>{
                 let data = {"login": $('#login').val(), "password": $('#password').val()};
-                this.api.registerUser(data);
-                this.auth();
+                let result = this.api.registerUser(data);
+                if(result) this.auth();
                 
             }
 

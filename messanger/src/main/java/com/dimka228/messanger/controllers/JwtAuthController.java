@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +20,11 @@ import com.dimka228.messanger.dto.UserDto;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.exceptions.AppException;
 import com.dimka228.messanger.exceptions.UserNotFoundException;
-import com.dimka228.messanger.exceptions.WronPasswordException;
+import com.dimka228.messanger.exceptions.WrongPasswordException;
 import com.dimka228.messanger.security.jwt.TokenProvider;
 import com.dimka228.messanger.services.UserService;
+
+import jakarta.validation.Valid;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +46,8 @@ public class JwtAuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody UserDto userDto) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid UserDto userDto, BindingResult result) {
+        result.failOnError((m)->new WrongPasswordException("passwd must be 5 letters length"));
         User user = userDto.getUser();
       
     
@@ -68,7 +72,7 @@ public class JwtAuthController {
             final String token = jwtTokenUtil.generateToken(userDto.getUser());
             return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
         } catch (Exception e){
-            throw new WronPasswordException();
+            throw new WrongPasswordException();
         }
     }
 }
