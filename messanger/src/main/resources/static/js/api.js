@@ -27,7 +27,7 @@ function MessengerApi(options){
 
     this.query = function(method, path, data, async=false){
         let response = null;
-        console.log(`sending ${method} request on ${options.serverUrl}${path}`);
+        console.log(`sending ${method} request on ${options.serverUrl}${path} ${data? JSON.stringify(data): ''}`);
         $.ajax({
             url: `${options.serverUrl}${path}`,         /* Куда отправить запрос */
             method: method,             /* Метод запроса (post или get) */
@@ -36,9 +36,10 @@ function MessengerApi(options){
             data: JSON.stringify(data),     /* Данные передаваемые в массиве */
             async: async,
             contentType : 'application/json',
-            success: function(data){   /* функция которая будет выполнена после успешного запроса.  */
-                 console.log(data||{}); /* В переменной data содержится ответ от index.php. */
-                 response = data||{};
+            success: function(res){   /* функция которая будет выполнена после успешного запроса.  */
+                 
+                 response = res||{};
+                 console.log(res);
             },
             error: function (xhr, ajaxOptions, thrownError){   /* функция которая будет выполнена после успешного запроса.  */
                 if (xhr.status == 200) return xhr.responseText;

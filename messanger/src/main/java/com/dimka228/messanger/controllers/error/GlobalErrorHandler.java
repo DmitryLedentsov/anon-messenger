@@ -72,7 +72,7 @@ public class GlobalErrorHandler{
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     public Map<String, Object> handleSignatureException(
             SignatureException e, WebRequest webRequest){
-        return  createExceptionMessage(e.getLocalizedMessage(), HttpStatus.FORBIDDEN, webRequest);
+        return  createExceptionMessage("invalid token", HttpStatus.FORBIDDEN, webRequest);
     }
 
     @ExceptionHandler(JwtException.class)
@@ -111,6 +111,9 @@ public class GlobalErrorHandler{
     ){
         return createExceptionMessage(e.getMessage(), HttpStatus.BAD_REQUEST, webRequest);
     }
+
+ 
+
 
     /*@ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
