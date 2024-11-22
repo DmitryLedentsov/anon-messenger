@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 @Service
@@ -71,8 +72,8 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public List<UserStatus> getUserStatusList(User user){
-        return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptyList());
+    public Set<UserStatus> getUserStatusList(User user){
+        return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
     }
     public boolean checkUserStatus(User user, String status){
         return getUserStatusList(user).stream().anyMatch(s->s.getName().equals(status));

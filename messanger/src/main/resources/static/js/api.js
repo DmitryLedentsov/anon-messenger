@@ -184,6 +184,13 @@ function MessengerApi(options){
             return this.query('post',`/chat/${chatId}/send`,{message:msg});
         }
 
+        this.getUserInChat = (chatId,userId)=>{
+            return this.query('get',`/chat/${chatId}/user/${userId}`);
+        }
+
+        this.getAllRolesInChat = (chatId)=>{
+            return this.query('get',`/chat/${chatId}/roles`);
+        }
         this.getChats = ()=>{
             
             let response = this.query('get',`/chats`);

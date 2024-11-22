@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Data
 public class UserProfileDTO {
     String login;
-    Integer rating;
-    List<String> statusList;
+    String role;
+    Set<String> statuses;
     String registrationTime;
+    
 }

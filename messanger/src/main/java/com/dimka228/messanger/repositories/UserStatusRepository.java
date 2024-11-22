@@ -8,11 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @Transactional
 public interface UserStatusRepository extends JpaRepository<UserStatus, Integer> {
-    Optional<List<UserStatus>> findAllByUserId(Integer id);
+    Optional<Set<UserStatus>> findAllByUserId(Integer id);
     @Transactional
     void deleteByUserIdAndName(Integer id,String s);
     boolean existsByUserIdAndName(Integer id, String name);

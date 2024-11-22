@@ -39,7 +39,10 @@ import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @AllArgsConstructor
@@ -134,6 +137,13 @@ public class ChatController {
        
         
     }
+
+    @GetMapping("/chat/{chatId}/roles")
+    public Set<String> getRoles(@PathVariable Integer chatId) {
+        Chat chat = chatService.getChat(chatId);
+        return chatService.getAllRolesInChat(chat);
+    }
+    
     /*@MessageMapping("/chat/.addUser")
     @SendTo("/topic/public")
     public MessageInfo addUser(@Payload MessageInfo chatMessage,

@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -124,5 +127,13 @@ public class ChatService {
 
     public List<UserInChat> getUsersInChat(Chat chat){
         return userInChatRepository.findAllByChatId(chat.getId()).orElse(Collections.emptyList());
+    }
+
+    public Set<String> getAllRolesInChat(Chat chat){
+        Set<String> list = new HashSet<>();
+        for (UserInChat userInChat : getUsersInChat(chat)) {
+            list.add(userInChat.getRole());
+        }
+        return list;
     }
 }

@@ -3,37 +3,44 @@ package com.dimka228.messanger.controllers;
 import com.dimka228.messanger.dto.UserProfileDTO;
 import com.dimka228.messanger.entities.*;
 import com.dimka228.messanger.models.MessageInfo;
+import com.dimka228.messanger.services.ChatService;
 import com.dimka228.messanger.services.UserService;
 import com.dimka228.messanger.utils.DateConverter;
 import lombok.AllArgsConstructor;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-@Controller
-@RequestMapping("/users")
+@RestController
 public class UsersController {
     private final UserService userService;
-    @GetMapping("/profile/{id}")
-    public String profile(@PathVariable Integer id, Model model ){
+    private final ChatService chatService;
+    @GetMapping("/chat/{chatId}/user/{id}")
+    public UserProfileDTO profile(@PathVariable Integer chatId,@PathVariable Integer id ){
         //TODO: aa
         /*user = userService.getUser("aboba");
         id = 1;*/
 
         User user = userService.getUser(id);
+        Chat chat = chatService.getChat(chatId);
         UserProfile profile = userService.getUserProfile(user);
-        List<String> userStatuses = userService.getUserStatusList(user).stream().map(s->s.getName()).collect(Collectors.toList());
+        Set<String> userStatuses = userService.getUserStatusList(user).stream().map(s->s.getName()).collect(Collectors.toSet());
         Instant registrationTime = userService.getLastUserActionTime(user,UserAction.REGISTER);
-        UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(),profile.getRating(),userStatuses, DateConverter.format(registrationTime));
 
-        model.addAttribute("profile", profileDTO);
-        return "profile";
+        UserInChat userInChat = chatService.getUserInChat(user,chat);
+        UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(),userInChat.getRole(),userStatuses, DateConverter.format(registrationTime));
+
+        return profileDTO;
     }
 }

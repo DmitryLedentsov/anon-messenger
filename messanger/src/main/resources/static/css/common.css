@@ -54,7 +54,7 @@ li {
     font-size: 15px;
     font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
 }
-.element, .btn, .modal-content {
+.element, .btn, .modal-content, .form-control {
     /*text-decoration: none;
     text-align: left;*/
     background-color: #121212;
@@ -120,7 +120,7 @@ dt {
     padding: 10px;
 }
 ul {list-style: none;}
-ul li::before {content: ">>  "; color: #B5E853;}
+ul li::before {content: "⮞⮞  "; color: #B5E853;}
 ol {display: table; margin-left: 0; margin-right: auto; list-style-position: inside;}
 /*  font style  */
 .bold {font-weight: bold;}
@@ -130,7 +130,8 @@ ol {display: table; margin-left: 0; margin-right: auto; list-style-position: ins
 .strickthrough {text-decoration: line-through;}
 .underline {text-decoration: underline;}
 .keyword {color: #E867E8; border: 1px solid gray; background-color: black; padding: 2px 2px; }
-.linkk {color: #6CBDEC; text-decoration: underline;}
+.link {color: #6CBDEC}
+.link:hover {text-decoration: underline; cursor: pointer;}
 .w3-black,.w3-hover-black:hover{color:#BAB9B9!important;background-color:#000!important}
 /* margin for button */
 .leftmar {margin-left: 30px;}
@@ -178,6 +179,10 @@ input[type="password"]:focus {
 .form-control {
     background-color: rgb(45, 52, 61);
 }
+.form-control:disabled {
+    background-color: rgb(45, 52, 61);
+}
+
 
 .form-control:focus {
     background-color: rgb(45, 52, 61);
@@ -200,6 +205,7 @@ input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus,
 .uneditable-input:focus,
+.form-control:focus,
 .selected-item{   
   border-color: rgba(126, 239, 104, 0.8);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
@@ -207,3 +213,4 @@ input[type="color"]:focus,
   background-color: rgba(0, 0, 0, 0.075);
   color: white;
 }
+
