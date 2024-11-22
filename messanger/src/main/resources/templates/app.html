@@ -293,7 +293,8 @@
                 chat.messages.push(data);
 
                 $msgList = $('.message-list');
-                $msgList.append(this.renderMsgTemplate(data));
+                appendListItem('.message-list',this.renderMsgTemplate(data),)
+                //$msgList.append(this.renderMsgTemplate(data));
             }
             this.onUpdateMsg=(chat,data)=>{
                 
@@ -374,10 +375,18 @@
                     this.onUpdateMsg(chat,data);
                 }
                 if(chatId==this.currentChatId){
-                    this.renderMessages(chatId);
+                    //this.renderMessages(chatId);
                 }
             }
 
+            function appendListItem(listName, listItemHTML){
+                $(listItemHTML)
+                    .hide()
+                    .css('opacity',0.0)
+                    .appendTo(listName)
+                    .slideDown('slow')
+                    .animate({opacity: 1.0})
+            }
 
             this.onError = (error)=>{
                 console.log(error);
@@ -482,6 +491,7 @@
                 $.each(this.chats, function(index, el) {
                     const rendered = Mustache.render(template, el);
                     $chatList.append(rendered);
+                    
       
                 });
             }
@@ -499,7 +509,8 @@
                     el.isOwned = userId==el.senderId;
                     
                     const rendered = Mustache.render(template, el);
-                    $msgList.append(rendered);
+                    //$msgList.append(rendered);
+                    appendListItem('.message-list',rendered);
       
                 });
             }
@@ -510,6 +521,9 @@
                 return rendered;
             }
             this.renderMsgTemplate = (msg)=>{
+                let userId = this.token.userId;
+                msg.isOwned = userId==msg.senderId;
+                    
                 const template = $('#message-template').html();
                 const rendered = Mustache.render(template, msg);
                 return rendered;
