@@ -39,7 +39,7 @@ public class UsersController {
         Instant registrationTime = userService.getLastUserActionTime(user,UserAction.REGISTER);
 
         UserInChat userInChat = chatService.getUserInChat(user,chat);
-        UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(),userInChat.getRole(),userStatuses, DateConverter.format(registrationTime));
+        UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(),userInChat.getRole(),user.getId(),userStatuses, DateConverter.format(registrationTime));
 
         return profileDTO;
     }

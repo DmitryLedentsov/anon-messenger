@@ -11,6 +11,7 @@ import java.util.Set;
 public class UserProfileDTO {
     String login;
     String role;
+    Integer id;
     Set<String> statuses;
     String registrationTime;
     

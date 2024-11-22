@@ -342,6 +342,7 @@
 
             this.onError = (error)=>{
                 if(error.message) error = error.message;
+                //$('.modal').modal('hide');
                 $("#errorModalMessage").html(error);
                 $("#errorModal").modal('show');;
             }
@@ -349,6 +350,7 @@
             this.initEvents = ()=>{
                 $('.btn-close').on('click',function(e){
                     $(this).closest('.modal').modal('hide');
+                    console.log('hide modal');
                 })
             }
 
@@ -490,7 +492,8 @@
               mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
                   if (node.nodeType === 1 && !node["htmx-internal-data"]) {
-                    htmx.process(node)
+                    htmx.process(node);
+                    app.initEvents();
                   }
                 })
               })
