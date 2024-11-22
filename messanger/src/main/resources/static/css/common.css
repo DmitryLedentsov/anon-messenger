@@ -2,6 +2,7 @@
 
 :root {
     color-scheme: dark;
+    --main-color: #B5E853;
 }
 body {
     height: 100%;
