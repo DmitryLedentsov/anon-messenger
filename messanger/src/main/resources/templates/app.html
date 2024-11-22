@@ -125,13 +125,13 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
             </div>
             <div class="modal-body" id="errorModalMessage">
                 <!-- Сообщение об ошибке будет вставляться сюда -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary " data-bs-dismiss="modal" aria-label="Close">Закрыть</button>
+                <button type="button" class="btn btn-secondary  btn-close" data-bs-dismiss="modal" aria-label="Close">Закрыть</button>
             </div>
         </div>
     </div>
@@ -341,6 +341,7 @@
 
 
             this.onError = (error)=>{
+                console.log(error);
                 if(error.message) error = error.message;
                 //$('.modal').modal('hide');
                 $("#errorModalMessage").html(error);

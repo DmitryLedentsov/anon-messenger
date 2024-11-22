@@ -45,7 +45,7 @@ function MessengerApi(options){
                 if (xhr.status == 200) return xhr.responseText;
                 console.log([xhr, ajaxOptions, thrownError])
             
-                options.onError && options.onError(xhr.responseJSON || xhr.responseText);
+                options.onError && thrownError.name=='NetworkError'?options.onError({message:"connection error"}): options.onError(xhr.responseJSON || xhr.responseText);
                 throw new Error(xhr.responseJSON || xhr.responseText || 'connection error');
             }
         });
@@ -78,14 +78,15 @@ function MessengerApi(options){
         };
     
         this.client.onWebSocketError = (error) => {
-            options.onError && options.onError(error);
+            options.onError && options.onError("connection error");
             console.error('Error with websocket', error);
         };
     
         this.client.onStompError = (frame) => {
-            options.onError && options.onError( frame.headers['message']);
             console.error('Broker reported error: ' + frame.headers['message']);
             console.error('Additional details: ' + frame.body);
+            options.onError && options.onError( frame.headers['message']);
+      
         };
     
     
