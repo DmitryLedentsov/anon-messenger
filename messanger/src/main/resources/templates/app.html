@@ -493,9 +493,9 @@
                 mutation.addedNodes.forEach((node) => {
                   if (node.nodeType === 1 && !node["htmx-internal-data"]) {
                     htmx.process(node);
-                    app.initEvents();
                   }
                 })
+                app.initEvents();
               })
             })
             observer.observe(document, {childList: true, subtree: true})

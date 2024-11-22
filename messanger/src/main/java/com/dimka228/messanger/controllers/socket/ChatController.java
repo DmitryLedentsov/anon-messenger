@@ -65,7 +65,7 @@ public class ChatController {
         }
 
         List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
-        System.out.println(usersInChat.get(0).getUser().getId());
+      
        
         chatDtoRequest.getUsers().add(user.getLogin());//добавляем нашего
        
@@ -91,7 +91,7 @@ public class ChatController {
         if(chatService.getUserRoleInChat(user,chat).equals(UserInChat.Roles.CREATOR)){
 
             List<UserInChat> users = chatService.getUsersInChat(chat);
-            System.out.println(users.get(0).getUser().getId());
+
             chatService.deleteOrLeaveChat(user,chat);
             for(UserInChat cur: users){
                 socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);

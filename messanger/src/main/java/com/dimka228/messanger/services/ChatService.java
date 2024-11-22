@@ -111,7 +111,6 @@ public class ChatService {
         if(userInChat.getRole().equals(UserInChat.Roles.CREATOR)){
 
             deleteChat(chat.getId());
-            System.out.println("deleting chat");
             
         } else {
             userInChatRepository.delete(userInChat);
