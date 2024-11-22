@@ -26,9 +26,7 @@
             overflow-y: auto;
             color: blue;
         }
-        .selected-item{
-            color: red;
-        }
+      
         .chat-item {
             display: flex;
             justify-content: space-between;
@@ -161,6 +159,30 @@
     </div>
 </div>
 
+<!-- Модальное окно для создания чата -->
+<script id="user-in-chat-modal-template" type="x-tmpl-mustache">
+<div class="modal" id="editUserInChat" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"  data-bs-theme="dark">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userinChatLogin">{{login}}</h5>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="userInChatName" class="form-label">Название чата</label>
+                    <input type="text" class="form-control" id="userInChatName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="users" class="form-label">Пользователи</label>
+                    <input type="text" class="form-control" id="users" required>
+                </div>
+                <button class="btn btn-primary btn-close" onclick="app.createChat()">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+
  <!-- Основная часть приложения -->
  <div class="app-container" data-bs-theme="dark">
     <!-- Список чатов -->
@@ -169,7 +191,7 @@
         <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-target="#createChatModal">Создать чат</button>
         <div class="chat-list"></div>
         <script id="chat-template" type="x-tmpl-mustache">
-            <div class="btn chat-item" data-id="{{id}}" onclick="app.renderMessages({{id}})">
+            <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                 <span>{{name}}</span>
                 <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});">-</span>
             </div>
@@ -257,8 +279,14 @@
                 $(`.chat-item[data-id=${id}]`).addClass('selected-item');
                 let chat = this.findChatById(id);
                 console.log(chat);
-                this.renderMessages(chat.messages || []);
+                this.api.subscribeOnMessagesInChat(id,(msg)=>this.receiveMsg(id,msg));
+                this.renderMessages(id);
+               
             };
+
+            this.openUserInChat = (id)=>{
+                
+            }
 
             this.createChat = ()=>{
                 let users = $('#users').val();
@@ -308,15 +336,15 @@
                 this.api = new MessengerApi({serverUrl: 'http://localhost:9087', brokerUrl:'ws://localhost:9087/ws', onConnect: (m)=>{
                 this.chats = this.api.getChats();
                
-                this.chats.forEach(el => {
-                    this.api.subscribeOnMessagesInChat(el.id,(msg)=>this.receiveMsg(el.id,msg));
-                });
+                //this.chats.forEach(el => {
+                //    this.api.subscribeOnMessagesInChat(el.id,(msg)=>this.receiveMsg(el.id,msg));
+                //});
                 this.api.subscribeOnChats((m)=>{
                     let op = m.operation;
                     let data = m.data;
                     if(op==="ADD") {
                         this.chats.push(data);
-                        this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
+                        //this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
                         this.onAddChat(data);
                     }
                     else if(op==="DELETE") {
@@ -375,6 +403,11 @@
 
             this.banUser = (id)=>{
                 this.api.banUserFromChat(id, this.currentChatId);
+            }
+
+            this.renderUserInChatModal = (user)=>{
+                const template = $('#user-in-chat-modal-template').html();
+                $('body').append(template);
             }
             this.renderChats = ()=>{
                 const template = $('#chat-template').html();
