@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/","/test","/app","/ws/**").permitAll()
                         
-                        .requestMatchers("/js/**","/css/**","favicon.ico").permitAll()
+                        .requestMatchers("/js/**","/css/**","/icons/**","favicon.ico").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api-docs/**", "/api-docs-ui/*").permitAll()
                         .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
