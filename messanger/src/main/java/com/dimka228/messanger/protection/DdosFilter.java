@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DdosFilter implements Filter {
 
     private final ConcurrentHashMap<String, AtomicLong> requestCount = new ConcurrentHashMap<>();
-    private final long rateLimit = 50; 
+    private final long rateLimit = 70; 
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

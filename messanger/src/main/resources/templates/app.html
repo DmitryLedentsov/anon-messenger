@@ -302,15 +302,15 @@
             this.onDeleteMsg=(chat,data)=>{
                
                 chat.messages = chat.messages.filter((e)=>e.id!=data.id);
-                $(`.message-item[data-id=${data.id}]`).remove();
+                removeItem(`.message-item[data-id=${data.id}]`);
 
             }
 
             this.onAddChat = (data)=>{
-                $(".chat-list").append(this.renderChatTemplate(data));
+                appendListItem(".chat-list",this.renderChatTemplate(data));
             }
             this.onDeleteChat = (data)=>{
-                $(`.chat-item[data-id=${data.id}]`).remove();
+                removeItem(`.chat-item[data-id=${data.id}]`);
                 if(data.id == this.currentChatId){
                     $('.message-list').empty();
                 }
@@ -384,8 +384,12 @@
                     .hide()
                     .css('opacity',0.0)
                     .appendTo(listName)
-                    .slideDown('slow')
+                    .slideDown(100)
                     .animate({opacity: 1.0})
+            }
+
+            function removeItem(name){
+                $(name).fadeOut(300, function(){ $(this).remove();});
             }
 
             this.onError = (error)=>{
@@ -490,7 +494,8 @@
                 $chatList.empty();
                 $.each(this.chats, function(index, el) {
                     const rendered = Mustache.render(template, el);
-                    $chatList.append(rendered);
+                    //$chatList.append(rendered);
+                    appendListItem('.chat-list',rendered);
                     
       
                 });
