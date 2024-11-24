@@ -1,8 +1,12 @@
 FROM base as database
 
+ENV APP=messenger-0.0.1-spring-boot.jar
+ENV SERVICEPATH=/etc/main_service
+ENV INSTALLPATH=${SERVICEPATH}/infra/installation
+ENV BINPATH=${SERVICEPATH}/bin
+
 #run configuration scripts
 RUN set -a; source ${INSTALLPATH}/postgresql/install.sh postgresql; set +a
-RUN ls -l
 
 # EXPOSE 443/tcp
 # EXPOSE 80/tcp
