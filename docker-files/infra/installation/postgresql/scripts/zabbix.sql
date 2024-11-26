@@ -1,0 +1,3 @@
+CREATE ROLE "zabbix" WITH LOGIN PASSWORD 'athyfylj';
+
+CREATE DATABASE "zabbix" WITH OWNER 'zabbix';
