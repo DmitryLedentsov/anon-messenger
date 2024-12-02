@@ -31,17 +31,17 @@
         <!--Logger for org.springframework.boot package-->
         <Logger name="org.springframework" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile" level="WARN"/>
+            <!--<AppenderRef ref="RollingFile" level="WARN"/>-->
         </Logger>
         <!--Logger for org.apache.catalina package-->
         <Logger name="org.apache.catalina" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile" level="DEBUG"/>
+            <!--<AppenderRef ref="RollingFile" level="DEBUG"/>-->
         </Logger>
         <!--Logger for org.hibernate package-->
         <Logger name="org.hibernate" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile" level="WARN"/>
+            <!--<AppenderRef ref="RollingFile" level="WARN"/>-->
         </Logger>
         <!--Logger for com.zaxxer.hikari package-->
         <Logger name="com.zaxxer.hikari" level="WARN" additivity="false">
