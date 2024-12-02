@@ -5,11 +5,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 @Order(1)
 public class DdosFilter implements Filter {
 
@@ -25,7 +27,7 @@ public class DdosFilter implements Filter {
     if (count.incrementAndGet() > rateLimit) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
       httpResponse.setStatus(429);
-      // System.out.println("ddos attack!!!");
+      log.info("ddos attack!!!");
       httpResponse.getWriter().write("Rate limit exceeded. Please try again later.");
       return;
     }

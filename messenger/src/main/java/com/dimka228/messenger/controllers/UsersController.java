@@ -5,7 +5,6 @@ import com.dimka228.messenger.entities.*;
 import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
-import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;

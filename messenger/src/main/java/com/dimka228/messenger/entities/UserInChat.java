@@ -42,7 +42,6 @@ public class UserInChat {
     this.joinTime = i;
   }
 
-
   public String getRole() {
     return role;
   }
