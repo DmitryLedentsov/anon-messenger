@@ -2,13 +2,15 @@ package com.dimka228.messenger.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateConverter {
-  private static final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
+  private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
   public static String format(Instant instant) {
-    Date date = Date.from(instant);
-    return formatter.format(date);
+    return formatter.format(instant);
   }
 }

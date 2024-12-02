@@ -1,13 +1,11 @@
 package com.dimka228.messenger.services;
 
 import com.dimka228.messenger.entities.User;
-import com.dimka228.messenger.entities.UserAction;
 import com.dimka228.messenger.entities.UserProfile;
 import com.dimka228.messenger.entities.UserStatus;
 import com.dimka228.messenger.exceptions.ActionNotFoundException;
 import com.dimka228.messenger.exceptions.UserExistsException;
 import com.dimka228.messenger.exceptions.UserNotFoundException;
-import com.dimka228.messenger.repositories.UserActionRepository;
 import com.dimka228.messenger.repositories.UserProfileRepository;
 import com.dimka228.messenger.repositories.UserRepository;
 import com.dimka228.messenger.repositories.UserStatusRepository;
@@ -26,7 +24,6 @@ public class UserService {
   private final UserRepository repository;
   private final BCryptPasswordEncoder passwordEncoder;
   private final UserStatusRepository statusRepository;
-  private final UserActionRepository actionRepository;
   private final UserProfileRepository profileRepository;
 
   public boolean checkUser(String login) {
@@ -97,23 +94,10 @@ public class UserService {
     statusRepository.deleteByUserIdAndName(u.getId(), s);
   }
 
-  public List<UserAction> getUserActionList(Integer id) {
-    if (!checkUser(id)) throw new UserNotFoundException();
-    return actionRepository.findAllByUserId(id).orElse(Collections.emptyList());
-  }
+
 
   public UserProfile getUserProfile(User user) {
     return profileRepository.findByUserId(user.getId());
   }
 
-  public Instant getLastUserActionTime(User user, String name) {
-    try {
-      return actionRepository
-          .findFirstByUserIdAndNameOrderByTimeDesc(user.getId(), name)
-          .orElseThrow(() -> new ActionNotFoundException(name))
-          .getTime();
-    } catch (EntityNotFoundException e) {
-      throw new ActionNotFoundException(name);
-    }
-  }
 }
