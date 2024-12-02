@@ -4,6 +4,8 @@ import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserStatus;
 import com.dimka228.messenger.services.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -11,6 +13,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class WebSocketEventListener {
   private final UserService userService;
 
@@ -22,7 +25,7 @@ public class WebSocketEventListener {
     User user = userService.getUser(event.getUser().getName());
     userService.addUserStatus(user, UserStatus.ONLINE);
 
-    System.out.println("new session for user: " + user.getLogin());
+    log.info("new session for user: " + user.getLogin());
   }
 
   @EventListener
@@ -30,6 +33,6 @@ public class WebSocketEventListener {
     if (event.getUser() == null) return;
     User user = userService.getUser(event.getUser().getName());
     userService.removeUserStatus(user, UserStatus.ONLINE);
-    System.out.println("session disconnected user: " + user.getLogin());
+    log.info("session disconnected user: " + user.getLogin());
   }
 }

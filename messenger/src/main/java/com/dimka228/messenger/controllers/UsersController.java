@@ -32,8 +32,6 @@ public class UsersController {
         userService.getUserStatusList(user).stream()
             .map(s -> s.getName())
             .collect(Collectors.toSet());
-    Instant registrationTime = userService.getLastUserActionTime(user, UserAction.REGISTER);
-
     UserInChat userInChat = chatService.getUserInChat(user, chat);
     UserProfileDTO profileDTO =
         new UserProfileDTO(
@@ -41,7 +39,7 @@ public class UsersController {
             userInChat.getRole(),
             user.getId(),
             userStatuses,
-            DateConverter.format(registrationTime));
+            DateConverter.format(userInChat.getJoinTime()));
 
     return profileDTO;
   }

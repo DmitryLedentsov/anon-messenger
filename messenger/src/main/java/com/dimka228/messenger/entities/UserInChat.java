@@ -2,6 +2,7 @@ package com.dimka228.messenger.entities;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -29,6 +30,18 @@ public class UserInChat {
 
   @Column(name = "role", nullable = false, length = 20)
   private String role;
+
+  @Column(name = "join_time")
+  private Instant joinTime;
+
+  public Instant getJoinTime() {
+    return joinTime;
+  }
+
+  public void setJoinTime(Instant i) {
+    this.joinTime = i;
+  }
+
 
   public String getRole() {
     return role;
