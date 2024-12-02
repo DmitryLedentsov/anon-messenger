@@ -5,6 +5,8 @@ import com.dimka228.messenger.exceptions.WrongTokenException;
 import com.dimka228.messenger.security.jwt.TokenProvider;
 import com.dimka228.messenger.services.UserDetailsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -28,6 +30,7 @@ import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
+@Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   private final TokenProvider jwtTokenUtil;
@@ -85,7 +88,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
               String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
 
               if (authorizationHeader == null) throw new WrongTokenException("empty token");
-              System.out.println("TOKEN: " + authorizationHeader);
+              log.debug("TOKEN: " + authorizationHeader);
               String token = authorizationHeader.substring(7);
 
               try {
