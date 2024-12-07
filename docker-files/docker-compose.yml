@@ -1,8 +1,8 @@
-version: '3.9'
-
 services:
   os_base:
       image: os_base:latest
+      entrypoint: ["/usr/bin/true"]
+      network_mode: host
       build:
         context: ./
         dockerfile: os_base.Dockerfile
@@ -13,8 +13,6 @@ services:
       env_file:
         - path: ./default.env
           required: true # default
-      networks:
-        - pgsql_bridge
   messenger:
       tty: true
       restart: unless-stopped
@@ -52,13 +50,15 @@ services:
           - PGPASSWORD=${PGPASSWORD}
       # network_mode: host
       ports:
-          - "5435:5435"
+        - "5435:5435"
       env_file:
         - path: ./default.env
           required: true # default
       networks:
         pgsql_bridge:
           ipv4_address: 192.167.1.3
+      depends_on:
+        - os_base
   monitoring_server:
       tty: true
       restart: unless-stopped
@@ -82,7 +82,6 @@ services:
       networks:
         pgsql_bridge:
           ipv4_address: 192.167.1.4
-      
 
 networks:
   pgsql_bridge:
