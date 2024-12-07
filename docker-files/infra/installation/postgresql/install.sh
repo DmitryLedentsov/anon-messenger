@@ -7,6 +7,9 @@ export INSTALLPATH=${SERVICEPATH}/infra/installation
 export BINPATH=${SERVICEPATH}/bin
 export APPPATH=${INSTALLPATH}/postgresql
 
+touch ${APPPATH}/pwfile.conf
+echo $PGPASSWORD > ${APPPATH}/pwfile.conf
+
 pg_createcluster -p 5435 15 messenger -- --auth=scram-sha-256 --username=postgres --pwfile=${APPPATH}/pwfile.conf
 
 cat ${APPPATH}/pg_hba.conf > /etc/postgresql/15/messenger/pg_hba.conf

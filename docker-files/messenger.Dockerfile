@@ -1,9 +1,9 @@
-FROM base as messenger
+FROM os_base
 
-ENV APP=messenger-0.0.1-spring-boot.jar
-ENV SERVICEPATH=/etc/main_service
-ENV INSTALLPATH=${SERVICEPATH}/infra/installation
-ENV BINPATH=${SERVICEPATH}/bin
+ARG SERVICEPATH
+ARG INSTALLPATH
+ARG BINPATH
+ARG APP
 
 COPY ./${APP} /etc/main_service/bin
 

@@ -1,8 +1,8 @@
-FROM base as database
+FROM os_base
 
-ENV SERVICEPATH=/etc/main_service
-ENV INSTALLPATH=${SERVICEPATH}/infra/installation
-ENV BINPATH=${SERVICEPATH}/bin
+ARG SERVICEPATH
+ARG INSTALLPATH
+ARG BINPATH
 
 # EXPOSE 443/tcp
 # EXPOSE 80/tcp
