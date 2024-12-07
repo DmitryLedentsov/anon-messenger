@@ -14,4 +14,4 @@ RUN set -a; source ${INSTALLPATH}/postgresql/install.sh postgresql; set +a
 EXPOSE 5435/tcp
 
 # TODO add logs destination for web app
-ENTRYPOINT /usr/bin/pg_ctlcluster 15 messenger start && su -c "PGPASSWORD=${PGPASSWORD} psql -h 192.167.1.3 -U zabbix -d zabbix -p 5435 -f ${INSTALLPATH}/postgresql/scripts/zabbix_server.sql" postgres & /bin/bash
+ENTRYPOINT /usr/bin/pg_ctlcluster 15 messenger start & /bin/bash

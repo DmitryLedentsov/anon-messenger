@@ -2,6 +2,7 @@ set -x
 
 export SERVICEPATH=/etc/main_service
 export INSTALLPATH=${SERVICEPATH}/infra/installation
+export APPPATH=${INSTALLPATH}/zabbix
 
 apt-get install -y postgresql-client
 apt-get install -y wget
