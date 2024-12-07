@@ -180,8 +180,6 @@ BEGIN
 END;  
 $$ language plpgsql ; 
 
-
-
 CREATE TRIGGER UserSendMessageInfo AFTER INSERT ON M_MESSAGE
 FOR EACH ROW EXECUTE PROCEDURE add_message_action();
 
