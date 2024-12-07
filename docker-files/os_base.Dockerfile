@@ -1,14 +1,14 @@
-FROM --platform=amd64 debian as base
+FROM --platform=amd64 debian as os_base
 
 LABEL maintainer="sasha.atalyan@gmail.com"
 
+ARG SERVICEPATH
+ARG INSTALLPATH
+ARG BINPATH
+
 SHELL ["/bin/bash", "-c"]
 
-ENV SERVICEPATH=/etc/main_service
-ENV INSTALLPATH=${SERVICEPATH}/infra/installation
-ENV BINPATH=${SERVICEPATH}/bin
-
-RUN mkdir -p ${INSTALLPATH} ${BINPATH}
+RUN mkdir -p "${INSTALLPATH}" "${BINPATH}"
 
 #copy files to image
 COPY ./infra /etc/main_service/infra
