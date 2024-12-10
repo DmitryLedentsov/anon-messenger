@@ -98,6 +98,12 @@ public class GlobalErrorHandler {
     return createExceptionMessage(e.getMessage(), HttpStatus.BAD_REQUEST, webRequest);
   }
 
+  @ExceptionHandler(Exception.class)
+  @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+  public Map<String, Object> handleAppException(Exception e, WebRequest webRequest) {
+    return createExceptionMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
+  }
+
   /*@ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseStatus(code = HttpStatus.BAD_REQUEST)
   public Map<String, Object> handleAppException(

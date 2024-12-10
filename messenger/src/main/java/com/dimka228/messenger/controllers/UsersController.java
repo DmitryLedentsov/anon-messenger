@@ -1,20 +1,28 @@
 package com.dimka228.messenger.controllers;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dimka228.messenger.dto.UserProfileDTO;
-import com.dimka228.messenger.entities.*;
+import com.dimka228.messenger.entities.Chat;
+import com.dimka228.messenger.entities.User;
+import com.dimka228.messenger.entities.UserInChat;
+import com.dimka228.messenger.entities.UserProfile;
 import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
-import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
 public class UsersController {
   private final UserService userService;
   private final ChatService chatService;

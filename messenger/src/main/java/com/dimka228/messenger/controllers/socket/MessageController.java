@@ -1,17 +1,10 @@
 package com.dimka228.messenger.controllers.socket;
 
-import com.dimka228.messenger.dto.MessageDTO;
-import com.dimka228.messenger.dto.OperationDTO;
-import com.dimka228.messenger.entities.*;
-import com.dimka228.messenger.models.MessageInfo;
-import com.dimka228.messenger.services.ChatService;
-import com.dimka228.messenger.services.SocketMessagingService;
-import com.dimka228.messenger.services.UserService;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import org.springframework.messaging.handler.annotation.*;
+
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,9 +13,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dimka228.messenger.dto.MessageDTO;
+import com.dimka228.messenger.dto.OperationDTO;
+import com.dimka228.messenger.entities.Chat;
+import com.dimka228.messenger.entities.Message;
+import com.dimka228.messenger.entities.User;
+import com.dimka228.messenger.entities.UserInChat;
+import com.dimka228.messenger.models.MessageInfo;
+import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.SocketMessagingService;
+import com.dimka228.messenger.services.UserService;
+
+import lombok.AllArgsConstructor;
+
 @RestController
 @AllArgsConstructor
-@RequestMapping("chat")
+@RequestMapping(value="chat", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
 public class MessageController {
   private SocketMessagingService socketMessagingService;
   private UserService userService;
