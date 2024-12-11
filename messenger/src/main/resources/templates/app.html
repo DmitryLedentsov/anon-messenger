@@ -57,7 +57,7 @@
             cursor: pointer;
         }
         .chat-item:hover {
-            background-color: var(--main-color);
+            border-color: var(--main-color);
         }
         .remove-btn {
             margin-left: 0.5rem;
@@ -320,6 +320,7 @@
             }
 
             this.openChat = (id) => {
+                this.api.unsubscribeOnMessagesInChat(this.currentChatId);
                 this.currentChatId = parseInt(id);
                 console.log( this.currentChatId);
                 $(`.chat-item`).removeClass('selected-item');

@@ -1,8 +1,18 @@
 /* version 1.0.1 */
 
+@font-face {
+    font-family: Minimal;
+    src: url("../fonts/TransformaSans_Trial-Regular.ttf") format("opentype");
+    
+}
+@font-face {
+    font-family: MinimalEng;
+    src: url("../fonts/Minimal-Mono-Regular.otf") format("opentype");
+    
+}
 :root {
     color-scheme: dark;
-    --main-color: #B5E853;
+    --main-color: #ffffff;
 }
 body {
     height: 100%;
@@ -16,14 +26,14 @@ body {
 body {
     margin: 0;
     padding: 0;
-    background-color: #1A1A1A;
+    background-color: #000000;
     line-height: 1.5;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
 }
 h1, h2, h3, h4, h5, h6, h7, h8 {
-    color: #B5E853;
+    color:  var(--main-color);
     line-height: 1.5;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
     text-align: left;
     margin: 0 0 20px;
 }
@@ -31,37 +41,41 @@ p {
     color: #FFFFFF;
     padding-left: 30px;
     font-size: 15px;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
 }
+
 
 .error{
     color: red;
     font-size: 15px;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
 }
 
 
 span {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
 }
 .hr {
     border: 0;
-    border-top: 2px dashed #B5E853;
+    border-top: 2px dashed  var(--main-color);
 }
 li {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;;
+    font-family: 'MinimalEng','Minimal';
 }
 .element, .btn, .modal-content, .form-control {
     /*text-decoration: none;
     text-align: left;*/
-    background-color: #121212;
+    background-color: black;
     color: white;
-    border: 2px solid #000000;
+   
     border-radius: 15px;
+    background-color: black;
+	/* border: ; */
+	border-color: #262626;
     /*padding: 10px 14px;
     font-size: 14px;
     display: inline-block;
@@ -82,7 +96,7 @@ td {
 }
 th {
     color: #FFFFFF;
-    border-bottom: 1px dashed #B5E853;
+    border-bottom: 1px dashed  var(--main-color);
     text-align: left;
     padding: 8px;
 }
@@ -121,7 +135,7 @@ dt {
     padding: 10px;
 }
 ul {list-style: none;}
-ul li::before {content: "⮞⮞  "; color: #B5E853;}
+ul li::before {content: "⮞⮞  "; color:  var(--main-color);}
 ol {display: table; margin-left: 0; margin-right: auto; list-style-position: inside;}
 /*  font style  */
 .bold {font-weight: bold;}
@@ -131,14 +145,14 @@ ol {display: table; margin-left: 0; margin-right: auto; list-style-position: ins
 .strickthrough {text-decoration: line-through;}
 .underline {text-decoration: underline;}
 .keyword {color: #E867E8; border: 1px solid gray; background-color: black; padding: 2px 2px; }
-.link {color: #6CBDEC}
+.link {color: #522727;}
 .link:hover {text-decoration: underline; cursor: pointer;}
 .w3-black,.w3-hover-black:hover{color:#BAB9B9!important;background-color:#000!important}
 /* margin for button */
 .leftmar {margin-left: 30px;}
 /* font colour*/
 .gray {color: #8D8D8D;}
-.green {color: #B5E853;}
+.green {color:  var(--main-color);}
 /* padding */
 .topp {padding-top: 10px;}
 .left {padding-left: 30px}
@@ -153,13 +167,13 @@ button{
     box-sizing: border-box;
     border-width: 1px;
     border-style: dashed;
-    border-color: #B5E853;
+    border-color:  var(--main-color);
     outline: 0;
 
-    background: #3D3D3D;
+    background: #000000;
     border-color: #bbb;
     color: white;
-    border: 2px solid #000000;
+    border: 2px solid #676767;
     border-radius: 15px !important;
 
 }
@@ -186,7 +200,8 @@ input[type="password"]:focus {
 
 
 .form-control:focus {
-    background-color: rgb(45, 52, 61);
+    background-color: rgb(3, 3, 3);
+    border-color: #BAB9B9;
 }
 
 
@@ -208,10 +223,17 @@ input[type="color"]:focus,
 .uneditable-input:focus,
 .form-control:focus,
 .selected-item{   
-  border-color: rgba(126, 239, 104, 0.8);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+  /*border-color: rgba(134, 134, 134, 0.8);*/
+  border-color: #BAB9B9 !important;
+  /*border-style: dashed;*/
+  box-shadow: 0;
   outline: 0 none;
-  background-color: rgba(0, 0, 0, 0.075);
   color: white;
 }
 
+
+.btn-primary:hover {
+	color: #fff;
+	background-color: #474747;
+	border-color: #dcdcdc;
+}

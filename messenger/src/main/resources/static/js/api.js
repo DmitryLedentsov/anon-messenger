@@ -90,20 +90,23 @@ function MessengerApi(options){
         };
     
     
+        this.subscribtions = {};
         this.socketClientSubscribe = (topic,callback)=>{
             topic = topicUrl+topic;
             console.log('subscribe '+topic);
-            this.client.subscribe(topic, (m) => {
+            this.subscribtions[topic] = this.client.subscribe(topic, (m) => {
                 let data = m.body ? JSON.parse(m.body) : {};
                 console.log('receive '+ topic);
                 data && console.log(data);
                 callback(data)
             });
+
         }
         this.socketClientUnSubscribe = (topic) => {
             topic = topicUrl+topic;
             console.log('unsubscribe '+ topic);
-            this.client.unsubscribe(topic);
+
+            if(this.subscribtions[topic]) this.subscribtions[topic].unsubscribe();
         }
    
     
