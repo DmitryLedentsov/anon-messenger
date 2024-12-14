@@ -4,6 +4,6 @@ const msgTemplate = (msg) =>
 <button class="socket-action" data-url="/app/chat/${chatId}/delete/${msg.id}" data-data="${msg.message}">delete</button> 
 </li>`;
 
-const chatTemplate = (chat)=>`<li class = "chat">
-<a href="/chat/${chat.id}">${chat.name}</a> <button class="socket-action" data-url="/app/user/${userId}/chat/delete/${chat.id}">${chat.role==="CREATOR"? "delete":"leave"}</button> 
+const chatTemplate = (chat) => `<li class = "chat">
+<a href="/chat/${chat.id}">${chat.name}</a> <button class="socket-action" data-url="/app/user/${userId}/chat/delete/${chat.id}">${chat.role === "CREATOR" ? "delete" : "leave"}</button> 
 </li>`;

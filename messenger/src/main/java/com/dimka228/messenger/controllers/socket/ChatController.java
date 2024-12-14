@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,14 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE})
 public class ChatController {
   private SocketMessagingService socketMessagingService;
   private UserService userService;
   private ChatService chatService;
 
   @PostMapping("/chat")
-  // @SendTo("/topic/public")
   public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
     User user = userService.getUser(principal.getName());
     Chat chat = chatService.addChat(chatDtoRequest.getName());
@@ -58,9 +58,6 @@ public class ChatController {
       OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
       socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
     }
-
-    // return "redirect:/chat/" + chat.getId().toString();
-    // msgTemplate.convertAndSend("/topic/user/"+id+"chats", data);
     return new ChatDTO(
         chat.getId(),
         chat.getName(),
@@ -70,11 +67,9 @@ public class ChatController {
   }
 
   @DeleteMapping("/chat/{chatId}")
-  // @SendTo("/topic/public")
   public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
     User user = userService.getUser(principal.getName());
     Chat chat = chatService.getChat(chatId);
-    // return "redirect:/chat/" + chat.getId().toString();
     ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null, null, null);
     OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
     if (chatService.getUserRoleInChat(user, chat).equals(UserInChat.Roles.CREATOR)) {
@@ -133,14 +128,4 @@ public class ChatController {
     Chat chat = chatService.getChat(chatId);
     return chatService.getAllRolesInChat(chat);
   }
-
-  /*@MessageMapping("/chat/.addUser")
-  @SendTo("/topic/public")
-  public MessageInfo addUser(@Payload MessageInfo chatMessage,
-                             SimpMessageHeaderAccessor headerAccessor) {
-      // Add username in web socket session
-      headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-      return chatMessage;
-  }*/
-
 }

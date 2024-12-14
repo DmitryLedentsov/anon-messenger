@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link  th:href = "@{/css/bootstrap.min.css}" rel="stylesheet">
-    <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
-    <link  th:href = "@{/css/common.css}" rel="stylesheet">
-    <link  th:href = "@{/css/chat-create.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/chat-create.css}" rel="stylesheet">
 </head>
+
 <body>
-<div class="main">
-<form name="chat-create" th:action="@{/chat/create}" method="post">
-    <span>Chat Name:</span>
-    <div>
-    <input type="text" name="name" placeholder="..."/>
+    <div class="main">
+        <form name="chat-create" th:action="@{/chat/create}" method="post">
+            <span>Chat Name:</span>
+            <div>
+                <input type="text" name="name" placeholder="..." />
+            </div>
+            <span>User names separated by comma:</span>
+            <div>
+                <input type="text" name="users" placeholder="..." />
+            </div>
+            <input type="submit" value="create!" />
+        </form>
     </div>
-    <span>User names separated by comma:</span>
-    <div>
-    <input type="text" name="users" placeholder="..."/>
-    </div>
-    <input type="submit" value="create!" />
-</form>
-</div>
-<div th:insert="fragments :: include-validation-js-libs"></div>
+    <div th:insert="fragments :: include-validation-js-libs"></div>
 </body>
+
 </html>

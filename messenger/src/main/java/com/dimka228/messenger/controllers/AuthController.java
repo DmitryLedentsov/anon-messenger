@@ -39,7 +39,6 @@ public class AuthController {
     if (signupError == null) {
       try {
         userService.registerUser(user);
-        // "auth/login";
       } catch (UserExistsException e) {
         signupError = "There was an error signing you up. Please try again.";
       }

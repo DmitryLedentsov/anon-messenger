@@ -45,8 +45,6 @@ public class User implements UserDetails, Cloneable {
     this.id = id;
   }
 
-  // для совместимости
-
   public User clone() {
     User newUser = new User();
     newUser.setPassword(getPassword());

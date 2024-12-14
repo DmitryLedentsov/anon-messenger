@@ -2,11 +2,10 @@ package com.dimka228.messenger.protection;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -36,9 +35,6 @@ public class DdosFilter implements Filter {
     chain.doFilter(request, response);
   }
 
-  /*
-   * периодически сбрасываем инфу по запросам
-   */
   @Scheduled(fixedRate = 20000)
   public void reportCurrentTime() {
     requestCount.clear();

@@ -1,18 +1,5 @@
 package com.dimka228.messenger.controllers.socket;
 
-import java.security.Principal;
-import java.time.Instant;
-import java.util.List;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -23,19 +10,31 @@ import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.SocketMessagingService;
 import com.dimka228.messenger.services.UserService;
-
+import java.security.Principal;
+import java.time.Instant;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value="chat", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(
+    value = "chat",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE})
 public class MessageController {
   private SocketMessagingService socketMessagingService;
   private UserService userService;
   private ChatService chatService;
 
   @PostMapping("/{id}/send")
-  // @SendTo("/topic/public")
   public MessageDTO sendMessage(
       @PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
     User user = userService.getUser(principal.getName());
@@ -56,7 +55,6 @@ public class MessageController {
   }
 
   @DeleteMapping("/{id}/message/{msgId}")
-  // @SendTo("/topic/public")
   public MessageDTO deleteMessage(
       @PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
     User user = userService.getUser(principal.getName());
@@ -77,23 +75,6 @@ public class MessageController {
     Chat chat = chatService.getChat(id);
     User user = userService.getUser(principal.getName());
     List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
-
-    /*for (MessageInfo msg : messages) {
-        MessageDTO fullMsg = new MessageDTO(msg.getId(),msg.getMessage(),msg.getSenderId(),msg.getSender(), msg.getSendTime());
-        OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg,OperationDTO.ADD);
-        msgTemplate.convertAndSend("/topic/chat/"+id+"/messages", data);
-        msgTemplate.convertAndSend("/topic/user/"+user.getId()+"/chat/", data);
-    }*/
     return messages;
   }
-
-  /*@MessageMapping("/chat/.addUser")
-  @SendTo("/topic/public")
-  public MessageInfo addUser(@Payload MessageInfo chatMessage,
-                             SimpMessageHeaderAccessor headerAccessor) {
-      // Add username in web socket session
-      headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-      return chatMessage;
-  }*/
-
 }
