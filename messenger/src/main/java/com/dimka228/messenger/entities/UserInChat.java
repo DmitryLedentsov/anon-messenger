@@ -18,14 +18,11 @@ public class UserInChat {
   @Id
   @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
   @JoinColumn(name = "user_id", nullable = false)
-  // @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
 
-  // https://stackoverflow.com/questions/7197181/jpa-unidirectional-many-to-one-and-cascading-delete
   @Id
   @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
   @JoinColumn(name = "chat_id", nullable = false)
-  // @OnDelete(action = OnDeleteAction.CASCADE)
   private Chat chat;
 
   @Column(name = "role", nullable = false, length = 20)
@@ -41,7 +38,6 @@ public class UserInChat {
   public void setJoinTime(Instant i) {
     this.joinTime = i;
   }
-
 
   public String getRole() {
     return role;

@@ -8,7 +8,8 @@ function handleActions(e) {
     /*e.stopPropagation();
     e.stopImmediatePropagation();*/
     let cur = $(this);
-    console.log("click: " + cur.attr('data-url'));
+    //DEBUG
+    //console.log("click: " + cur.attr('data-url'));
     //console.log($form.serializeJSON());
     client.publish({
         destination: cur.attr('data-url'),

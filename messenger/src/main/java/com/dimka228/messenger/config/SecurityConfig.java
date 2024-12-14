@@ -35,7 +35,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-        // Своего рода отключение CORS (разрешение запросов со всех доменов)
+        // TODO potato: включить CORS, он не так просто существует
         .cors(
             cors ->
                 cors.configurationSource(
@@ -48,12 +48,9 @@ public class SecurityConfig {
                       corsConfiguration.setAllowCredentials(true);
                       return corsConfiguration;
                     }))
-        // Настройка доступа к конечным точкам
         .authorizeHttpRequests(
             request ->
                 request
-                    // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое
-                    // количество уровней вложенности
                     .requestMatchers("/auth/**")
                     .permitAll()
                     .requestMatchers("/", "/test", "/app", "/ws/**")

@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link  th:href = "@{/css/bootstrap.min.css}" rel="stylesheet">
-    <link  th:href = "@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
-    <link  th:href = "@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
+
 <body>
-<h3 th:text="'User: '+${user?.login}"></h3>
-<br>
-<br>
-<a th:href="@{/chat/create}">create chat</a>
-<br> <br> <br>
-<span> List of chats: <span>
-<!--<div th:each="chat : ${chats}">
+    <h3 th:text="'User: '+${user?.login}"></h3>
+    <br>
+    <br>
+    <a th:href="@{/chat/create}">create chat</a>
+    <br> <br> <br>
+    <span> List of chats: <span>
+            <!--<div th:each="chat : ${chats}">
     <a th:if="${chat}" th:text="${chat?.name}" th:href="@{'/chat/' + ${chat?.id}}"></a>
     <br>
 </div>-->
-<div id="chats">
-    <ul class="list data-elem"  id="chat-list" th:data-url="@{'/topic/user/' + ${user.id}} + '/chats'"></ul>
-    <!--<ul class="list" th:each="message : ${messages}">
+            <div id="chats">
+                <ul class="list data-elem" id="chat-list" th:data-url="@{'/topic/user/' + ${user.id}} + '/chats'"></ul>
+                <!--<ul class="list" th:each="message : ${messages}">
         <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
     </ul>-->
-</div>
-<script th:inline="javascript">
-    /*<![CDATA[*/
+            </div>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
 
-    var loginUserName = /*[[${user.login}]]*/ 'User Name';
-    var userId = [[${user.id}]];
-    var chats = [[${chats}]];
+                var loginUserName = /*[[${user.login}]]*/ 'User Name';
+                var userId = [[${ user.id }]];
+                var chats = [[${ chats }]];
 
-    /*]]>*/
-</script>
-<div th:insert="fragments :: include-js-libs"></div>
-<script type="text/javascript" th:src="@{/js/templates.js}"></script>
-<script type="text/javascript" th:src="@{/js/client.js}"></script>
-<script type="text/javascript" th:src="@{/js/index.js}"></script>
-<script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
-<script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
+                /*]]>*/
+            </script>
+            <div th:insert="fragments :: include-js-libs"></div>
+            <script type="text/javascript" th:src="@{/js/templates.js}"></script>
+            <script type="text/javascript" th:src="@{/js/client.js}"></script>
+            <script type="text/javascript" th:src="@{/js/index.js}"></script>
+            <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
+            <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
 </body>
+
 </html>

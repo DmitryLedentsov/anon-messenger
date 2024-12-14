@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" name="Project name">
     <Properties>
         <Property name="log-path">logs</Property>
@@ -9,49 +9,60 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}"/>
+            <PatternLayout
+                pattern="%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
         </Console>
         <RollingFile name="RollingFile" filePattern="${log-path}/${logfile-name}-%d{yyyy-MM-dd}.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN} ${sys:PID} --- [%15.15t] %c : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
+            <PatternLayout
+                pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN} ${sys:PID} --- [%15.15t] %c : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
             </Policies>
-            <DirectWriteRolloverStrategy/>
+            <DirectWriteRolloverStrategy />
         </RollingFile>
-<!--        <Async name="Async">-->
-<!--            <AppenderRef ref="RollingFile"/>-->
-<!--        </Async>-->
+        <!--        <Async name="Async">-->
+        <!--            <AppenderRef ref="RollingFile"/>-->
+        <!--        </Async>-->
     </Appenders>
 
     <Loggers>
-        <!--Root level logger to control overall logging-->
+        <!--Root
+        level logger to control overall logging-->
         <Root level="ERROR">
-            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Console" />
         </Root>
-        <!--Logger for org.springframework.boot package-->
+        <!--Logger
+        for org.springframework.boot package-->
         <Logger name="org.springframework" level="WARN" additivity="false">
-            <AppenderRef ref="Console"/>
-            <!--<AppenderRef ref="RollingFile" level="WARN"/>-->
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef
+            ref="RollingFile" level="WARN"/>-->
         </Logger>
-        <!--Logger for org.apache.catalina package-->
+        <!--Logger
+        for org.apache.catalina package-->
         <Logger name="org.apache.catalina" level="WARN" additivity="false">
-            <AppenderRef ref="Console"/>
-            <!--<AppenderRef ref="RollingFile" level="DEBUG"/>-->
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef
+            ref="RollingFile" level="DEBUG"/>-->
         </Logger>
-        <!--Logger for org.hibernate package-->
+        <!--Logger
+        for org.hibernate package-->
         <Logger name="org.hibernate" level="WARN" additivity="false">
-            <AppenderRef ref="Console"/>
-            <!--<AppenderRef ref="RollingFile" level="WARN"/>-->
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef
+            ref="RollingFile" level="WARN"/>-->
         </Logger>
-        <!--Logger for com.zaxxer.hikari package-->
+        <!--Logger
+        for com.zaxxer.hikari package-->
         <Logger name="com.zaxxer.hikari" level="WARN" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile" level="WARN"/>
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" level="WARN" />
         </Logger>
-        <!--Logger for com.medium package-->
+        <!--Logger
+        for com.medium package-->
         <Logger name="com.dimka228" level="INFO" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
         </Logger>
     </Loggers>
 </Configuration>

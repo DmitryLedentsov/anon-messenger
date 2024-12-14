@@ -104,18 +104,6 @@ public class GlobalErrorHandler {
     return createExceptionMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
   }
 
-  /*@ExceptionHandler(HttpMessageNotReadableException.class)
-  @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-  public Map<String, Object> handleAppException(
-      HttpMessageNotReadableException e, WebRequest webRequest
-  ){
-      return createExceptionMessage("bad request data", HttpStatus.BAD_REQUEST, webRequest);
-  }*/
-
-  //    ---------------- Being reworked
-
-  // alter to not just create the message but also log the error
-  // create method to log the error to an internal file
   private Map<String, Object> createExceptionMessage(
       String e, HttpStatus status, WebRequest webRequest) {
 
@@ -129,7 +117,7 @@ public class GlobalErrorHandler {
     error.put("code", status.value());
     error.put("timestamp", timestamp);
     error.put("reason", status.getReasonPhrase());
-    
+
     return error;
   }
 }

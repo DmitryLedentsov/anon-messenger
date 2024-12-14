@@ -3,14 +3,12 @@ package com.dimka228.messenger.services;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserProfile;
 import com.dimka228.messenger.entities.UserStatus;
-import com.dimka228.messenger.exceptions.ActionNotFoundException;
 import com.dimka228.messenger.exceptions.UserExistsException;
 import com.dimka228.messenger.exceptions.UserNotFoundException;
 import com.dimka228.messenger.repositories.UserProfileRepository;
 import com.dimka228.messenger.repositories.UserRepository;
 import com.dimka228.messenger.repositories.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -94,10 +92,7 @@ public class UserService {
     statusRepository.deleteByUserIdAndName(u.getId(), s);
   }
 
-
-
   public UserProfile getUserProfile(User user) {
     return profileRepository.findByUserId(user.getId());
   }
-
 }

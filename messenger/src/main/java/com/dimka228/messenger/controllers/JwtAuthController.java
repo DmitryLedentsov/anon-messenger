@@ -58,7 +58,6 @@ public class JwtAuthController {
       final Authentication authentication =
           authenticationManager.authenticate(
               new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
-      // SecurityContextHolder.getContext().setAuthentication(authentication);
       final String token = jwtTokenUtil.generateToken(userDto.getUser());
       return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
     } catch (Exception e) {
