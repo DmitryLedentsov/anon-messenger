@@ -1,6 +1,8 @@
 package com.dimka228.messenger.controllers.error;
 
 import com.dimka228.messenger.exceptions.AppException;
+import com.dimka228.messenger.exceptions.WrongTokenException;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -35,77 +37,77 @@ public class GlobalErrorHandler {
   @ResponseStatus(code = HttpStatus.BAD_REQUEST)
   public Map<String, Object> handleNumberFormatException(
       NumberFormatException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST, webRequest);
+    return createExceptionMessage(e, HttpStatus.BAD_REQUEST, webRequest);
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
   @ResponseStatus(code = HttpStatus.NOT_FOUND)
   public Map<String, Object> handleEntityNotFoundException(
       EntityNotFoundException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.NOT_FOUND, webRequest);
+    return createExceptionMessage(e, HttpStatus.NOT_FOUND, webRequest);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
   @ResponseStatus(code = HttpStatus.BAD_REQUEST)
   public Map<String, Object> handleIllegalArgumentException(
       IllegalArgumentException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST, webRequest);
+    return createExceptionMessage(e, HttpStatus.BAD_REQUEST, webRequest);
   }
 
   @ExceptionHandler(UsernameNotFoundException.class)
   @ResponseStatus(code = HttpStatus.FORBIDDEN)
   public Map<String, Object> handleUsernameNotFoundException(
       UsernameNotFoundException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.FORBIDDEN, webRequest);
+    return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
   }
 
   @ExceptionHandler(SignatureException.class)
   @ResponseStatus(code = HttpStatus.FORBIDDEN)
   public Map<String, Object> handleSignatureException(SignatureException e, WebRequest webRequest) {
-    return createExceptionMessage("invalid token", HttpStatus.FORBIDDEN, webRequest);
+    return createExceptionMessage(new WrongTokenException(), HttpStatus.FORBIDDEN, webRequest);
   }
 
   @ExceptionHandler(JwtException.class)
   @ResponseStatus(code = HttpStatus.FORBIDDEN)
   public Map<String, Object> handleJwtException(JwtException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.FORBIDDEN, webRequest);
+    return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
   }
 
   @ExceptionHandler(MalformedJwtException.class)
   @ResponseStatus(code = HttpStatus.FORBIDDEN)
   public Map<String, Object> handleMalformedJwtException(
       MalformedJwtException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.FORBIDDEN, webRequest);
+    return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
   }
 
   @ExceptionHandler(ExpiredJwtException.class)
   @ResponseStatus(code = HttpStatus.FORBIDDEN)
   public Map<String, Object> handleExpiredJwtException(
       ExpiredJwtException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getMessage(), HttpStatus.FORBIDDEN, webRequest);
+    return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
   }
 
   @ExceptionHandler(BadCredentialsException.class)
   @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
   public Map<String, Object> handleBadCredentialsException(
       BadCredentialsException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getLocalizedMessage(), HttpStatus.UNAUTHORIZED, webRequest);
+    return createExceptionMessage(e, HttpStatus.UNAUTHORIZED, webRequest);
   }
 
   @ExceptionHandler(AppException.class)
   @ResponseStatus(code = HttpStatus.BAD_REQUEST)
   public Map<String, Object> handleAppException(AppException e, WebRequest webRequest) {
-    return createExceptionMessage(e.getMessage(), HttpStatus.BAD_REQUEST, webRequest);
+    return createExceptionMessage(e, HttpStatus.BAD_REQUEST, webRequest);
   }
 
   @ExceptionHandler(Exception.class)
   @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
   public Map<String, Object> handleAppException(Exception e, WebRequest webRequest) {
-    return createExceptionMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
+    return createExceptionMessage(e, HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
   }
 
   private Map<String, Object> createExceptionMessage(
-      String e, HttpStatus status, WebRequest webRequest) {
+      Exception e, HttpStatus status, WebRequest webRequest) {
 
     Map<String, Object> error = new HashMap<>();
     String timestamp = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
@@ -113,11 +115,11 @@ public class GlobalErrorHandler {
     if (webRequest instanceof ServletWebRequest) {
       error.put("uri", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
     }
-    error.put("message", e);
+    error.put("message", e.getMessage());
     error.put("code", status.value());
     error.put("timestamp", timestamp);
     error.put("reason", status.getReasonPhrase());
-
+    error.put("type", e.getClass().getSimpleName());
     return error;
   }
 }

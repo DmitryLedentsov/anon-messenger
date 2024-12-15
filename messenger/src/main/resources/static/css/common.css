@@ -335,6 +335,11 @@ input[type="color"]:focus,
     border-color: #dcdcdc !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
 }
+.btn.btn-primary:focus {
+  
+    border-color: #dcdcdc !important;
+    box-shadow: 0 0 0 0.2rem rgba(112, 112, 112, 0.25) !important;
+}
 .btn.btn-primary:active   {
     color: #fff !important;
     background-color: #959494 !important;
