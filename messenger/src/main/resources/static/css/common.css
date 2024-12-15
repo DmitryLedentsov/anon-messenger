@@ -299,6 +299,7 @@ input[type="password"]:focus {
 .form-control:focus {
     background-color: rgb(3, 3, 3);
     border-color: #BAB9B9;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
 }
 
 
@@ -327,9 +328,19 @@ input[type="color"]:focus,
     outline: 0 none;
     color: white;
 }
-
-<<<<<<< HEAD .btn-primary:hover {
-    color: #fff;
-    background-color: #474747;
-    border-color: #dcdcdc;
+.btn.btn-primary:hover {
+    color: #fff !important;
+    background-color: #474747 !important;
+    border-color: #BAB9B9;
+    border-color: #dcdcdc !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
 }
+.btn.btn-primary:active   {
+    color: #fff !important;
+    background-color: #959494 !important;
+    border-color: #dcdcdc !important;
+    border-color: #BAB9B9;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
+    
+}
+
