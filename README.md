@@ -1,5 +1,24 @@
 # Анонимный Мессенджер AnonMessenger
 
+## Deploy docker-compose
+
+```bash
+# Build application
+cd messenger
+# Put jar file into ${project_dir}/docker-files
+sudo mvn -с install
+cd ../docker-files
+# Remove old images
+sudo docker-compose --env-file ./default.env down
+sudo docker image rm -f $(sudo docker image ls -q)
+
+# Build new (without caching, cache doesn't update after not Dockerfile changes)
+sudo docker-compose --env-file ./default.env build --no-cache
+
+# Start postgres, messenger at http://localhost:9087 and zabbix at http://localhost:8080
+sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d
+```
+
 ## Описание предметной области
 
 Анонимный мессенджер с минимальными данными о пользователе - не хранится никакой личной информации, только логин/пароль. Для пользования мессенджером пользователь регистрируется или заходит под уже созданным аккаунтом.
