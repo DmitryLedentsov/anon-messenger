@@ -130,7 +130,7 @@
 
 <body>
 
-
+    <div id="settings" th:attr="socket-url=${socket.url},server-url=${server.publicUrl}"> </div>
 
 
     <div th:insert="fragments :: include-js-libs"></div>
@@ -452,9 +452,9 @@
 
 
                 this.init = () => {
-
+                    let $settings = $('#settings');
                     this.api = new MessengerApi({
-                        serverUrl: 'http://localhost:9087', brokerUrl: 'ws://localhost:9087/ws', onConnect: (m) => {
+                        serverUrl: $settings.attr('server-url'), brokerUrl: $settings.attr('socket-url'), onConnect: (m) => {
                             this.chats = this.api.getChats();
 
                             //this.chats.forEach(el => {

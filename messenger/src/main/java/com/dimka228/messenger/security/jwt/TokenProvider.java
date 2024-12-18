@@ -11,13 +11,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TokenProvider {
+  @Value("${messenger.jwt.token-validity}")
   public long TOKEN_VALIDITY = 100000;
 
+  @Value("${messenger.jwt.key}")
   private String jwtSigningKey = "9a4f2c8d3b7a1e6f45c8a0b3f267d8b1d4e6f3c8a9d2b5f8e3a9c8b5f6v8a3d9";
 
   public String extractUserName(String token) {
