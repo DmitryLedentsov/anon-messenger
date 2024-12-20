@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Welcome Page</title>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+           
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        
+          
+        }
+
+        .container {
+            margin-top: 10%;
+            text-align: center;
+            height: 100vh;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 30vh;
+            height: 30vh;
+            /* fill-rule: evenodd; */
+            /* filter: sepia(1); */
+            /*filter: drop-shadow(0px 1px 40px red);*/
+            /* box-shadow: 0px 0px 5px #fff; */
+            /* filter: blur(1px); */
+            filter: drop-shadow(2px 4px 6vh red);
+        }
+
+        .text {
+            font-size: 2.5em;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            filter: drop-shadow(2px 4px 6px rgba(255,255,255,0.3));
+        }
+        .background {
+
+            background-image: url('../icons/background-test-24.webp');
+            background-position-y: center;
+            background-position-x: center;
+            position: fixed;
+            top:0;
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            z-index: -20;
+            opacity: 0.2;
+            background-size: cover;
+            filter: blur(5px);
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <div class="logo">
+            <img src="../icons/logo-4.png" alt="Company Logo">
+        </div>
+        <h1 class="text">
+            ShhhChat
+        </h1>
+    </div>
+</body>
+
+</html>

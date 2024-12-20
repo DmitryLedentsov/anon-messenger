@@ -30,4 +30,9 @@ public class IndexController {
     model.addAttribute("server", serverProperties);
     return "app";
   }
+
+  @GetMapping("/welcome")
+  public String intro(Model model, Principal principal) {
+    return "intro";
+  }
 }

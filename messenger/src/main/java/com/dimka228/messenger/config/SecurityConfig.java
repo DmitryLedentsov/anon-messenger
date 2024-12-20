@@ -57,7 +57,7 @@ public class SecurityConfig {
                 request
                     .requestMatchers("/auth/**")
                     .permitAll()
-                    .requestMatchers("/", "/test", "/app", websocketPath+"/**")
+                    .requestMatchers("/", "/test", "/app","/welcome", websocketPath+"/**")
                     .permitAll()
                     .requestMatchers("/js/**", "/css/**", "/icons/**", "/fonts/**", "favicon.ico")
                     .permitAll()
