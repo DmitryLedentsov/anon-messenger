@@ -17,10 +17,12 @@
         .chat-list,
         .chat-messages-section {
             padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
         }
 
         .chats-section {
             padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
             width: 30%;
             border-right: 1px solid #ddd;
             overflow-y: auto;
@@ -49,9 +51,10 @@
         }
 
         .icon-wrapper img {
-            width: 100%;
-            height: 100%;
-            position: relative;
+            width: 50pt;
+            height: 50pt;
+            position: fixed;
+            right: 0;
             filter: contrast(0.5);
         }
 
@@ -114,9 +117,9 @@
 
         .background {
 
-            background-image: url('../icons/background-test-11.webp');
+            background-image: url('../icons/background-test-24.webp');
             position: fixed;
-           
+
             width: 100%;
             height: 100%;
             background-repeat: no-repeat;
@@ -291,7 +294,7 @@
         </script>
             <div class="message-list"></div>
             <div class="input-group mt-3">
-                <input type="text" id="messageInput" class="form-control" placeholder="Напишите сообщение...">
+                <textarea type="text" id="messageInput" class="form-control" placeholder="Напишите сообщение..."></textarea>
                 <div class="btn btn-primary" onclick="app.sendMessage()">Отправить</button>
                 </div>
             </div>
@@ -299,7 +302,7 @@
             <!-- Сообщения чата -->
             <div class="profile-section">
                 <div class="icon-wrapper" onclick="app.openCurrentUserProfile()">
-                    <img th:src="@{/icons/profile.png}">
+                    <img th:src="@{/icons/profile-shhh.png}">
                 </div>
             </div>
         </div>
