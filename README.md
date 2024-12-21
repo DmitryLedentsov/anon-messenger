@@ -16,7 +16,22 @@ sudo docker image rm -f $(sudo docker image ls -q)
 sudo docker-compose --env-file ./default.env build --no-cache
 
 # Start postgres, messenger at http://localhost:9087 and zabbix at http://localhost:8080
-sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d
+sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d 
+```
+
+Если вы хотите запустить сервер на определённом IP-адресе, то надо отредактировать файл *application-net.properties*, где указываете вместо localhost нужный вам IP-адрес:
+
+```text
+messenger.public-url = http://localhost:9087
+messenger.websocket.url = ws://localhost:9087/ws
+```
+
+Собрать и запустить как раньше, но с указанием другого docker-compose конфигурационного файла:
+
+```bash
+sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml build --no-cache
+
+sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up postgres_db messenger monitoring_server -d 
 ```
 
 ## Описание предметной области
