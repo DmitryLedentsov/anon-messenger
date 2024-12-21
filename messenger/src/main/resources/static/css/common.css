@@ -26,7 +26,7 @@ body {
 body {
     margin: 0;
     padding: 0;
-    background-color: #000000;
+    background-color: #171717;
     line-height: 1.5;
     font-family: 'Minimal', Helvetica, sans-serif;
 }
@@ -84,11 +84,10 @@ li {
 .form-control {
     /*text-decoration: none;
     text-align: left;*/
-    background-color: black;
     color: white;
 
     border-radius: 15px;
-    background-color: black;
+    background-color: #171717;
     /* border: ; */
     border-color: #262626;
     /*padding: 10px 14px;
@@ -202,12 +201,12 @@ ol {
 .keyword {
     color: #E867E8;
     border: 1px solid gray;
-    background-color: black;
+    background-color: #171717;
     padding: 2px 2px;
 }
 
 .link {
-    color: #522727;
+    color: #52279F;
 }
 
 .link:hover {
@@ -218,7 +217,7 @@ ol {
 .w3-black,
 .w3-hover-black:hover {
     color: #BAB9B9 !important;
-    background-color: #000 !important
+    background-color: #171717 !important
 }
 
 /* margin for button */
@@ -250,6 +249,7 @@ ol {
 
 
 input[type="text"],
+textarea,
 input[type="email"],
 input[type="password"],
 input[type="submit"],
@@ -260,7 +260,7 @@ button {
     border-color: var(--main-color);
     outline: 0;
 
-    background: #000000;
+    background: #171717;
     border-color: #bbb;
     color: white;
     border: 2px solid #676767;
@@ -275,6 +275,7 @@ button:hover {
 }
 
 input[type="text"]:focus,
+textarea:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
     border-color: #888;
@@ -292,7 +293,7 @@ input[type="password"]:focus {
 
 
 .form-control:focus {
-    background-color: rgb(3, 3, 3);
+    background-color: #171717;
     border-color: #BAB9B9;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
 }
@@ -300,6 +301,7 @@ input[type="password"]:focus {
 
 textarea:focus,
 input[type="text"]:focus,
+textarea:focus,
 input[type="password"]:focus,
 input[type="datetime"]:focus,
 input[type="datetime-local"]:focus,
