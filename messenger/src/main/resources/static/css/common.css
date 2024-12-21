@@ -1,14 +1,9 @@
 /* version 1.0.1 */
+@import 'https://fonts.googleapis.com/css?family=Inconsolata';
 
 @font-face {
     font-family: Minimal;
     src: url("../fonts/TransformaSans_Trial-Regular.ttf") format("opentype");
-
-}
-
-@font-face {
-    font-family: MinimalEng;
-    src: url("../fonts/Minimal-Mono-Regular.otf") format("opentype");
 
 }
 
@@ -33,7 +28,7 @@ body {
     padding: 0;
     background-color: #000000;
     line-height: 1.5;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
 }
 
 h1,
@@ -46,7 +41,7 @@ h7,
 h8 {
     color: var(--main-color);
     line-height: 1.5;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
     text-align: left;
     margin: 0 0 20px;
 }
@@ -55,21 +50,21 @@ p {
     color: #FFFFFF;
     padding-left: 30px;
     font-size: 15px;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
 }
 
 
 .error {
     color: red;
     font-size: 15px;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
 }
 
 
 span {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
 }
 
 .hr {
@@ -80,7 +75,7 @@ span {
 li {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: 'MinimalEng', 'Minimal';
+    font-family: 'Minimal', Helvetica, sans-serif;
 }
 
 .element,
@@ -328,6 +323,7 @@ input[type="color"]:focus,
     outline: 0 none;
     color: white;
 }
+
 .btn.btn-primary:hover {
     color: #fff !important;
     background-color: #474747 !important;
@@ -335,17 +331,18 @@ input[type="color"]:focus,
     border-color: #dcdcdc !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
 }
+
 .btn.btn-primary:focus {
-  
+
     border-color: #dcdcdc !important;
     box-shadow: 0 0 0 0.2rem rgba(112, 112, 112, 0.25) !important;
 }
-.btn.btn-primary:active   {
+
+.btn.btn-primary:active {
     color: #fff !important;
     background-color: #959494 !important;
     border-color: #dcdcdc !important;
     border-color: #BAB9B9;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
-    
-}
 
+}
