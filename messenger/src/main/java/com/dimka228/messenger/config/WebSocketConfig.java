@@ -1,15 +1,13 @@
 package com.dimka228.messenger.config;
 
+import com.dimka228.messenger.config.properties.WebSocketProperties;
 import com.dimka228.messenger.exceptions.AppException;
 import com.dimka228.messenger.exceptions.WrongTokenException;
 import com.dimka228.messenger.security.jwt.TokenProvider;
 import com.dimka228.messenger.services.UserDetailsService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -29,8 +27,6 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
-import com.dimka228.messenger.config.properties.WebSocketProperties;
-
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
@@ -40,6 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   private final TokenProvider jwtTokenUtil;
   private final UserDetailsService userDetailsService;
   private final WebSocketProperties properties;
+
   @Qualifier("handlerExceptionResolver")
   private HandlerExceptionResolver resolver;
 

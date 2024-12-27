@@ -3,6 +3,7 @@ package com.dimka228.messenger.entities;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(
@@ -10,6 +11,7 @@ import java.time.Instant;
     indexes = {@Index(name = "m_user_in_chat_user_id_idx", columnList = "user_id")})
 @IdClass(UserInChat.ID.class)
 public class UserInChat {
+  @EqualsAndHashCode
   public static class ID implements Serializable {
     private User user;
     private Chat chat;

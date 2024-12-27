@@ -2,7 +2,6 @@ package com.dimka228.messenger.controllers.error;
 
 import com.dimka228.messenger.exceptions.AppException;
 import com.dimka228.messenger.exceptions.WrongTokenException;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;

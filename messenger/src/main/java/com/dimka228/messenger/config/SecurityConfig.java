@@ -5,7 +5,6 @@ import com.dimka228.messenger.services.UserDetailsService;
 import com.dimka228.messenger.services.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +34,8 @@ public class SecurityConfig {
   private final UserDetailsService userDetailsService;
 
   @Value("${messenger.websocket.path}")
-  private String websocketPath="/ws";
+  private String websocketPath = "/ws";
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -57,7 +57,7 @@ public class SecurityConfig {
                 request
                     .requestMatchers("/auth/**")
                     .permitAll()
-                    .requestMatchers("/", "/test", "/app","/welcome", websocketPath+"/**")
+                    .requestMatchers("/", "/test", "/app", "/welcome", websocketPath + "/**")
                     .permitAll()
                     .requestMatchers("/js/**", "/css/**", "/icons/**", "/fonts/**", "favicon.ico")
                     .permitAll()

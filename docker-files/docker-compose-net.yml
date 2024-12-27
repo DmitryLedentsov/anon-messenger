@@ -23,7 +23,7 @@ services:
           - INSTALLPATH=${INSTALLPATH}
           - BINPATH=${BINPATH}
           - APP=${APP}
-          - SPRING_PROPERTY=net
+          - SPRING_PROPERTY=${SPRING_PROPERTY}
       network_mode: host
       depends_on:
         - postgres_db

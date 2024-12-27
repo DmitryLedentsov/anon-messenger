@@ -1,18 +1,5 @@
 package com.dimka228.messenger.controllers.socket;
 
-import java.security.Principal;
-import java.time.Instant;
-import java.util.List;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -24,8 +11,18 @@ import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.SocketMessagingService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
-
+import java.security.Principal;
+import java.time.Instant;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
@@ -68,7 +65,8 @@ public class MessageController {
     chatService.deleteMessageFromUserInChat(user, chat, msg);
 
     MessageDTO fullMsg =
-        new MessageDTO(msgId, "aa", user.getId(), user.getLogin(), DateConverter.format(Instant.now()));
+        new MessageDTO(
+            msgId, "aa", user.getId(), user.getLogin(), DateConverter.format(Instant.now()));
     OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
     socketMessagingService.sendMessageOperationToChat(id, data);
     return fullMsg;

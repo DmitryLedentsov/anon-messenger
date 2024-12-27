@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
@@ -16,14 +15,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @Order(1)
-@ConditionalOnProperty(name="messenger.protection.ddos")
+@ConditionalOnProperty(name = "messenger.protection.ddos")
 public class DdosFilter implements Filter {
 
   private final ConcurrentHashMap<String, AtomicLong> requestCount = new ConcurrentHashMap<>();
 
   @Value("${messenger.protection.ddos.max-requests}")
-  private  long rateLimit;
-  
+  private long rateLimit;
+
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {

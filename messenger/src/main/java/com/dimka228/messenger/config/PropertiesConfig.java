@@ -7,4 +7,4 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:application.properties")
 @PropertySource("classpath:application-net.properties")
 @PropertySource("classpath:application-docker.properties")
-public class PropertiesConfig { }
+public class PropertiesConfig {}
