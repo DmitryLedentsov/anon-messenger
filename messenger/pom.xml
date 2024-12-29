@@ -178,6 +178,13 @@
 			<artifactId>passay</artifactId>
 			<version>1.6.6</version>
 		</dependency>
+
+		<!--Apache
+		Kafka-->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

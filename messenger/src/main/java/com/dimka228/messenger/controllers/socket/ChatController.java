@@ -2,13 +2,17 @@ package com.dimka228.messenger.controllers.socket;
 
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.dto.ChatDtoRequest;
+import com.dimka228.messenger.dto.ChatUpdateDTO;
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
-import com.dimka228.messenger.entities.*;
+import com.dimka228.messenger.entities.Chat;
+import com.dimka228.messenger.entities.User;
+import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.CannotBanSelfException;
 import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.SimpleProducer;
 import com.dimka228.messenger.services.SocketMessagingService;
 import com.dimka228.messenger.services.UserService;
 import java.security.Principal;
@@ -31,9 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
     consumes = {MediaType.APPLICATION_JSON_VALUE},
     produces = {MediaType.APPLICATION_JSON_VALUE})
 public class ChatController {
+
   private SocketMessagingService socketMessagingService;
   private UserService userService;
   private ChatService chatService;
+  private final SimpleProducer simpleProducer;
 
   @PostMapping("/chat")
   public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
@@ -57,6 +63,8 @@ public class ChatController {
           new ChatDTO(chat.getId(), chat.getName(), cur.getRole(), null, chatDtoRequest.getUsers());
       OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
       socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+      ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
+      simpleProducer.sendChatsUpdate(message);
     }
     return new ChatDTO(
         chat.getId(),
@@ -79,12 +87,15 @@ public class ChatController {
       chatService.deleteOrLeaveChat(user, chat);
       for (UserInChat cur : users) {
         socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+        ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
+        simpleProducer.sendChatsUpdate(message);
       }
     } else {
       chatService.deleteOrLeaveChat(user, chat);
       socketMessagingService.sendChatOperationToUser(user.getId(), data);
+      ChatUpdateDTO message = new ChatUpdateDTO(user.getId(), null, data);
+      simpleProducer.sendChatsUpdate(message);
     }
-
     return chatDTO;
   }
 
@@ -104,22 +115,28 @@ public class ChatController {
     User user = userService.getUser(userId);
     UserInChat userInChat = chatService.getUserInChat(cur, chat);
 
-    if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
+    if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
       throw new WrongPrivilegesException();
-    if (user.getId() == cur.getId()) throw new CannotBanSelfException();
+    }
+    if (user.getId() == cur.getId()) {
+      throw new CannotBanSelfException();
+    }
     List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
-    socketMessagingService.sendChatOperationToUser(
-        userId,
-        new OperationDTO<ChatDTO>(
-            new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
+    OperationDTO<ChatDTO> chatData =
+        new OperationDTO<>(new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE);
+    socketMessagingService.sendChatOperationToUser(userId, chatData);
+    ChatUpdateDTO message = new ChatUpdateDTO(userId, null, chatData);
+    simpleProducer.sendChatsUpdate(message);
     chatService.deleteOrLeaveChat(user, chat);
     for (MessageInfo messageInfo : messages) {
       MessageDTO data =
           new MessageDTO(
               messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(), null);
-      OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
-      socketMessagingService.sendMessageOperationToChat(chatId, op);
+      OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
+      // socketMessagingService.sendMessageOperationToChat(chatId, op);
+      message = new ChatUpdateDTO(chatId, op, null);
+      simpleProducer.sendChatUpdate(message);
     }
   }
 

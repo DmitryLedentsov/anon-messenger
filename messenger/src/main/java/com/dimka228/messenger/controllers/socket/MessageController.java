@@ -1,5 +1,6 @@
 package com.dimka228.messenger.controllers.socket;
 
+import com.dimka228.messenger.dto.ChatUpdateDTO;
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -8,6 +9,7 @@ import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.SimpleProducer;
 import com.dimka228.messenger.services.SocketMessagingService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
@@ -34,6 +36,7 @@ public class MessageController {
   private SocketMessagingService socketMessagingService;
   private UserService userService;
   private ChatService chatService;
+  private final SimpleProducer simpleProducer;
 
   @PostMapping("/{id}/send")
   public MessageDTO sendMessage(
@@ -52,6 +55,8 @@ public class MessageController {
             DateConverter.format(Instant.now()));
     OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
     socketMessagingService.sendMessageOperationToChat(id, data);
+    ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
+    simpleProducer.sendChatUpdate(message);
     return chatMessage;
   }
 
@@ -69,6 +74,8 @@ public class MessageController {
             msgId, "aa", user.getId(), user.getLogin(), DateConverter.format(Instant.now()));
     OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
     socketMessagingService.sendMessageOperationToChat(id, data);
+    ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
+    simpleProducer.sendChatUpdate(message);
     return fullMsg;
   }
 

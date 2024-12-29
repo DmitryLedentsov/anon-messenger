@@ -1,5 +1,9 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "maven.view": "flat",
-    "java.compile.nullAnalysis.mode": "disabled"
+    "java.compile.nullAnalysis.mode": "disabled",
+    "editor.codeActionsOnSave": {
+        "source.addMissingImports": true,
+        "source.organizeImports": true,
+    },
 }
