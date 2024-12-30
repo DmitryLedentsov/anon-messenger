@@ -62,7 +62,7 @@ public class ChatController {
       ChatDTO chatDTO =
           new ChatDTO(chat.getId(), chat.getName(), cur.getRole(), null, chatDtoRequest.getUsers());
       OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-      socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+      //       socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
       ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
       simpleProducer.sendChatsUpdate(message);
     }
@@ -86,13 +86,13 @@ public class ChatController {
 
       chatService.deleteOrLeaveChat(user, chat);
       for (UserInChat cur : users) {
-        socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+        // socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
         ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
         simpleProducer.sendChatsUpdate(message);
       }
     } else {
       chatService.deleteOrLeaveChat(user, chat);
-      socketMessagingService.sendChatOperationToUser(user.getId(), data);
+      //       socketMessagingService.sendChatOperationToUser(user.getId(), data);
       ChatUpdateDTO message = new ChatUpdateDTO(user.getId(), null, data);
       simpleProducer.sendChatsUpdate(message);
     }
@@ -125,7 +125,7 @@ public class ChatController {
 
     OperationDTO<ChatDTO> chatData =
         new OperationDTO<>(new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE);
-    socketMessagingService.sendChatOperationToUser(userId, chatData);
+    //     socketMessagingService.sendChatOperationToUser(userId, chatData);
     ChatUpdateDTO message = new ChatUpdateDTO(userId, null, chatData);
     simpleProducer.sendChatsUpdate(message);
     chatService.deleteOrLeaveChat(user, chat);

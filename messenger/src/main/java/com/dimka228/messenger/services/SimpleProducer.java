@@ -15,9 +15,11 @@ public class SimpleProducer {
 
   public void sendChatsUpdate(ChatUpdateDTO message) {
     simpleProducer.send("chats-update", message);
+    simpleProducer.flush();
   }
 
   public void sendChatUpdate(ChatUpdateDTO message) {
     simpleProducer.send("chat-update", message);
+    simpleProducer.flush();
   }
 }

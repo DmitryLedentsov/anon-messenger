@@ -54,7 +54,7 @@ public class MessageController {
             user.getLogin(),
             DateConverter.format(Instant.now()));
     OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
-    socketMessagingService.sendMessageOperationToChat(id, data);
+    // socketMessagingService.sendMessageOperationToChat(id, data);
     ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
     simpleProducer.sendChatUpdate(message);
     return chatMessage;
@@ -73,7 +73,7 @@ public class MessageController {
         new MessageDTO(
             msgId, "aa", user.getId(), user.getLogin(), DateConverter.format(Instant.now()));
     OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
-    socketMessagingService.sendMessageOperationToChat(id, data);
+    // socketMessagingService.sendMessageOperationToChat(id, data);
     ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
     simpleProducer.sendChatUpdate(message);
     return fullMsg;

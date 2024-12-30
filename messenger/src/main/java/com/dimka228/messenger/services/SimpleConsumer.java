@@ -11,12 +11,12 @@ public class SimpleConsumer {
 
   private SocketMessagingService socketMessagingService;
 
-  @KafkaListener(topics = "chats-update", groupId = "updates")
+  @KafkaListener(topics = "chats-update")
   public void updateChats(ChatUpdateDTO message) {
     socketMessagingService.sendChatOperationToUser(message.getId(), message.getChatData());
   }
 
-  @KafkaListener(topics = "chat-update", groupId = "updates")
+  @KafkaListener(topics = "chat-update")
   public void updateChat(ChatUpdateDTO message) {
     socketMessagingService.sendMessageOperationToChat(message.getId(), message.getMessageData());
   }

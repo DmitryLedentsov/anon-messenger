@@ -3,7 +3,7 @@
     "maven.view": "flat",
     "java.compile.nullAnalysis.mode": "disabled",
     "editor.codeActionsOnSave": {
-        "source.addMissingImports": true,
-        "source.organizeImports": true,
+        "source.addMissingImports": "explicit",
+        "source.organizeImports": "explicit"
     },
 }
