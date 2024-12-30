@@ -312,6 +312,7 @@
         <script th:inline="javascript">
             var api = window.api || null;
             var app = window.app || {};
+            window.currentChatId = -1;
             function App() {
                 this.chats = [];
                 this.updateChat = (id, data) => {
@@ -368,7 +369,15 @@
 
                 this.openChat = (id) => {
                     this.api.unsubscribeOnMessagesInChat(this.currentChatId);
-                    this.currentChatId = parseInt(id);
+
+                    if (id !== window.currentChatId) {
+                        this.currentChatId = parseInt(id);
+                    }
+                    else {
+                        if (id == -1) return;
+                        this.currentChatId = id;
+                    }
+                    window.currentChatId = this.currentChatId;
                     console.log(this.currentChatId);
                     $(`.chat-item`).removeClass('selected-item');
                     $(`.chat-item[data-id=${id}]`).addClass('selected-item');
@@ -481,8 +490,7 @@
                             });
 
                             this.renderChats();
-
-
+                            this.openChat(window.currentChatId);
                         },
                         onError: this.onError
                     });
