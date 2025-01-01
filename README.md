@@ -1,5 +1,18 @@
 # Анонимный Мессенджер AnonMessenger
 
+## Table of contents
+
+- [Анонимный Мессенджер AnonMessenger](#анонимный-мессенджер-anonmessenger)
+  - [Table of contents](#table-of-contents)
+  - [Deploy](#deploy)
+      - [**`application-net.properties`**](#application-netproperties)
+      - [**`/etc/nginx/nginx.conf`**](#etcnginxnginxconf)
+  - [Deploy with Docker](#deploy-with-docker)
+  - [Описание предметной области](#описание-предметной-области)
+  - [Описание бизнес процессов](#описание-бизнес-процессов)
+  - [Стек технологий](#стек-технологий)
+  - [Этапы рефакторинга](#этапы-рефакторинга)
+
 ## Deploy
 
 Инструкция для запуска новой версии мессенджера с использованием Apache Kafka
@@ -36,60 +49,20 @@ user www-data;
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
-# This number should be, at maximum, the number of CPU cores on your system. 
-worker_processes 24;
-
-# Number of file descriptors used for Nginx.
-worker_rlimit_nofile 200000;
-
-# Only log critical errors.
-# error_log /var/log/nginx/error.log crit;
+# This number should be, at maximum, the number of CPU cores on your system.
+worker_processes auto;
 
 events {
-
-    # Determines how many clients will be served by each worker process.
-    worker_connections 4000;
-
-    # The effective method, used on Linux 2.6+, optmized to serve many clients with each thread.
-    use epoll;
-
-    # Accept as many connections as possible, after nginx gets notification about a new connection.
-    multi_accept on;
-
+    accept_mutex off;
 }
 http {
-        # Caches information about open FDs, freqently accessed files.
-    open_file_cache max=200000 inactive=20s; 
-    open_file_cache_valid 30s; 
-    open_file_cache_min_uses 2;
-    open_file_cache_errors on;
-
-    # Disable access log altogether.
-    access_log off;
-
-    # Sendfile copies data between one FD and other from within the kernel.
-    sendfile on; 
-
-    # Causes nginx to attempt to send its HTTP response head in one packet,  instead of using partial frames.
-    tcp_nopush on;
-
-    # Don't buffer data-sends (disable Nagle algorithm).
-    tcp_nodelay on; 
-
-    # Timeout for keep-alive connections. Server will close connections after this time.
-    keepalive_timeout 30;
-
-    # Number of requests a client can make over the keep-alive connection.
-    keepalive_requests 1000;
-
-    # Allow the server to close the connection after a client stops responding. 
-    reset_timedout_connection on;
-
-    # Send the client a "request timed out" if the body is not loaded by this time.
-    client_body_timeout 10;
+    access_log syslog:server=unix:/var/log/nginx.sock,nohostname;
+    error_log syslog:server=unix:/var/log/nginx.sock,nohostname;
+    sendfile on;
+    sendfile_max_chunk 512k;
 
     # If the client stops reading data, free up the stale client connection after this much time.
-    send_timeout 2;
+    send_timeout 15;
 
     # Compression.
     gzip on;
@@ -98,10 +71,13 @@ http {
     gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml;
     gzip_disable "msie6";
     upstream web {
-        ip_hash;
+        zone backend 64k;
+        ip_hash; # 100% is working
+        # server localhost:9088 backup;
         # server localhost:9089;
         # server localhost:9088;
-        server localhost:9087;
+        server localhost:9087 max_fails=1 fail_timeout=20s;
+        # server 192.167.1.2:9087 max_fails=1 fail_timeout=20s;
     }
 
     map $http_upgrade $proxy_connection {
@@ -110,9 +86,10 @@ http {
     }
 
     server {
-        listen 80;
+        # listen 192.167.1.10:80;
         proxy_next_upstream error timeout http_503;
-        proxy_next_upstream_tries 2; 
+        proxy_next_upstream_tries 2;
+        aio threads;
 
         location / {
             proxy_pass http://web;
@@ -128,7 +105,6 @@ http {
            # Default in Spring Boot
            proxy_pass_header X-XSRF-TOKEN;
 
-           # WebSocket support (nginx 1.4)
            proxy_http_version 1.1;
            proxy_set_header Upgrade $http_upgrade;
            proxy_set_header Connection $proxy_connection;
@@ -149,9 +125,9 @@ sudo java -jar messenger-0.0.1-spring-boot.jar --spring.profiles.active=net
 # ...
 ```
 
-### Deprecated
+## Deploy with Docker
 
-<strike>
+В последних версиях был добавлен proxy контейнер для балансировки нагрузки. Теперь работает перенаправление с <http://localhost>.
 
 ```bash
 # Build application
@@ -166,15 +142,8 @@ sudo docker image rm -f $(sudo docker image ls -q)
 # Build new (without caching, cache doesn't update after not Dockerfile changes)
 sudo docker-compose --env-file ./default.env build --no-cache
 
-# Start postgres, messenger at http://localhost:9087 and zabbix at http://localhost:8080
-sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d 
-```
-
-Если вы хотите запустить сервер на определённом IP-адресе, то надо отредактировать файл *application-net.properties*, где указываете вместо localhost нужный вам IP-адрес:
-
-```text
-messenger.public-url = http://localhost:9087
-messenger.websocket.url = ws://localhost:9087/ws
+# Start postgres, messenger at http://localhost and zabbix at http://localhost:8080
+sudo docker-compose --env-file ./default.env up -d 
 ```
 
 Собрать и запустить как раньше, но с указанием другого docker-compose конфигурационного файла:
@@ -182,10 +151,8 @@ messenger.websocket.url = ws://localhost:9087/ws
 ```bash
 sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml build --no-cache
 
-sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up postgres_db messenger monitoring_server -d 
+sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up -d 
 ```
-
-</strike>
 
 ## Описание предметной области
 
@@ -193,24 +160,24 @@ sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up post
 
 Для входа нужны:
 
-* Логин
-* Пароль
+- Логин
+- Пароль
 
 Для регистрации нужны:
 
-* Уникальный никнейм (логин)
-* Пароль
+- Уникальный никнейм (логин)
+- Пароль
 
 После аутентификации и авторизации пользователь имеет следующие возможности:
 
-* Создавать собственные чаты
-* Приглашать в свои чаты людей (по логину)
-* Писать и просматривать текстовые сообщения
-* Банить пользователей в чате (если есть роль админа или создателя чата)
-* Создатель чата может назначать админами других пользователей
-* Удалять свои чаты вместе со всеми сообщениями
-* Удаление аккаунта
-* Выход из аккаунта
+- Создавать собственные чаты
+- Приглашать в свои чаты людей (по логину)
+- Писать и просматривать текстовые сообщения
+- Банить пользователей в чате (если есть роль админа или создателя чата)
+- Создатель чата может назначать админами других пользователей
+- Удалять свои чаты вместе со всеми сообщениями
+- Удаление аккаунта
+- Выход из аккаунта
 
 ## Описание бизнес процессов
 
@@ -221,33 +188,33 @@ sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up post
 
 После аутентификации и авторизации пользователя перекинет на основную страницу с списком чатов. Здесь пользователь сможет:
 
-* Создать новый чат
-* Читать сообщения в уже существующих чатах
-* Удалять чаты
-* Выйти из аккаунта
-* Удалить аккаунт
+- Создать новый чат
+- Читать сообщения в уже существующих чатах
+- Удалять чаты
+- Выйти из аккаунта
+- Удалить аккаунт
 
 При нажатии на чат будут загружаться данные о чате и сообщения пользователей.
 В чате пользователь сможет:
 
-* Удалять пользователей (если создатель)
-* Просматривать сообщения
-* Удалить текущий чат(все свои сообщения)
+- Удалять пользователей (если создатель)
+- Просматривать сообщения
+- Удалить текущий чат(все свои сообщения)
 
 При создании чата будет отображаться соответствующее окно с следующими полями:
 
-* Название чата (Не обязательно уникальное)
-* Список людей, которых пользователь собирается пригласить
-* Строка поиска, для поиска людей по никнейму
+- Название чата (Не обязательно уникальное)
+- Список людей, которых пользователь собирается пригласить
+- Строка поиска, для поиска людей по никнейму
 
 ## Стек технологий
 
-Backend: Spring+PostgreSQL
+Backend: Spring Boot (Spring MVC) + PostgreSQL 15 + Apache Kafka (Inter servers communication) + Nginx (Load balancer)
 
 Frontend: Js(Jquery) + Websockets
 
 ## Этапы рефакторинга
 
-* Внедрение шифрования по алгоритму ГОСТ
-* Переделать под SPA(все на одной странице)
-* Минимизировать и нормализовать базу данных
+- <strike>Внедрение шифрования по алгоритму ГОСТ</strike>
+- Переделать под SPA(все на одной странице)
+- Минимизировать и нормализовать базу данных

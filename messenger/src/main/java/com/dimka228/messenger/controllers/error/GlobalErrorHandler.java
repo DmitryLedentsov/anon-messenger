@@ -1,16 +1,9 @@
 package com.dimka228.messenger.controllers.error;
 
-import com.dimka228.messenger.exceptions.AppException;
-import com.dimka228.messenger.exceptions.WrongTokenException;
-
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import lombok.Data;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,10 +14,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import com.dimka228.messenger.exceptions.AppException;
+import com.dimka228.messenger.exceptions.WrongTokenException;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
 
 @Data
 @RestControllerAdvice
