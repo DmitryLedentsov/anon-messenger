@@ -1,8 +1,7 @@
-/* vesion 1.0.1 */
+/* version 1.0.1 */
 body {
     background: #1A1A1A;
     font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
-    ;
 }
 
 .login {
@@ -49,8 +48,6 @@ a {
     border-color: #B5E853;
     padding: 16px;
     outline: 0;
-    /*font-family: inherit;
-    */
     font-size: 0.95em;
 }
 

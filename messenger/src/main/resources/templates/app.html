@@ -56,6 +56,7 @@
             position: fixed;
             right: 0;
             filter: contrast(0.5);
+            filter: drop-shadow(1px 1px 1px red);
         }
 
         .icon-wrapper img:hover {
@@ -117,7 +118,7 @@
 
         .background {
 
-            background-image: url('../icons/background-test-24.webp');
+            /* background-image: url('../icons/background-test-24.webp'); */
             position: fixed;
 
             width: 100%;
@@ -126,8 +127,8 @@
             z-index: -20;
             opacity: 0.2;
             background-size: cover;
-            filter: blur(5px);
-
+            background-color: rgb(17, 17, 17, 0.5);
+            filter: blur(5px)
         }
     </style>
 </head>
@@ -294,7 +295,8 @@
         </script>
             <div class="message-list"></div>
             <div class="input-group mt-3">
-                <textarea type="text" id="messageInput" class="form-control" placeholder="Напишите сообщение..."></textarea>
+                <textarea type="text" id="messageInput" class="form-control"
+                    placeholder="Напишите сообщение..."></textarea>
                 <div class="btn btn-primary" onclick="app.sendMessage()">Отправить</button>
                 </div>
             </div>
@@ -310,6 +312,7 @@
         <script th:inline="javascript">
             var api = window.api || null;
             var app = window.app || {};
+            window.currentChatId = -1;
             function App() {
                 this.chats = [];
                 this.updateChat = (id, data) => {
@@ -340,7 +343,6 @@
 
                     $msgList = $('.message-list');
                     appendListItem('.message-list', this.renderMsgTemplate(data),)
-                    //$msgList.append(this.renderMsgTemplate(data));
                 }
                 this.onUpdateMsg = (chat, data) => {
 
@@ -367,7 +369,15 @@
 
                 this.openChat = (id) => {
                     this.api.unsubscribeOnMessagesInChat(this.currentChatId);
-                    this.currentChatId = parseInt(id);
+
+                    if (id !== window.currentChatId) {
+                        this.currentChatId = parseInt(id);
+                    }
+                    else {
+                        if (id == -1) return;
+                        this.currentChatId = id;
+                    }
+                    window.currentChatId = this.currentChatId;
                     console.log(this.currentChatId);
                     $(`.chat-item`).removeClass('selected-item');
                     $(`.chat-item[data-id=${id}]`).addClass('selected-item');
@@ -442,7 +452,6 @@
                 this.onError = (error) => {
                     console.log(error);
                     if (error.message) error = error.message;
-                    //$('.modal').modal('hide');
                     $("#errorModalMessage").html(error);
                     $("#errorModal").modal('show');;
                 }
@@ -460,16 +469,11 @@
                     this.api = new MessengerApi({
                         serverUrl: $settings.attr('server-url'), brokerUrl: $settings.attr('socket-url'), onConnect: (m) => {
                             this.chats = this.api.getChats();
-
-                            //this.chats.forEach(el => {
-                            //    this.api.subscribeOnMessagesInChat(el.id,(msg)=>this.receiveMsg(el.id,msg));
-                            //});
                             this.api.subscribeOnChats((m) => {
                                 let op = m.operation;
                                 let data = m.data;
                                 if (op === "ADD") {
                                     this.chats.push(data);
-                                    //this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
                                     this.onAddChat(data);
                                 }
                                 else if (op === "DELETE") {
@@ -483,12 +487,10 @@
                                     this.updateChat(data.id, data);
                                     this.onUpdateChat(data);
                                 }
-                                //this.renderChats();
                             });
 
                             this.renderChats();
-
-
+                            this.openChat(window.currentChatId);
                         },
                         onError: this.onError
                     });
@@ -543,7 +545,6 @@
                     $chatList.empty();
                     $.each(this.chats, function (index, el) {
                         const rendered = Mustache.render(template, el);
-                        //$chatList.append(rendered);
                         appendListItem('.chat-list', rendered);
 
 
@@ -563,7 +564,6 @@
                         el.isOwned = userId == el.senderId;
 
                         const rendered = Mustache.render(template, el);
-                        //$msgList.append(rendered);
                         appendListItem('.message-list', rendered);
 
                     });

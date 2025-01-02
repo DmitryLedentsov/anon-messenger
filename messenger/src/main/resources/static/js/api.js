@@ -52,8 +52,6 @@ function MessengerApi(options) {
 
     this.initSocketClient = (login) => {
         this.setAuth(login);
-        // DEBUG
-        // console.log('client init with token ' + login.token);
         this.client = new StompJs.Client({
             brokerURL: options.brokerUrl,
             connectHeaders: {
@@ -63,10 +61,6 @@ function MessengerApi(options) {
 
 
         this.client.onConnect = (frame) => {
-            // DEBUG
-            // console.log('Connected: ' + frame);
-
-            // sendMsg({senderId:userId, message:"aaaa"});
 
             this.socketClientSubscribe(`/user/${login.userId}/error`, (m) => {
 
@@ -93,7 +87,6 @@ function MessengerApi(options) {
         this.subscribtions = {};
         this.socketClientSubscribe = (topic, callback) => {
             topic = topicUrl + topic;
-            // DEBUG
             console.log('subscribe ' + topic);
             this.subscribtions[topic] = this.client.subscribe(topic, (m) => {
                 let data = m.body ? JSON.parse(m.body) : {};
@@ -105,8 +98,6 @@ function MessengerApi(options) {
         }
         this.socketClientUnSubscribe = (topic) => {
             topic = topicUrl + topic;
-            // DEBUG
-            // console.log('unsubscribe ' + topic);
 
             if (this.subscribtions[topic]) this.subscribtions[topic].unsubscribe();
         }
@@ -114,21 +105,14 @@ function MessengerApi(options) {
 
         this.socketClientConnect = () => {
             this.client.activate();
-            // DEBUG
-            // console.log("Connecting");
         }
 
         this.socketClientDisconnect = () => {
             this.client.deactivate();//.then(r =>  setConnected(false));
-            // DEBUG
-            // console.log("Disconnecting");
         }
 
         this.publishSocketMessage = (url, msg) => {
             url = publishUrl + url;
-            // DEBUG
-            // console.log('publish ' + url);
-            // What the hell???
             msg && console.log(msg);
             if (!msg) msg = { aboba: 'aboba' };
             this.client.publish({
@@ -140,8 +124,6 @@ function MessengerApi(options) {
 
 
     this.initLogic = (userId) => {
-        // DEBUG
-        // console.log('init chats for user: ' + userId);
         this.chats = [];
 
 
@@ -167,7 +149,6 @@ function MessengerApi(options) {
         };
         this.subscribeOnMessagesInChat = (chatId, onReceive) => {
             this.socketClientSubscribe(`/chat/${chatId}/messages`, (m) => {
-                //console.log(m);
                 onReceive && onReceive(m);
             });
         }

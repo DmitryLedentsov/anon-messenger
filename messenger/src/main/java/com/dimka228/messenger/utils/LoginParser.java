@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoginParser {
-  public static List<String> parseLogins(String s) {
-    return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());
-  }
+    public static List<String> parseLogins(String s) {
+        return Arrays.stream(s.trim().split(",")).distinct().collect(Collectors.toList());
+    }
 }

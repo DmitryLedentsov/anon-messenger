@@ -1,61 +1,70 @@
 package com.dimka228.messenger.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(
-    name = "m_user_status",
-    indexes = {
-      @Index(name = "m_user_status_user_id_idx", columnList = "user_id"),
-      @Index(name = "m_user_status_name_key", columnList = "name", unique = true)
-    })
+        name = "m_user_status",
+        indexes = {
+            @Index(name = "m_user_status_user_id_idx", columnList = "user_id"),
+            @Index(name = "m_user_status_name_key", columnList = "name", unique = true)
+        })
 public class UserStatus {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  @Column(name = "name", nullable = false, length = 20)
-  private String name;
+    @Column(name = "name", nullable = false, length = 20)
+    private String name;
 
-  @Column(name = "description", length = 20)
-  private String description;
+    @Column(name = "description", length = 20)
+    private String description;
 
-  public String getDescription() {
-    return description;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public User getUser() {
-    return user;
-  }
+    public User getUser() {
+        return user;
+    }
 
-  public void setUser(User user) {
-    this.user = user;
-  }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-  public static final String ONLINE = "ONLINE";
+    public static final String ONLINE = "ONLINE";
 
-  public Integer getId() {
-    return id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }
