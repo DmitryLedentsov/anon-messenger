@@ -4,19 +4,20 @@ import com.dimka228.messenger.entities.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.crypto.SecretKey;
 
 @Service
 public class TokenProvider {
@@ -24,9 +25,10 @@ public class TokenProvider {
     public long TOKEN_VALIDITY = 100000;
 
     @Value("${messenger.jwt.key}")
-    private String jwtSigningKey =
+    private final String jwtSigningKey =
             "9a4f2c8d3b7a1e6f45c8a0b3f267d8b1d4e6f3c8a9d2b5f8e3a9c8b5f6v8a3d9";
 
+    @Cacheable(value = "extractUserName", key = "#token")
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -46,6 +48,7 @@ public class TokenProvider {
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
+    @Cacheable(value = "extractClaim", key = "#token")
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
@@ -53,11 +56,11 @@ public class TokenProvider {
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 60 * 24))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -65,15 +68,22 @@ public class TokenProvider {
         return extractExpiration(token).before(new Date());
     }
 
+    @Cacheable(value = "extractExpiration", key = "#token")
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    @Cacheable(value = "extractAllClaims", key = "#token")
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    private Key getSigningKey() {
+    @Cacheable("getSigningKey")
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

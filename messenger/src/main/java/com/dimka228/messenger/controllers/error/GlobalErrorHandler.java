@@ -1,12 +1,10 @@
 package com.dimka228.messenger.controllers.error;
 
 import com.dimka228.messenger.exceptions.AppException;
-import com.dimka228.messenger.exceptions.WrongTokenException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -60,13 +58,6 @@ public class GlobalErrorHandler {
         return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
     }
 
-    @ExceptionHandler(SignatureException.class)
-    @ResponseStatus(code = HttpStatus.FORBIDDEN)
-    public Map<String, Object> handleSignatureException(
-            SignatureException e, WebRequest webRequest) {
-        return createExceptionMessage(new WrongTokenException(), HttpStatus.FORBIDDEN, webRequest);
-    }
-
     @ExceptionHandler(JwtException.class)
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     public Map<String, Object> handleJwtException(JwtException e, WebRequest webRequest) {
@@ -112,8 +103,8 @@ public class GlobalErrorHandler {
         Map<String, Object> error = new HashMap<>();
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
-        if (webRequest instanceof ServletWebRequest) {
-            error.put("uri", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
+        if (webRequest instanceof ServletWebRequest servletWebRequest) {
+            error.put("uri", servletWebRequest.getRequest().getRequestURI());
         }
         error.put("message", e.getMessage());
         error.put("code", status.value());

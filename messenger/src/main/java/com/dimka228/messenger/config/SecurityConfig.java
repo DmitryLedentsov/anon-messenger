@@ -72,7 +72,7 @@ public class SecurityConfig {
                                                 "/css/**",
                                                 "/icons/**",
                                                 "/fonts/**",
-                                                "favicon.ico")
+                                                "/favicon.ico")
                                         .permitAll()
                                         .requestMatchers(
                                                 "/swagger-ui/**",
@@ -93,6 +93,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Caching for passwordEncoder STRICTLY DOES NOT ALLOWED!!!
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

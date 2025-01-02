@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +30,6 @@ public class JwtAuthController {
     private final AuthenticationManager authenticationManager;
     private final TokenProvider jwtTokenUtil;
 
-    @Autowired
     public JwtAuthController(
             UserService userService,
             AuthenticationManager authenticationManager,
@@ -53,6 +51,7 @@ public class JwtAuthController {
     }
 
     @PostMapping("/signin")
+    @SuppressWarnings("UseSpecificCatch")
     public ResponseEntity<TokenDTO> signIn(@RequestBody UserDto userDto) {
 
         User user = userService.getUser(userDto.getLogin());

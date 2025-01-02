@@ -4,6 +4,7 @@
 
 - [Анонимный Мессенджер AnonMessenger](#анонимный-мессенджер-anonmessenger)
   - [Table of contents](#table-of-contents)
+  - [Генерация сертификата для https](#генерация-сертификата-для-https)
   - [Хостинг](#хостинг)
       - [**`Потребление.png`**](#потреблениеpng)
   - [Deploy docker-compose](#deploy-docker-compose)
@@ -11,6 +12,13 @@
   - [Описание бизнес процессов](#описание-бизнес-процессов)
   - [Стек технологий](#стек-технологий)
   - [Этапы рефакторинга](#этапы-рефакторинга)
+
+## Генерация сертификата для https
+
+```bash
+cd messenger/src/main/resources/keystore
+keytool -genkeypair -alias messenger -keyalg RSA -keysize 4096 -storetype PKCS12 -keystore messenger.p12 -validity 365
+```
 
 ## Хостинг
 

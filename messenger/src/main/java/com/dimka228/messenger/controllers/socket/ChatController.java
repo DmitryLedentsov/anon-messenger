@@ -100,6 +100,7 @@ public class ChatController {
     }
 
     @GetMapping("/chats")
+    @SuppressWarnings("unused")
     List<Chat> messages(Principal principal) {
         User user = userService.getUser(principal.getName());
         List<Chat> chats = chatService.getChatsForUser(user);
@@ -133,7 +134,7 @@ public class ChatController {
                             userId,
                             user.getLogin(),
                             null);
-            OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
+            OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
             socketMessagingService.sendMessageOperationToChat(chatId, op);
         }
     }

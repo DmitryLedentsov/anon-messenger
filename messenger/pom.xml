@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.5</version>
+		<version>3.4.1</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.dimka228</groupId>
@@ -158,6 +158,12 @@
 			<artifactId>passay</artifactId>
 			<version>1.6.6</version>
 		</dependency>
+
+		<!-- caching -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -211,7 +217,14 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.13.0</version>
 				<configuration>
-					<compilerArgument>-Xlint:all</compilerArgument>
+					<!-- <compilerArgument>-Xlint:all,-serial,-processing</compilerArgument> -->
+					<compilerArgs>
+						<arg>-Xlint:all,-serial,-processing</arg>
+						<arg>-J-Xmx2g</arg>
+						<arg>-J-XX:+UseZGC</arg>
+						<arg>-J-XX:+ZGenerational</arg>
+						<arg>-J-XX:SoftMaxHeapSize=2048m</arg>
+					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>

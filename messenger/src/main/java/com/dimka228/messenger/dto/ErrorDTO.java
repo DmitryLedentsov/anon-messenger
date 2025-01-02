@@ -15,6 +15,6 @@ public class ErrorDTO {
     String message;
 
     public ErrorDTO(Exception e) {
-        setMessage(e.getMessage());
+        message = e.getMessage();
     }
 }

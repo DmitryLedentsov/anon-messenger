@@ -1,7 +1,6 @@
 package com.dimka228.messenger.config;
 
 import com.dimka228.messenger.config.properties.WebSocketProperties;
-import com.dimka228.messenger.exceptions.AppException;
 import com.dimka228.messenger.exceptions.WrongTokenException;
 import com.dimka228.messenger.security.jwt.TokenProvider;
 import com.dimka228.messenger.services.UserDetailsService;
@@ -17,7 +16,6 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,23 +53,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         return super.handleClientMessageProcessingError(
                                 clientMessage, ex.getCause());
                     }
-
-                    private Message<byte[]> prepareErrorMessage(
-                            Message<byte[]> clientMessage,
-                            AppException apiError,
-                            String errorCode) {
-                        String message = apiError.getMessage();
-
-                        StompHeaderAccessor accessor =
-                                StompHeaderAccessor.create(StompCommand.ERROR);
-
-                        accessor.setMessage(errorCode);
-                        accessor.setLeaveMutable(true);
-
-                        return MessageBuilder.createMessage(
-                                message != null ? message.getBytes() : "".getBytes(),
-                                accessor.getMessageHeaders());
-                    }
                 });
     }
 
@@ -80,6 +61,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(
                 new ChannelInterceptor() {
                     @Override
+                    @SuppressWarnings("UseSpecificCatch")
                     public Message<?> preSend(Message<?> message, MessageChannel channel) {
                         StompHeaderAccessor accessor =
                                 MessageHeaderAccessor.getAccessor(
