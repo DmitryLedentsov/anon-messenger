@@ -14,9 +14,6 @@
     <br>
     <div id="messages">
         <ul class="list data-elem" id="msg-list" th:data-url="@{'/topic/chat/' + ${chat.id}} + '/messages'"></ul>
-        <!--<ul class="list" th:each="message : ${messages}">
-    <li th:if="${message}" th:text="${message?.senderId} + ' --- ' + ${message?.sender} + ' --- ' + ${message?.message}"></li>
-</ul>-->
     </div>
     <br>
     <br>
@@ -29,15 +26,13 @@
 
     </form>
     <script th:inline="javascript">
-        /*<![CDATA[*/
 
-        var loginUserName = /*[[${user.login}]]*/ 'User Name';
+        var loginUserName = 'User Name';
         var chatId = [[${ chat.id }]];
         var userId = [[${ user.id }]];
         var messages = [[${ messages }]];
         console.log("chatId: " + chatId);
 
-        /*]]>*/
     </script>
     <div th:insert="fragments :: include-js-libs"></div>
     <script type="text/javascript" th:src="@{/js/templates.js}"></script>

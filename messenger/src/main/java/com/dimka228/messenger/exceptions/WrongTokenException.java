@@ -1,11 +1,11 @@
 package com.dimka228.messenger.exceptions;
 
 public class WrongTokenException extends AppException {
-  public WrongTokenException() {
-    super("wrong token");
-  }
+    public WrongTokenException() {
+        super("Wrong token");
+    }
 
-  public WrongTokenException(String msg) {
-    super(msg);
-  }
+    public WrongTokenException(String msg) {
+        super(msg);
+    }
 }

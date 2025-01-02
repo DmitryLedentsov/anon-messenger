@@ -1,4 +1,5 @@
 input[type="text"],
+textarea,
 input[type="email"],
 input[type="password"] {
     display: block;

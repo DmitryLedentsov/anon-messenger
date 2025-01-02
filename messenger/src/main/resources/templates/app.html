@@ -17,10 +17,12 @@
         .chat-list,
         .chat-messages-section {
             padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
         }
 
         .chats-section {
             padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
             width: 30%;
             border-right: 1px solid #ddd;
             overflow-y: auto;
@@ -49,10 +51,12 @@
         }
 
         .icon-wrapper img {
-            width: 100%;
-            height: 100%;
-            position: relative;
+            width: 50pt;
+            height: 50pt;
+            position: fixed;
+            right: 0;
             filter: contrast(0.5);
+            filter: drop-shadow(1px 1px 1px red);
         }
 
         .icon-wrapper img:hover {
@@ -114,17 +118,17 @@
 
         .background {
 
-            background-image: url('../icons/background-test-11.webp');
+            /* background-image: url('../icons/background-test-24.webp'); */
             position: fixed;
-           
+
             width: 100%;
             height: 100%;
             background-repeat: no-repeat;
             z-index: -20;
             opacity: 0.2;
             background-size: cover;
-            filter: blur(5px);
-
+            background-color: rgb(17, 17, 17, 0.5);
+            filter: blur(5px)
         }
     </style>
 </head>
@@ -142,6 +146,9 @@
 
     <script src="https://unpkg.com/hyperscript.org@0.9.5"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+
+    <!-- Option 1: Include in HTML -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 
     <script type="text/javascript" th:src="@{/js/templates.js}"></script>
     <script type="text/javascript" th:src="@{/js/api.js}"></script>
@@ -268,6 +275,7 @@
     <div class="app-container  terminal">
         <!-- Список чатов -->
         <div class="chats-section">
+            
             <h5>Список чатов</h5>
             <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-target="#createChatModal">Создать
                 чат</button>
@@ -275,9 +283,9 @@
             <script id="chat-template" type="x-tmpl-mustache">
             <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                 <span>{{name}}</span>
-                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});">-</span>
+                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
             </div>
-        </script>
+            </script>
         </div>
 
         <!-- Сообщения чата -->
@@ -285,13 +293,14 @@
             <h5>Чат</h5>
             <script id="message-template" type="x-tmpl-mustache">
             <div class="message-item" data-id="{{id}}">
-                <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});">-</span> {{/isOwned}}</span>
+                <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
                 <span class="message-time">{{sendTime}}</span>
             </div>
         </script>
             <div class="message-list"></div>
             <div class="input-group mt-3">
-                <input type="text" id="messageInput" class="form-control" placeholder="Напишите сообщение...">
+                <textarea type="text" id="messageInput" class="form-control"
+                    placeholder="Напишите сообщение..."></textarea>
                 <div class="btn btn-primary" onclick="app.sendMessage()">Отправить</button>
                 </div>
             </div>
@@ -299,7 +308,7 @@
             <!-- Сообщения чата -->
             <div class="profile-section">
                 <div class="icon-wrapper" onclick="app.openCurrentUserProfile()">
-                    <img th:src="@{/icons/profile.png}">
+                    <img th:src="@{/icons/profile-shhh.png}">
                 </div>
             </div>
         </div>
@@ -307,6 +316,7 @@
         <script th:inline="javascript">
             var api = window.api || null;
             var app = window.app || {};
+            window.currentChatId = -1;
             function App() {
                 this.chats = [];
                 this.updateChat = (id, data) => {
@@ -337,7 +347,6 @@
 
                     $msgList = $('.message-list');
                     appendListItem('.message-list', this.renderMsgTemplate(data),)
-                    //$msgList.append(this.renderMsgTemplate(data));
                 }
                 this.onUpdateMsg = (chat, data) => {
 
@@ -364,7 +373,15 @@
 
                 this.openChat = (id) => {
                     this.api.unsubscribeOnMessagesInChat(this.currentChatId);
-                    this.currentChatId = parseInt(id);
+
+                    if (id !== window.currentChatId) {
+                        this.currentChatId = parseInt(id);
+                    }
+                    else {
+                        if (id == -1) return;
+                        this.currentChatId = id;
+                    }
+                    window.currentChatId = this.currentChatId;
                     console.log(this.currentChatId);
                     $(`.chat-item`).removeClass('selected-item');
                     $(`.chat-item[data-id=${id}]`).addClass('selected-item');
@@ -439,7 +456,6 @@
                 this.onError = (error) => {
                     console.log(error);
                     if (error.message) error = error.message;
-                    //$('.modal').modal('hide');
                     $("#errorModalMessage").html(error);
                     $("#errorModal").modal('show');;
                 }
@@ -457,16 +473,11 @@
                     this.api = new MessengerApi({
                         serverUrl: $settings.attr('server-url'), brokerUrl: $settings.attr('socket-url'), onConnect: (m) => {
                             this.chats = this.api.getChats();
-
-                            //this.chats.forEach(el => {
-                            //    this.api.subscribeOnMessagesInChat(el.id,(msg)=>this.receiveMsg(el.id,msg));
-                            //});
                             this.api.subscribeOnChats((m) => {
                                 let op = m.operation;
                                 let data = m.data;
                                 if (op === "ADD") {
                                     this.chats.push(data);
-                                    //this.api.subscribeOnMessagesInChat(data.id,(msg)=>this.receiveMsg(data.id,msg));
                                     this.onAddChat(data);
                                 }
                                 else if (op === "DELETE") {
@@ -480,12 +491,10 @@
                                     this.updateChat(data.id, data);
                                     this.onUpdateChat(data);
                                 }
-                                //this.renderChats();
                             });
 
                             this.renderChats();
-
-
+                            this.openChat(window.currentChatId);
                         },
                         onError: this.onError
                     });
@@ -540,7 +549,6 @@
                     $chatList.empty();
                     $.each(this.chats, function (index, el) {
                         const rendered = Mustache.render(template, el);
-                        //$chatList.append(rendered);
                         appendListItem('.chat-list', rendered);
 
 
@@ -560,7 +568,6 @@
                         el.isOwned = userId == el.senderId;
 
                         const rendered = Mustache.render(template, el);
-                        //$msgList.append(rendered);
                         appendListItem('.message-list', rendered);
 
                     });

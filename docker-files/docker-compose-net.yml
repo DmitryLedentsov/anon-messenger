@@ -24,15 +24,15 @@ services:
           - BINPATH=${BINPATH}
           - APP=${APP}
           - SPRING_PROPERTY=${SPRING_PROPERTY}
-      # network_mode: host
+      network_mode: host
       depends_on:
         - postgres_db
-      ports:
-          - "9087:9087"
+      #ports:
+      #    - "9087:9087"
       env_file: ./default.env
-      networks:
-        pgsql_bridge:
-          ipv4_address: 192.167.1.2
+      #networks:
+      #  pgsql_bridge:
+      #    ipv4_address: 192.167.1.2
   postgres_db:
       tty: true
       restart: unless-stopped

@@ -2,8 +2,6 @@ $(function () {
     let $form = $('.ajax-form');
     $form.submit(function (e) {
         e.preventDefault();
-        // DEBUG
-        // console.log("click");
         $.ajax({
             url: $form.attr('action'),
             type: 'post',
