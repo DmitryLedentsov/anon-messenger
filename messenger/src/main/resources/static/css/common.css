@@ -1,8 +1,16 @@
 /* version 1.0.1 */
 @font-face {
     font-family: Minimal;
-    src: url("../fonts/RobotoMono-Regular.ttf") format("opentype");
+    src: url("../fonts/TransformaSans_Trial-Regular.ttf") format("opentype");
+
 }
+
+@font-face {
+    font-family: MinimalEng;
+    src:url('../fonts/google.woff2')format('woff2');
+    unicode-range: U+00-FF, U+980-9FF;
+}
+
 
 :root {
     color-scheme: dark;
@@ -25,8 +33,9 @@ body {
     padding: 0;
     background-color: #171717;
     line-height: 1.5;
-    font-family: 'Minimal', system-ui, sans-serif;
-    text-shadow: 0.1px 0.1px 0.1px rgb(220, 58, 255, 1)
+    font-family:  'MinimalEng', 'Minimal';
+    
+    text-shadow: 0.1px 0.1px 0.1px rgb(255, 58, 58)
 }
 
 h1,
@@ -39,7 +48,7 @@ h7,
 h8 {
     color: var(--main-color);
     line-height: 1.5;
-    font-family: 'Minimal', system-ui, sans-serif;
+    font-family:  'MinimalEng', 'Minimal';
     text-align: left;
     margin: 0 0 20px;
 }
@@ -48,21 +57,21 @@ p {
     color: #FFFFFF;
     padding-left: 30px;
     font-size: 15px;
-    font-family: 'Minimal', system-ui, sans-serif;
+    font-family:  'MinimalEng', 'Minimal';
 }
 
 
 .error {
     color: red;
     font-size: 15px;
-    font-family: 'Minimal', system-ui, sans-serif;
+    font-family:  'MinimalEng', 'Minimal';
 }
 
 
 span {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: 'Minimal', system-ui, sans-serif;
+    font-family:  'MinimalEng', 'Minimal';
 }
 
 .hr {
@@ -73,7 +82,7 @@ span {
 li {
     color: #FFFFFF;
     font-size: 15px;
-    font-family: 'Minimal', system-ui, sans-serif;
+    font-family:  'MinimalEng', 'Minimal';
 }
 
 .element,
@@ -190,7 +199,7 @@ ol {
 }
 
 .keyword {
-    color: #E867E8;
+    color: #e86767;
     border: 1px solid gray;
     background-color: #171717;
     padding: 2px 2px;

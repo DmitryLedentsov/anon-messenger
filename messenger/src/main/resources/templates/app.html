@@ -147,6 +147,9 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.5"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 
+    <!-- Option 1: Include in HTML -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+
     <script type="text/javascript" th:src="@{/js/templates.js}"></script>
     <script type="text/javascript" th:src="@{/js/api.js}"></script>
 
@@ -272,6 +275,7 @@
     <div class="app-container  terminal">
         <!-- Список чатов -->
         <div class="chats-section">
+            
             <h5>Список чатов</h5>
             <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-target="#createChatModal">Создать
                 чат</button>
@@ -279,9 +283,9 @@
             <script id="chat-template" type="x-tmpl-mustache">
             <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                 <span>{{name}}</span>
-                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});">-</span>
+                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
             </div>
-        </script>
+            </script>
         </div>
 
         <!-- Сообщения чата -->
@@ -289,7 +293,7 @@
             <h5>Чат</h5>
             <script id="message-template" type="x-tmpl-mustache">
             <div class="message-item" data-id="{{id}}">
-                <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});">-</span> {{/isOwned}}</span>
+                <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
                 <span class="message-time">{{sendTime}}</span>
             </div>
         </script>
