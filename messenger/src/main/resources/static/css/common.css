@@ -15,6 +15,7 @@
 :root {
     color-scheme: dark;
     --main-color: #ffffff;
+    --background-color: #000000;
 }
 
 body {
@@ -31,11 +32,11 @@ body {
 body {
     margin: 0;
     padding: 0;
-    background-color: #171717;
+    background-color: var(--background-color);
     line-height: 1.5;
     font-family:  'MinimalEng', 'Minimal';
     
-    text-shadow: 0.1px 0.1px 0.1px rgb(255, 58, 58)
+   
 }
 
 h1,
@@ -92,9 +93,33 @@ li {
     color: white;
     filter: drop-shadow(1px 1px 1px rgb(255, 255, 255, 0.1));
     border-radius: 15px;
-    background-color: #171717;
+    background-color: rgba(var(--background-color),0.4) !important;
     border-color: #262626;
 }
+
+.element::before,
+.btn::before,
+.modal-content::before,
+.form-control::before
+ {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+  
+    display: block;
+
+    background-size:cover;
+    width: 100%;
+    height: 100%;
+    background-image: url('../icons/background-4.jpg') !important;
+    filter: blur(2px);
+    border-radius: 15px;
+}
+
+
 
 blockquote {
     border-left-style: dotted;
@@ -157,14 +182,7 @@ dt {
     padding: 10px;
 }
 
-ul {
-    list-style: none;
-}
 
-ul li::before {
-    content: "⮞⮞  ";
-    color: var(--main-color);
-}
 
 ol {
     display: table;
@@ -201,12 +219,12 @@ ol {
 .keyword {
     color: #e86767;
     border: 1px solid gray;
-    background-color: #171717;
+    background-color: var(--background-color);
     padding: 2px 2px;
 }
 
 .link {
-    color: #52279F;
+    color: #9f2727;
 }
 
 .link:hover {
@@ -217,7 +235,7 @@ ol {
 .w3-black,
 .w3-hover-black:hover {
     color: #BAB9B9 !important;
-    background-color: #171717 !important
+    background-color: var(--background-color) !important
 }
 
 /* margin for button */
@@ -260,7 +278,7 @@ button {
     border-color: var(--main-color);
     outline: 0;
 
-    background: #171717;
+    /*background: var(--background-color);*/
     border-color: #bbb;
     color: white;
     border: 2px solid #676767;
@@ -293,7 +311,7 @@ input[type="password"]:focus {
 
 
 .form-control:focus {
-    background-color: #171717;
+    background-color: var(--background-color);
     border-color: #BAB9B9;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
 }
@@ -301,7 +319,6 @@ input[type="password"]:focus {
 
 textarea:focus,
 input[type="text"]:focus,
-textarea:focus,
 input[type="password"]:focus,
 input[type="datetime"]:focus,
 input[type="datetime-local"]:focus,
@@ -346,3 +363,5 @@ input[type="color"]:focus,
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
 
 }
+
+
