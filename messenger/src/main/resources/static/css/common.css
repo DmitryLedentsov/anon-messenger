@@ -93,10 +93,11 @@ li {
     color: white;
     filter: drop-shadow(1px 1px 1px rgb(255, 255, 255, 0.1));
     border-radius: 15px;
-    background-color: rgba(var(--background-color),0.4) !important;
+    /*background-color: rgba(var(--background-color),0.4) !important;*/
+    background-color: var(--background-color) !important;
     border-color: #262626;
 }
-
+/*
 .element::before,
 .btn::before,
 .modal-content::before,
@@ -117,7 +118,7 @@ li {
     background-image: url('../icons/background-4.jpg') !important;
     filter: blur(2px);
     border-radius: 15px;
-}
+}*/
 
 
 

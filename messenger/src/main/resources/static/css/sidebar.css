@@ -33,7 +33,7 @@ li {
     min-width: 264px;
     transition: all 0.35s ease-in-out;
     /*box-shadow: 0 0 35px 0 rgb(75 54 54 / 50%);*/
-    z-index: 1111;
+    z-index: 1;
 }
 
 /* Sidebar collapse */
