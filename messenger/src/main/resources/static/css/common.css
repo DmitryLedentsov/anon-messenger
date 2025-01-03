@@ -96,6 +96,7 @@ li {
     /*background-color: rgba(var(--background-color),0.4) !important;*/
     background-color: var(--background-color);
     border-color: #262626;
+    border-width: 2px;
 }
 input,textarea{
     background-color: rgba(var(--background-color),0.4) !important;
