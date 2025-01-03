@@ -1,4 +1,3 @@
-
 *,
 ::after,
 ::before {
@@ -20,6 +19,7 @@ a {
 li {
     list-style: none;
 }
+
 /* Layout skeleton */
 
 .wrapper {

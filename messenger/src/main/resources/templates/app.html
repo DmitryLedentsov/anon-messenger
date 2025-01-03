@@ -10,20 +10,22 @@
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/sidebar.css}" rel="stylesheet">
     <style>
-   
         .chat-list,
         .chat-messages-section {
             padding: 1rem;
             margin: 1.2rem 1rem 0 0;
         }
-        .send-button, textarea{
+
+        .send-button,
+        textarea {
             max-height: min-content;
         }
 
-        .messages-wrapper{
+        .messages-wrapper {
             max-height: 90vh;
             overflow: auto;
         }
+
         .chats-section {
             padding: 1rem;
             margin: 1.2rem 1rem 0 0;
@@ -35,7 +37,7 @@
 
         .chat-messages-section {
             width: 100%;
-         
+
             color: blue;
         }
 
@@ -119,10 +121,10 @@
             opacity: 0.5;
         }
 
-        
+
         .background {
 
-            background-image: url('../icons/background-4.jpg'); 
+            /* background-image: url('../icons/background-4.jpg');  */
             position: fixed;
 
             width: 100%;
@@ -151,15 +153,16 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.5"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 
-    
+
 
     <!-- Option 1: Include in HTML -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-    crossorigin="anonymous"></script>
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
 
-    
+
 
     <script type="text/javascript" th:src="@{/js/templates.js}"></script>
     <script type="text/javascript" th:src="@{/js/api.js}"></script>
@@ -324,48 +327,51 @@
             </div>
         </div>-->
 
-       
-            <!-- Sidebar -->
-            <aside id="sidebar" class="border-right">
-                <div class="h-100">
-                    <div class="sidebar-logo">
-                        <a href="#"> <h5>Список чатов</h5></a>
-                    </div>
-                    <!-- Sidebar Navigation -->
-                    <ul class="sidebar-nav">
-                      
-                        <li class="sidebar-item">
-                           
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="border-right">
+            <div class="h-100">
+                <div class="sidebar-logo">
+                    <a href="#">
+                        <h5>Список чатов</h5>
+                    </a>
+                </div>
+                <!-- Sidebar Navigation -->
+                <ul class="sidebar-nav">
+
+                    <li class="sidebar-item">
+
                         <div class="container-fluid">
-                        <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-target="#createChatModal">Создать чат</button>
-                        <div class="chat-list"></div>
-                        <script id="chat-template" type="x-tmpl-mustache">
+                            <button class="btn btn-primary add-chat-btn" data-toggle="modal"
+                                data-target="#createChatModal">Создать чат</button>
+                            <div class="chat-list"></div>
+                            <script id="chat-template" type="x-tmpl-mustache">
                         <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                             <span>{{name}}</span>
                             <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
                         </div>
                         </script>
                         </div>
-                        </li>
-                        
-                       
-                     
-                    </ul>
-                </div>
-            </aside>
-            <!-- Main Component -->
-            <div class="main">
-                <nav class="navbar navbar-expand px-3 border-bottom">
-                    <!-- Button for sidebar toggle -->
-                    <button class=" btn btn-primary open-sidebar" type="button" data-bs-theme="dark">
-                        <i class="bi bi-list"></i>
-                    </button>
-                </nav>
-                <main class="content px-3 py-2 messages-wrapper">
-                    <div class="container-fluid" >
-                        <div class="mb-3">
-                            <div class="chat-messages-section">
-                            
+                    </li>
+
+
+
+                </ul>
+            </div>
+        </aside>
+        <!-- Main Component -->
+        <div class="main">
+            <nav class="navbar navbar-expand px-3 border-bottom">
+                <!-- Button for sidebar toggle -->
+                <button class=" btn btn-primary open-sidebar" type="button" data-bs-theme="dark">
+                    <i class="bi bi-list"></i>
+                </button>
+            </nav>
+            <main class="content px-3 py-2 messages-wrapper">
+                <div class="container-fluid">
+                    <div class="mb-3">
+                        <div class="chat-messages-section">
+
                             <script id="message-template" type="x-tmpl-mustache">
                                 <div class="message-item" data-id="{{id}}">
                                     <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
@@ -374,16 +380,18 @@
                             </script>
                             <div class="message-list"></div>
                             <div class="input-group mt-3">
-                                <textarea type="text" id="messageInput" class="form-control auto-grow" placeholder="Напишите сообщение..."></textarea>
-                                <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i class="bi bi-send" ></i></button>
-                              
+                                <textarea type="text" id="messageInput" class="form-control auto-grow"
+                                    placeholder="Напишите сообщение..."></textarea>
+                                <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i
+                                        class="bi bi-send"></i></button>
+
                             </div>
-                    
+
                         </div>
                     </div>
-                </main>
-            </div>
-     
+            </main>
+        </div>
+
 
         <script th:inline="javascript">
             var api = window.api || null;
@@ -537,7 +545,7 @@
                         $(this).closest('.modal').modal('hide');
                         console.log('hide modal');
                     })
-                    
+
                 }
 
 
@@ -578,10 +586,10 @@
 
 
                     $('textarea').css('overflow', 'hidden');
-                 
+
 
                     const toggler = document.querySelector(".open-sidebar");
-                    toggler.addEventListener("click",function(){
+                    toggler.addEventListener("click", function () {
                         document.querySelector("#sidebar").classList.toggle("collapsed");
                     });
 

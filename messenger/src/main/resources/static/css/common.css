@@ -7,7 +7,7 @@
 
 @font-face {
     font-family: MinimalEng;
-    src:url('../fonts/google.woff2')format('woff2');
+    src: url('../fonts/google.woff2')format('woff2');
     unicode-range: U+00-FF, U+980-9FF;
 }
 
@@ -15,7 +15,7 @@
 :root {
     color-scheme: dark;
     --main-color: #ffffff;
-    --background-color: #000000;
+    --background-color: #171717;
 }
 
 body {
@@ -34,9 +34,7 @@ body {
     padding: 0;
     background-color: var(--background-color);
     line-height: 1.5;
-    font-family:  'MinimalEng', 'Minimal';
-    
-   
+    font-family: 'MinimalEng', 'Minimal';
 }
 
 h1,
@@ -49,7 +47,7 @@ h7,
 h8 {
     color: var(--main-color);
     line-height: 1.5;
-    font-family:  'MinimalEng', 'Minimal';
+    font-family: 'MinimalEng', 'Minimal';
     text-align: left;
     margin: 0 0 20px;
 }
@@ -58,21 +56,21 @@ p {
     color: #FFFFFF;
     padding-left: 30px;
     font-size: 15px;
-    font-family:  'MinimalEng', 'Minimal';
+    font-family: 'MinimalEng', 'Minimal';
 }
 
 
 .error {
     color: red;
     font-size: 15px;
-    font-family:  'MinimalEng', 'Minimal';
+    font-family: 'MinimalEng', 'Minimal';
 }
 
 
 span {
     color: #FFFFFF;
     font-size: 15px;
-    font-family:  'MinimalEng', 'Minimal';
+    font-family: 'MinimalEng', 'Minimal';
 }
 
 .hr {
@@ -83,7 +81,7 @@ span {
 li {
     color: #FFFFFF;
     font-size: 15px;
-    font-family:  'MinimalEng', 'Minimal';
+    font-family: 'MinimalEng', 'Minimal';
 }
 
 .element,
@@ -98,28 +96,28 @@ li {
     border-color: #262626;
     border-width: 2px;
 }
-input,textarea{
-    background-color: rgba(var(--background-color),0.4) !important;
+
+input, textarea {
+    background-color: rgba(var(--background-color), 0.4) !important;
 }
 
 .element::before,
 .btn::before,
 .modal-content::before,
-.form-control::before
- {
+.form-control::before {
     content: "";
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: -1;
-  
+
     display: block;
 
-    background-size:cover;
+    background-size: cover;
     width: 100%;
     height: 100%;
-    background-image: url('../icons/background-4.jpg') !important;
+    /* background-image: url('../icons/background-4.jpg') !important; */
     filter: blur(4px);
     border-radius: 15px;
 }
@@ -366,5 +364,3 @@ input[type="color"]:focus,
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
 
 }
-
-
