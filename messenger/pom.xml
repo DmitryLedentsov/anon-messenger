@@ -110,7 +110,8 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- for messaging -->
+		<!--for
+		messaging-->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-websocket</artifactId>
@@ -126,8 +127,9 @@
 			<artifactId>spring-security-messaging</artifactId>
 		</dependency>
 
-		<!-- JWT AUTH TOCKEN-->
-		<!-- Утилиты -->
+		<!--JWT
+		AUTH TOCKEN-->
+		<!--Утилиты-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -145,7 +147,7 @@
 			<artifactId>jjwt-jackson</artifactId>
 		</dependency>
 
-		<!-- DOCS-->
+		<!--DOCS-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -159,10 +161,17 @@
 			<version>1.6.6</version>
 		</dependency>
 
-		<!-- caching -->
+		<!--caching -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+		<!--Apache
+		Kafka-->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 	</dependencies>
 

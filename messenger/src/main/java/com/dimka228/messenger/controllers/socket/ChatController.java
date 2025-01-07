@@ -2,6 +2,7 @@ package com.dimka228.messenger.controllers.socket;
 
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.dto.ChatDtoRequest;
+import com.dimka228.messenger.dto.ChatUpdateDTO;
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -11,7 +12,7 @@ import com.dimka228.messenger.exceptions.CannotBanSelfException;
 import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
-import com.dimka228.messenger.services.SocketMessagingService;
+import com.dimka228.messenger.services.KafkaChatsProducer;
 import com.dimka228.messenger.services.UserService;
 
 import lombok.AllArgsConstructor;
@@ -37,9 +38,10 @@ import java.util.stream.Collectors;
         consumes = {MediaType.APPLICATION_JSON_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE})
 public class ChatController {
-    private final SocketMessagingService socketMessagingService;
+
     private final UserService userService;
     private final ChatService chatService;
+    private final KafkaChatsProducer producer;
 
     @PostMapping("/chat")
     public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
@@ -56,7 +58,7 @@ public class ChatController {
 
         List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
 
-        chatDtoRequest.getUsers().add(user.getLogin()); // добавляем нашего
+        chatDtoRequest.getUsers().add(user.getLogin());
 
         for (UserInChat cur : usersInChat) {
             ChatDTO chatDTO =
@@ -67,7 +69,8 @@ public class ChatController {
                             null,
                             chatDtoRequest.getUsers());
             OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-            socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+            ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
+            producer.sendChatsUpdate(message);
         }
         return new ChatDTO(
                 chat.getId(),
@@ -89,18 +92,18 @@ public class ChatController {
 
             chatService.deleteOrLeaveChat(user, chat);
             for (UserInChat cur : users) {
-                socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+                ChatUpdateDTO message = new ChatUpdateDTO(cur.getUser().getId(), null, data);
+                producer.sendChatsUpdate(message);
             }
         } else {
             chatService.deleteOrLeaveChat(user, chat);
-            socketMessagingService.sendChatOperationToUser(user.getId(), data);
+            ChatUpdateDTO message = new ChatUpdateDTO(user.getId(), null, data);
+            producer.sendChatsUpdate(message);
         }
-
         return chatDTO;
     }
 
     @GetMapping("/chats")
-    @SuppressWarnings("unused")
     List<Chat> messages(Principal principal) {
         User user = userService.getUser(principal.getName());
         List<Chat> chats = chatService.getChatsForUser(user);
@@ -116,15 +119,19 @@ public class ChatController {
         User user = userService.getUser(userId);
         UserInChat userInChat = chatService.getUserInChat(cur, chat);
 
-        if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
+        if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
             throw new WrongPrivilegesException();
-        if (Objects.equals(user.getId(), cur.getId())) throw new CannotBanSelfException();
+        }
+        if (Objects.equals(user.getId(), cur.getId())) {
+            throw new CannotBanSelfException();
+        }
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
-        socketMessagingService.sendChatOperationToUser(
-                userId,
+        OperationDTO<ChatDTO> chatData =
                 new OperationDTO<>(
-                        new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
+                        new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE);
+        ChatUpdateDTO message = new ChatUpdateDTO(userId, null, chatData);
+        producer.sendChatsUpdate(message);
         chatService.deleteOrLeaveChat(user, chat);
         for (MessageInfo messageInfo : messages) {
             MessageDTO data =
@@ -135,7 +142,8 @@ public class ChatController {
                             user.getLogin(),
                             null);
             OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
-            socketMessagingService.sendMessageOperationToChat(chatId, op);
+            message = new ChatUpdateDTO(chatId, op, null);
+            producer.sendChatUpdate(message);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.dimka228.messenger.controllers.socket;
 
+import com.dimka228.messenger.dto.ChatUpdateDTO;
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -7,7 +8,7 @@ import com.dimka228.messenger.entities.Message;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
-import com.dimka228.messenger.services.SocketMessagingService;
+import com.dimka228.messenger.services.KafkaChatsProducer;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
 
@@ -33,9 +34,9 @@ import java.util.List;
         consumes = {MediaType.APPLICATION_JSON_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE})
 public class MessageController {
-    private final SocketMessagingService socketMessagingService;
     private final UserService userService;
     private final ChatService chatService;
+    private final KafkaChatsProducer producer;
 
     @PostMapping("/{id}/send")
     public MessageDTO sendMessage(
@@ -52,7 +53,8 @@ public class MessageController {
                         user.getLogin(),
                         DateConverter.format(Instant.now()));
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
-        socketMessagingService.sendMessageOperationToChat(id, data);
+        ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
+        producer.sendChatUpdate(message);
         return chatMessage;
     }
 
@@ -72,11 +74,13 @@ public class MessageController {
                         user.getLogin(),
                         DateConverter.format(Instant.now()));
         OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
-        socketMessagingService.sendMessageOperationToChat(id, data);
+        ChatUpdateDTO message = new ChatUpdateDTO(id, data, null);
+        producer.sendChatUpdate(message);
         return fullMsg;
     }
 
     @GetMapping("/{id}/messages")
+    @SuppressWarnings("unused")
     List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
         Chat chat = chatService.getChat(id);
         User user = userService.getUser(principal.getName());
