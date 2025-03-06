@@ -6,7 +6,7 @@ CREATE TABLE M_USER
 (
     ID    serial PRIMARY KEY,
     PASSWORD        TEXT NOT NULL,
-	LOGIN        VARCHAR(20) NOT NULL UNIQUE
+	LOGIN        VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE INDEX ON M_USER USING HASH(ID);
@@ -14,7 +14,7 @@ CREATE INDEX ON M_USER USING HASH(ID);
 CREATE TABLE M_CHAT
 (
     ID    serial PRIMARY KEY,
-    NAME VARCHAR(20) NOT NULL
+    NAME VARCHAR(50) NOT NULL
 );
 CREATE INDEX ON M_CHAT USING HASH(ID);
 
@@ -110,7 +110,7 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION GET_MESSAGES_FOR_USER_IN_CHAT(_user_id int, _chat int)  
-returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(20), MESSAGE TEXT, SEND_TIME TEXT)  
+returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(50), MESSAGE TEXT, SEND_TIME TEXT)  
 language plpgsql  
 as  
 $$   
@@ -128,7 +128,7 @@ $$;
 
 
 CREATE OR REPLACE FUNCTION GET_MESSAGES_FROM_CHAT(_chat int)  
-returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(20), MESSAGE TEXT, SEND_TIME TEXT)  
+returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(50), MESSAGE TEXT, SEND_TIME TEXT)  
 language plpgsql  
 as  
 $$   
@@ -158,8 +158,6 @@ BEGIN
 END;  
 $$;  
 
-
-
 CREATE OR REPLACE FUNCTION add_message_action()
 RETURNS trigger AS 
 $$   
@@ -188,7 +186,7 @@ CREATE TRIGGER ChatJoinInfo AFTER INSERT ON M_USER_IN_CHAT
 FOR EACH ROW 
 EXECUTE PROCEDURE join_chat_action();
 
-SELECT register('aboba','qwerty');
+SELECT register('agoba','qwerty');
 SELECT register('sanya','abcdef');
 SELECT register('kostya','vskdvb');
 

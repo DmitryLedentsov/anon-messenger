@@ -100,11 +100,18 @@ public class ChatController {
     }
 
     @GetMapping("/chats")
-    List<Chat> messages(Principal principal) {
+    List<Chat> getChats(Principal principal) {
         User user = userService.getUser(principal.getName());
         List<Chat> chats = chatService.getChatsForUser(user);
 
         return chats;
+    }
+    @GetMapping("/chat/{chatName}")
+    Chat getChats(Principal principal, @PathVariable String chatName) {
+        User user = userService.getUser(principal.getName());
+        Chat chat = chatService.getChatForUser(user,chatName);
+
+        return chat;
     }
 
     @DeleteMapping("/chat/{chatId}/ban/{userId}")

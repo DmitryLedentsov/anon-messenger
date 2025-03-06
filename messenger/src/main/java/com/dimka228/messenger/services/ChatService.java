@@ -37,6 +37,9 @@ public class ChatService {
     public List<Chat> getChatsForUser(User user) {
         return chatRepository.getChatsForUser(user.getId());
     }
+    public Chat getChatForUser(User user, String name) {
+        return getChatsForUser(user).stream().filter(chat->chat.getName().equals(name)).findFirst().orElseThrow(ChatNotFoundException::new);
+    }
 
     public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat) {
         return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId());

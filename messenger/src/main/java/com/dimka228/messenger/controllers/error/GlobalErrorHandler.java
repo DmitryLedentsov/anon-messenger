@@ -1,6 +1,7 @@
 package com.dimka228.messenger.controllers.error;
 
 import com.dimka228.messenger.exceptions.AppException;
+import com.dimka228.messenger.exceptions.DBException;
 import com.dimka228.messenger.exceptions.WrongTokenException;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,6 +26,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Data
 @RestControllerAdvice
@@ -100,11 +103,19 @@ public class GlobalErrorHandler {
         return createExceptionMessage(e, HttpStatus.BAD_REQUEST, webRequest);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleDbIntegrityException(DataIntegrityViolationException e, WebRequest webRequest) {
+        
+        return createExceptionMessage(new DBException(), HttpStatus.BAD_REQUEST, webRequest);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleAppException(Exception e, WebRequest webRequest) {
         return createExceptionMessage(e, HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
     }
+   
 
     private Map<String, Object> createExceptionMessage(
             Exception e, HttpStatus status, WebRequest webRequest) {

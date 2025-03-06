@@ -1,6 +1,8 @@
 console.log('messenger api loaded!!');
 function MessengerApi(options) {
     if (!$) throw new Error("jquery not imported");
+    //if(Stomp) StompJs=Stomp; //new vers
+    if (!StompJs) throw new Error("stompjs not imported");
     const signInUrl = `/auth/signin`;
     const signUpUrl = `/auth/signup`;
 
@@ -50,6 +52,10 @@ function MessengerApi(options) {
         return response;
     }
 
+    this.init = (login)=>{
+        this.initLogic(login);
+        this.initSocketClient(login);
+    }
     this.initSocketClient = (login) => {
         this.setAuth(login);
         this.client = new StompJs.Client({
@@ -67,7 +73,8 @@ function MessengerApi(options) {
                 alert(m.message)
             });
 
-            this.initLogic(login.userId);
+            
+            this.initSocketLogic(login.userId);
             options.onConnect && options.onConnect(frame);
         };
 
@@ -122,36 +129,7 @@ function MessengerApi(options) {
         }
     }
 
-
     this.initLogic = (userId) => {
-        this.chats = [];
-
-
-        this.subscribeOnChats = (onReceive) => {
-            this.socketClientSubscribe(`/user/${userId}/chats`, (m) => {
-                let op = m.operation;
-                let data = m.data;
-
-                onReceive && onReceive(m);
-                if (op === "DELETE") {
-                    this.unsubscribeOnMessagesInChat(data.id);
-                } else if (op == "ADD") {
-                    // this.subscribeOnMessagesInChat(data.id, onReceiveMsg)
-                }
-
-            })
-        }
-
-
-
-        this.unsubscribeOnMessagesInChat = (chatId) => {
-            this.socketClientUnSubscribe(`/chat/${chatId}/messages`);
-        };
-        this.subscribeOnMessagesInChat = (chatId, onReceive) => {
-            this.socketClientSubscribe(`/chat/${chatId}/messages`, (m) => {
-                onReceive && onReceive(m);
-            });
-        }
         this.createChat = (chat) => {
             return this.query('post', `/chat`, chat);
 
@@ -183,16 +161,53 @@ function MessengerApi(options) {
             let response = this.query('get', `/chats`);
             return response;
         }
+        this.getChat = (name) => {
+
+            let response = this.query('get', `/chat/${name}`);
+            return response;
+        }
+        
+        this.getMessagesFromChat = (chatId) => {
+            let messages = this.query('get', `/chat/${chatId}/messages`);
+
+            return messages;
+        }
+    }
+    this.initSocketLogic = (userId) => {
+        this.chats = [];
+
+
+        this.subscribeOnChats = (onReceive) => {
+            this.socketClientSubscribe(`/user/${userId}/chats`, (m) => {
+                let op = m.operation;
+                let data = m.data;
+
+                onReceive && onReceive(m);
+                if (op === "DELETE") {
+                    this.unsubscribeOnMessagesInChat(data.id);
+                } else if (op == "ADD") {
+                    // this.subscribeOnMessagesInChat(data.id, onReceiveMsg)
+                }
+
+            })
+        }
+
+
+
+        this.unsubscribeOnMessagesInChat = (chatId) => {
+            this.socketClientUnSubscribe(`/chat/${chatId}/messages`);
+        };
+        this.subscribeOnMessagesInChat = (chatId, onReceive) => {
+            this.socketClientSubscribe(`/chat/${chatId}/messages`, (m) => {
+                onReceive && onReceive(m);
+            });
+        }
         this.subscribeOnMessagesInChats = (ids, onReceive) => {
             ids.forEach(el => {
 
                 this.subscribeOnMessagesInChat(el, onReceive);
             });
         }
-        this.getMessagesFromChat = (chatId) => {
-            let messages = this.query('get', `/chat/${chatId}/messages`);
-
-            return messages;
-        }
+        
     }
 }

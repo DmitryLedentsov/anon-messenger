@@ -600,7 +600,7 @@
                 this.auth = () => {
                     this.token = this.api.authUser({ "login": $('#login').val(), "password": $('#password').val() });
                     if (!this.token) return;
-                    this.api.initSocketClient(this.token);
+                    this.api.init(this.token);
                     this.api.socketClientConnect();
 
                     $("#authModal").modal('hide');
