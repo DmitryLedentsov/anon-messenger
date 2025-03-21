@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://kit.fontawesome.com/ae360af17e.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/sidebar.css}" rel="stylesheet">
+    <style>
+        .chat-list,
+        .chat-messages-section {
+            padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
+        }
+
+        .send-button,
+        textarea {
+            max-height: min-content;
+        }
+
+        .messages-wrapper {
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .chats-section {
+            padding: 1rem;
+            margin: 1.2rem 1rem 0 0;
+            width: 30%;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            color: blue;
+        }
+
+        .chat-messages-section {
+            width: 100%;
+
+            color: blue;
+        }
+
+        .profile-section {
+            padding: 1rem;
+            width: 5vw;
+            height: 5vw;
+            top: 0;
+            right: 0;
+            position: fixed;
+        }
+
+        .icon-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .icon-wrapper img {
+            width: 50pt;
+            height: 50pt;
+            position: fixed;
+            right: 0;
+            filter: contrast(0.5);
+            filter: drop-shadow(1px 1px 1px red);
+        }
+
+        .icon-wrapper img:hover {
+            cursor: pointer;
+        }
+
+        .chat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        .chat-item:hover {
+            border-color: var(--main-color);
+        }
+
+        .remove-btn {
+            margin-left: 0.5rem;
+            color: red;
+            cursor: pointer;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: gray;
+        }
+
+        .add-chat-btn {
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        fade.in {
+            opacity: 1;
+        }
+
+        .fade.show {
+            opacity: 1;
+        }
+
+        .modal.in .modal-dialog {
+            transform: translate(0, 0);
+        }
+
+        .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+
+        .modal-backdrop.in {
+            opacity: 0.5;
+        }
+
+        .modal-backdrop.show {
+            opacity: 0.5;
+        }
+
+
+        .background {
+
+            /* background-image: url('../icons/background-4.jpg');  */
+            position: fixed;
+
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            z-index: -20;
+            opacity: 0.2;
+            background-size: cover;
+            background-color: var(--background-color);
+            filter: blur(5px)
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="settings" th:attr="socket-url=${socket.url},server-url=${server.publicUrl}"> </div>
+
+
+    <div th:insert="fragments :: include-js-libs"></div>
+
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/client-side-templates.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
+
+    <script src="https://unpkg.com/hyperscript.org@0.9.5"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+
+
+
+    <!-- Option 1: Include in HTML -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+
+
+
+    <script type="text/javascript" th:src="@{/js/templates.js}"></script>
+    <script type="text/javascript" th:src="@{/js/api.js}"></script>
+
+    <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
+    <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
+
+    <div class="background"></div>
+    <!-- Модальное окно авторизации -->
+    <div class="modal" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="authModalLabel">Авторизация</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="authForm">
+                        <div class="mb-3">
+                            <label for="login" class="form-label">Логин</label>
+                            <input type="text" class="form-control" id="login" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <button class="btn btn-primary" onclick="app.auth()">Войти</button>
+                        <button class="btn btn-primary" onclick="app.register()">Зарегистрироваться</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно для ошибок -->
+    <div class="modal" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body" id="errorModalMessage">
+                    <!-- Сообщение об ошибке будет вставляться сюда -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary  btn-close" data-bs-dismiss="modal"
+                        aria-label="Close">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания чата -->
+    <div class="modal" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createChatModalLabel">Создать чат</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="chatName" class="form-label">Название чата</label>
+                        <input type="text" class="form-control" id="chatName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="users" class="form-label">Пользователи</label>
+                        <input type="text" class="form-control" id="users" required>
+                    </div>
+                    <button class="btn btn-primary btn-close" onclick="app.createChat()">Создать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно профиля пользователя в чате-->
+    <script id="user-in-chat-modal-template" type="x-tmpl-mustache">
+<div class="modal" id="userInChatModal" tabindex="-1" aria-labelledby="userInChatModal" aria-hidden="true"  data-bs-theme="dark">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userinChatLogin">{{login}}</h5>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="role" class="form-label">Роль в чате:</label>
+                    <select name="role" id="role" class="form-control" disabled>
+                        {{#avaibleRoles}}
+                            <option value="{{role}}" {{selected}}>{{role}}</option>
+                        {{/avaibleRoles}}
+                    </select>
+                  
+                </div>
+                <div class="mb-3">
+                    <label  class="form-label">Дата регистрации: <span class="message-time">{{registrationTime}}</span></label>
+                </div>
+                <div class="mb-3">
+                    <label for="statusList" class="form-label">Статусы:</label>
+                    <ul name="statusList">
+                        {{#statuses}}
+                            <li>{{.}}</li>
+                        {{/statuses}}
+                    </ul>
+                </div>
+                {{#current}}
+                    <button class="btn btn-danger btn-close" onclick="app.deleteChat({{chatId}})">Выйти</button>
+                {{/current}}
+                {{^current}}
+                    <button class="btn btn-danger btn-close" onclick="app.banUser({{id}});">Забанить</button>
+                {{/current}}
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+
+    <!-- Основная часть приложения -->
+    <div class="noise"></div>
+    <div class="overlay"></div>
+    <div class="app-container  terminal wrapper">
+        <!-- Список чатов -->
+        <!--<div class="chats-section">
+            
+            <h5>Список чатов</h5>
+            <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-target="#createChatModal">Создать
+                чат</button>
+            <div class="chat-list"></div>
+            <script id="chat-template" type="x-tmpl-mustache">
+            <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
+                <span>{{name}}</span>
+                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+            </div>
+            </script>
+        </div>-->
+
+        <!-- Сообщения чата -->
+        <!--<div class="chat-messages-section">
+            <h5>Чат</h5>
+            <script id="message-template" type="x-tmpl-mustache">
+            <div class="message-item" data-id="{{id}}">
+                <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
+                <span class="message-time">{{sendTime}}</span>
+            </div>
+        </script>
+            <div class="message-list"></div>
+            <div class="input-group mt-3">
+                <textarea type="text" id="messageInput" class="form-control"
+                    placeholder="Напишите сообщение..."></textarea>
+                <div class="btn btn-primary" onclick="app.sendMessage()">Отправить</button>
+                </div>
+            </div>
+
+         
+            <div class="profile-section">
+                <div class="icon-wrapper" onclick="app.openCurrentUserProfile()">
+                    <img th:src="@{/icons/profile-shhh.png}">
+                </div>
+            </div>
+        </div>-->
+
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="border-right">
+            <div class="h-100">
+                <div class="sidebar-logo">
+                    <a href="#">
+                        <h5>Список чатов</h5>
+                    </a>
+                </div>
+                <!-- Sidebar Navigation -->
+                <ul class="sidebar-nav">
+
+                    <li class="sidebar-item">
+
+                        <div class="container-fluid">
+                            <button class="btn btn-primary add-chat-btn" data-toggle="modal"
+                                data-target="#createChatModal">Создать чат</button>
+                            <div class="chat-list"></div>
+                            <script id="chat-template" type="x-tmpl-mustache">
+                        <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
+                            <span>{{name}}</span>
+                            <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+                        </div>
+                        </script>
+                        </div>
+                    </li>
+
+
+
+                </ul>
+            </div>
+        </aside>
+        <!-- Main Component -->
+        <div class="main">
+            <nav class="navbar navbar-expand px-3 border-bottom">
+                <!-- Button for sidebar toggle -->
+                <button class=" btn btn-primary open-sidebar" type="button" data-bs-theme="dark">
+                    <i class="bi bi-list"></i>
+                </button>
+            </nav>
+            <main class="content px-3 py-2 messages-wrapper">
+                <div class="container-fluid">
+                    <div class="mb-3">
+                        <div class="chat-messages-section">
+
+                            <script id="message-template" type="x-tmpl-mustache">
+                                <div class="message-item" data-id="{{id}}">
+                                    <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
+                                    <span class="message-time">{{sendTime}}</span>
+                                </div>
+                            </script>
+                            <div class="message-list"></div>
+                            <div class="input-group mt-3">
+                                <textarea type="text" id="messageInput" class="form-control auto-grow"
+                                    placeholder="Напишите сообщение..."></textarea>
+                                <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i
+                                        class="bi bi-send"></i></button>
+
+                            </div>
+
+                        </div>
+                    </div>
+            </main>
+        </div>
+
+
+        <script th:inline="javascript">
+            var api = window.api || null;
+            var app = window.app || {};
+            window.currentChatId = -1;
+            function App() {
+                this.chats = [];
+                this.updateChat = (id, data) => {
+                    let idx = this.chats.map(o => o.id).indexOf(data.id);
+                    let messages = chats[idx].messages;
+                    this.chats[idx] = data;
+                    this.chats[idx].messages = messages;
+                }
+                this.updateOrCreateChat = (id, data) => {
+                    let idx = this.chats.map(o => o.id).indexOf(data.id);
+                    if (idx == -1) {
+                        this.chats.push(data);
+                        return;
+                    }
+                    let messages = chats[idx].messages;
+                    this.chats[idx] = data;
+                    this.chats[idx].messages = messages;
+                }
+                this.findChatById = (id) => {
+                    return this.chats.find(chat => chat.id == id);
+                }
+
+
+
+
+                this.onAddMsg = (chat, data) => {
+                    chat.messages.push(data);
+
+                    $msgList = $('.message-list');
+                    appendListItem('.message-list', this.renderMsgTemplate(data),)
+                }
+                this.onUpdateMsg = (chat, data) => {
+
+                }
+                this.onDeleteMsg = (chat, data) => {
+
+                    chat.messages = chat.messages.filter((e) => e.id != data.id);
+                    removeItem(`.message-item[data-id=${data.id}]`);
+
+                }
+
+                this.onAddChat = (data) => {
+                    appendListItem(".chat-list", this.renderChatTemplate(data));
+                }
+                this.onDeleteChat = (data) => {
+                    removeItem(`.chat-item[data-id=${data.id}]`);
+                    if (data.id == this.currentChatId) {
+                        $('.message-list').empty();
+                    }
+                }
+                this.onUpdateChat = (data) => {
+
+                }
+
+                this.openChat = (id) => {
+                    this.api.unsubscribeOnMessagesInChat(this.currentChatId);
+
+                    if (id !== window.currentChatId) {
+                        this.currentChatId = parseInt(id);
+                    }
+                    else {
+                        if (id == -1) return;
+                        this.currentChatId = id;
+                    }
+                    window.currentChatId = this.currentChatId;
+                    console.log(this.currentChatId);
+                    $(`.chat-item`).removeClass('selected-item');
+                    $(`.chat-item[data-id=${id}]`).addClass('selected-item');
+                    let chat = this.findChatById(id);
+                    console.log(chat);
+                    this.api.subscribeOnMessagesInChat(id, (msg) => this.receiveMsg(id, msg));
+                    this.renderMessages(id);
+
+                };
+
+                this.openUserInChat = (userId) => {
+                    let chatId = this.currentChatId;
+                    $(`#userInChatModal`).remove();
+                    let user = this.api.getUserInChat(chatId, userId);
+                    let roles = this.api.getAllRolesInChat(chatId);
+                    roles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
+                    user.avaibleRoles = roles;
+                    user.current = user.id == this.token.userId;
+                    user.chatId = chatId;
+                    if (!user.statuses.includes('ONLINE')) user.statuses.push('OFFLINE');
+                    this.renderUserInChatModal(user);
+                    $(`#userInChatModal`).modal('show');
+
+                }
+
+                this.openCurrentUserProfile = () => {
+                    this.openUserInChat(this.token.userId);
+                }
+
+                this.createChat = () => {
+                    let users = $('#users').val();
+                    users = users.split(',');
+                    let name = $('#chatName').val();
+                    this.api.createChat({ name: name, users: users });
+                }
+
+                this.receiveMsg = (chatId, m) => {
+                    let op = m.operation;
+                    let data = m.data;
+                    let chat = this.findChatById(chatId);
+                    chat.messages = chat.messages || [];
+
+                    if (chatId != this.currentChatId) return;
+                    if (op === "ADD") {
+                        this.onAddMsg(chat, data);
+
+                    }
+                    else if (op === "DELETE") {
+                        this.onDeleteMsg(chat, data);
+                    }
+                    else if (op === "UPDATE") {
+                        this.onUpdateMsg(chat, data);
+                    }
+                    if (chatId == this.currentChatId) {
+                        //this.renderMessages(chatId);
+                    }
+                }
+
+                function appendListItem(listName, listItemHTML) {
+                    $(listItemHTML)
+                        .hide()
+                        .css('opacity', 0.0)
+                        .appendTo(listName)
+                        .slideDown(100)
+                        .animate({ opacity: 1.0 })
+                }
+
+                function removeItem(name) {
+                    $(name).fadeOut(300, function () { $(this).remove(); });
+                }
+
+                this.onError = (error) => {
+                    console.log(error);
+                    if (error.message) error = error.message;
+                    $("#errorModalMessage").html(error);
+                    $("#errorModal").modal('show');;
+                }
+
+                this.initEvents = () => {
+                    $('.btn-close').on('click', function (e) {
+                        $(this).closest('.modal').modal('hide');
+                        console.log('hide modal');
+                    })
+
+                }
+
+
+                this.init = () => {
+                    let $settings = $('#settings');
+                    this.api = new MessengerApi({
+                        serverUrl: $settings.attr('server-url'), brokerUrl: $settings.attr('socket-url'), onConnect: (m) => {
+                            this.chats = this.api.getChats();
+                            this.api.subscribeOnChats((m) => {
+                                let op = m.operation;
+                                let data = m.data;
+                                if (op === "ADD") {
+                                    this.chats.push(data);
+                                    this.onAddChat(data);
+                                }
+                                else if (op === "DELETE") {
+
+                                    this.chats = this.chats.filter((e) => e.id != data.id);
+                                    this.onDeleteChat(data)
+
+
+                                }
+                                else if (op === "UPDATE") {
+                                    this.updateChat(data.id, data);
+                                    this.onUpdateChat(data);
+                                }
+                            });
+
+                            this.renderChats();
+                            this.openChat(window.currentChatId);
+                        },
+                        onError: this.onError
+                    });
+
+                    $("#authModal").modal('show');
+
+                    this.initEvents();
+
+
+                    $('textarea').css('overflow', 'hidden');
+
+
+                    const toggler = document.querySelector(".open-sidebar");
+                    toggler.addEventListener("click", function () {
+                        document.querySelector("#sidebar").classList.toggle("collapsed");
+                    });
+
+
+
+
+                }
+                this.auth = () => {
+                    this.token = this.api.authUser({ "login": $('#login').val(), "password": $('#password').val() });
+                    if (!this.token) return;
+                    this.api.init(this.token);
+                    this.api.socketClientConnect();
+
+                    $("#authModal").modal('hide');
+
+                }
+
+                this.register = () => {
+                    let data = { "login": $('#login').val(), "password": $('#password').val() };
+                    let result = this.api.registerUser(data);
+                    if (result) this.auth();
+
+                }
+
+
+                this.deleteChat = (id) => {
+                    this.api.deleteChat(id);
+                }
+
+                this.deleteMsg = (id) => {
+                    this.api.deleteMessage(this.currentChatId, id);
+                }
+
+                this.banUser = (id) => {
+                    this.api.banUserFromChat(id, this.currentChatId);
+                }
+
+                this.renderUserInChatModal = (user) => {
+                    const template = $('#user-in-chat-modal-template').html();
+
+                    $('body').append(Mustache.render(template, user));
+                }
+                this.renderChats = () => {
+                    const template = $('#chat-template').html();
+                    console.log('rendering chats');
+                    let $chatList = $('.chat-list');
+                    $chatList.empty();
+                    $.each(this.chats, function (index, el) {
+                        const rendered = Mustache.render(template, el);
+                        appendListItem('.chat-list', rendered);
+
+
+                    });
+                }
+                this.renderMessages = (chatId) => {
+                    this.currentChatId = chatId;
+
+                    let userId = this.token.userId;
+                    const template = $('#message-template').html();
+                    console.log('rendering chat ' + chatId);
+                    let chat = this.findChatById(chatId);
+                    chat.messages = this.api.getMessagesFromChat(chatId);
+                    $msgList = $('.message-list');
+                    $msgList.empty();
+                    chat.messages && $.each(chat.messages, function (index, el) {
+                        el.isOwned = userId == el.senderId;
+
+                        const rendered = Mustache.render(template, el);
+                        appendListItem('.message-list', rendered);
+
+                    });
+                }
+
+                this.renderChatTemplate = (chat) => {
+                    const template = $('#chat-template').html();
+                    const rendered = Mustache.render(template, chat);
+                    return rendered;
+                }
+                this.renderMsgTemplate = (msg) => {
+                    let userId = this.token.userId;
+                    msg.isOwned = userId == msg.senderId;
+
+                    const template = $('#message-template').html();
+                    const rendered = Mustache.render(template, msg);
+                    return rendered;
+                }
+
+                this.sendMessage = () => {
+                    let message = $('#messageInput').val();
+                    if (message && this.currentChatId) {
+                        this.api.sendMessageToChat(this.currentChatId, message);
+                        $('#messageInput').val('');
+                    }
+                }
+
+            }
+            $(() => {
+                app = new App();
+                app.init();
+
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === 1 && !node["htmx-internal-data"]) {
+                                htmx.process(node);
+                            }
+                        })
+                        app.initEvents();
+                    })
+                })
+                observer.observe(document, { childList: true, subtree: true })
+
+            });
+        </script>
+</body>
+
+</html>

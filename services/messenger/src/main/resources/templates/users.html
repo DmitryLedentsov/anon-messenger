@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:each="user : ${users}">
+        <span th:text="${user.login}">Login</span>
+    </div>
+</body>
+
+</html>

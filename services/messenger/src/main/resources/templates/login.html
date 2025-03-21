@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <title>Please Log In</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/login.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="login">
+        <h1 class="login-header">Please Log In</h1>
+
+        <form name="login" class="login-container" th:action="@{/auth/login}" method="post">
+            <span class="error" th:if="${param.error}">
+                Invalid username and password.</span>
+            <span class="error" th:if="${param.logout}">
+                You have been logged out.</span>
+            <div>
+                <input type="text" name="login" placeholder="Login" th:value="${user?.login}" />
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" th:value="${user?.password}" />
+            </div>
+            <br>
+            <input type="submit" value="Log in" />
+            <br>
+            <span> not registered? </span>
+            <br>
+            <a th:href="@{/auth/register}"> Register Here</a>
+        </form>
+    </div>
+    <div th:insert="fragments :: include-validation-js-libs"></div>
+</body>
+
+</html>

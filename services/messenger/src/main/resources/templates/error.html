@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h1 class="error">Something went wrong! </h1>
+    <h2 th:text="${error?.message}"></h2>
+    <a href="/">Go Home</a>
+</body>
+
+</html>

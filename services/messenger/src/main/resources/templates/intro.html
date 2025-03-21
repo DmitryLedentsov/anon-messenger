@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Welcome Page</title>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+
+        }
+
+        .container {
+            margin-top: 10%;
+            text-align: center;
+            height: 100vh;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 30vh;
+            height: 30vh;
+            /* fill-rule: evenodd; */
+            /* filter: sepia(1); */
+            /*filter: drop-shadow(0px 1px 40px red);*/
+            /* box-shadow: 0px 0px 5px #fff; */
+            /* filter: blur(1px); */
+            filter: drop-shadow(2px 4px 6vh red);
+        }
+
+        .text {
+            font-size: 2.5em;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            filter: drop-shadow(2px 4px 6px rgba(255, 255, 255, 0.3));
+        }
+
+        .background {
+
+            background-image: url('../icons/background-test-24.webp');
+            background-position-y: center;
+            background-position-x: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            z-index: -20;
+            opacity: 0.2;
+            background-size: cover;
+            filter: blur(5px);
+
+        }
+    </style>
+</head>
+
+<body>
+    <div th:insert="fragments :: include-js-libs"></div>
+    <div class="background"></div>
+    <div class="container">
+        <div class="logo">
+            <img src="../icons/logo-4.png" alt="Company Logo">
+        </div>
+        <h1 class="text" id="text">ShhhChat</h1>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Массив преимуществ
+            const advantages = [
+                "Удобный интерфейс",
+                "Мгновенные сообщения",
+                "Надежная защита данных",
+                "Кроссплатформенность",
+                "Легкость настройки",
+                "Анонимность",
+                "Вам есть что скрывать? :)",
+
+            ];
+
+            // Добавление обработчика клика на логотип
+            $(".logo img").click(function () {
+                const $logo = $(this);
+                const offset = $logo.offset();
+                const logoWidth = $logo.width();
+                const logoHeight = $logo.height();
+                const radius = 400; // Увеличенный радиус
+
+                // Удаление существующих текстовых элементов
+                $(".advantage-text").remove();
+
+                // Распределение элементов вокруг логотипа
+                advantages.forEach((advantage, index) => {
+                    const angle = (index / advantages.length) * (2 * Math.PI); // Угол для размещения
+                    let x = offset.left + logoWidth / 2 + radius * Math.cos(angle);
+                    let y = offset.top + logoHeight / 2 + radius * Math.sin(angle);
+
+                    // Проверка границ экрана
+                    const windowWidth = $(window).width();
+                    const windowHeight = $(window).height();
+                    const buffer = 20; // Минимальное расстояние от края экрана
+
+                    x = Math.min(Math.max(x, buffer), windowWidth - buffer);
+                    y = Math.min(Math.max(y, buffer), windowHeight - buffer);
+
+                    // Создание нового элемента
+                    const $advantageText = $("<div class='advantage-text'></div>")
+                        .text(advantage)
+                        .css({
+                            position: "absolute",
+                            top: offset.top + logoHeight / 2 + "px",
+                            left: offset.left + logoWidth / 2 + "px",
+                            transform: "translate(-50%, -50%)",
+                            color: "white",
+                            "font-size": "1.2em",
+                            "font-weight": "bold",
+                            "text-shadow": "0 0 5px rgba(0, 0, 0, 0.8)",
+                            opacity: 0
+                        });
+
+                    // Добавление элемента в body
+                    /* $("body").append($advantageText);
+         
+                     // Анимация появления и перемещения элемента
+                     $advantageText.animate({
+                         top: y + "px",
+                         left: x + "px",
+                         opacity: 1
+                     }, 1000);*/
+                });
+                var textElement = $('#text');
+                var newText = 'Кто здесь ?';
+
+                // Если текущий текст - это "ShhhChat", меняем его
+                if (textElement.text() === 'ShhhChat') {
+                    typeText(textElement, newText, 100); // начинаем анимацию набора текста
+                    setTimeout(function () {
+                        typeText(textElement, 'Тише....', 100); // возвращаем текст обратно
+                    }, 3000); // возвращаем текст через 3 секунды
+                    setTimeout(function () {
+                        typeText(textElement, 'ShhhChat', 100); // возвращаем текст обратно
+                    }, 6000); // возвращаем текст через 3 секунды
+                }
+
+
+                function typeText(element, text, speed) {
+                    let i = 0;
+                    element.text(''); // очищаем текущий текст
+                    let interval = setInterval(function () {
+                        if (i < text.length) {
+                            element.append(text.charAt(i)); // добавляем один символ
+                            i++;
+                        } else {
+                            clearInterval(interval); // останавливаем, когда весь текст добавлен
+                        }
+                    }, speed);
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

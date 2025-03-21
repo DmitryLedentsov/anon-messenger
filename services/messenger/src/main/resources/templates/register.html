@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <title>Please register</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/login.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="login">
+        <h1 class="login-header">Please Register</h1>
+
+        <form name="register" class="login-container" th:action="@{/auth/register}" method="post">
+            <span class="error" th:text="${error}"></span>
+            <div>
+                <input type="text" name="login" placeholder="Login" />
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" />
+            </div>
+            <br>
+            <input type="submit" value="register" />
+            <br>
+            <span> already registered? </span>
+            <br>
+            <a th:href="@{/auth/login}"> Login Here</a>
+        </form>
+    </div>
+    <div th:insert="fragments :: include-validation-js-libs"></div>
+</body>
+
+</html>
