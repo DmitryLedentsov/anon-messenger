@@ -6,7 +6,8 @@ SHELL ["/bin/bash", "-c"]
 
 ENV LANG=ru_RU.utf8
 
-EXPOSE 443/tcp
+EXPOSE 80/tcp
+EXPOSE 8080/tcp
 
 RUN apt-get update -y && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
     && localedef -i ru_RU -c -f UTF-8 -A /usr/share/locale/locale.alias ru_RU.UTF-8
@@ -18,6 +19,8 @@ RUN wget https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476
 RUN tar -xvzf openjdk-21.0.2_linux-x64_bin.tar.gz
 RUN wget https://downloads.apache.org/maven/mvnd/1.0.2/maven-mvnd-1.0.2-linux-amd64.tar.gz
 RUN tar -xvzf maven-mvnd-1.0.2-linux-amd64.tar.gz
+RUN wget https://dlcdn.apache.org/kafka/4.0.0/kafka_2.13-4.0.0.tgz
+RUN tar -xvzf kafka_2.13-4.0.0.tgz
 ENV PATH=${PATH}:/jdk-21.0.2/bin/:/maven-mvnd-1.0.2-linux-amd64/bin/
 RUN apt-get install -y lsb-release
 RUN apt-get install -y curl ca-certificates \

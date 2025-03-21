@@ -49,7 +49,7 @@ def mode_arg(default="fore"):
 def task_build_images():
     """Build docker container development:latest"""
     def build():
-        cmd = f"docker build --network=host --pull --rm -f Dockerfile -t development:latest ."
+        cmd = f"docker build --pull --rm -f Dockerfile -t development:latest ."
         return cmd
     return {
         'actions': [Interactive(build)],
@@ -59,7 +59,7 @@ def task_build_images():
 def task_container():
     """Run docker container development:latest"""
     def build():
-        cmd = f"docker run -i -p 433:443 --network=host  -v .:/home/dev -t  development:latest /bin/bash && cd /dev/home"
+        cmd = f"docker run -i -p 127.0.0.1:8081:8081 -v .:/home/dev -t  development:latest /bin/bash && cd /dev/home"
         return cmd
     return {
         'actions': [Interactive(build)],
@@ -156,6 +156,23 @@ def task_pg_clear():
         return cmd
     return {
         'actions': [Interactive(clear)],
+    }
+
+
+def task_kafka_run():
+    """Run kafka"""
+
+    def run(mode: str) -> str:
+        cmd = ""
+        if (mode == "back"):
+            cmd += f"/kafka_2.13-4.0.0/bin/kafka-server-start.sh -daemon /kafka_2.13-4.0.0/config/server.properties"
+        else:
+            cmd += f"/kafka_2.13-4.0.0/bin/kafka-server-start.sh /kafka_2.13-4.0.0/config/server.properties"
+        return cmd
+
+    return {
+        'actions': [Interactive(run)],
+        'params': [mode_arg("back")],
     }
 
 
