@@ -7,7 +7,8 @@
   - [Генерация сертификата для https](#генерация-сертификата-для-https)
   - [Хостинг](#хостинг)
       - [**`Потребление.png`**](#потреблениеpng)
-  - [Deploy docker-compose](#deploy-docker-compose)
+  - [Deploy](#deploy)
+    - [In the container](#in-the-container)
   - [Описание предметной области](#описание-предметной-области)
   - [Описание бизнес процессов](#описание-бизнес-процессов)
   - [Стек технологий](#стек-технологий)
@@ -22,32 +23,51 @@ keytool -genkeypair -alias messenger -keyalg RSA -keysize 4096 -storetype PKCS12
 
 ## Хостинг
 
-Самая последняя версия мессенджера с Apache Kafka находится по адресу: [http://195.133.8.71/](http://195.133.8.71/)
-
 Текущее потребление ресурсов, при запуске без docker:
 
 #### **`Потребление.png`**
 
 ![Потребление](tests/Потребление.png)
 
-## Deploy docker-compose
+## Deploy
+
+### In the container
 
 ```bash
-# Build application
-cd messenger
-# Put jar file into ${project_dir}/docker-files
-sudo mvn -с install
-cd ../docker-files
-# Remove old images
-sudo docker-compose --env-file ./default.env down
-sudo docker image rm -f $(sudo docker image ls -q)
+pip install doit # or for WSL: sudo apt install python3-doit
 
-# Build new (without caching, cache doesn't update after not Dockerfile changes)
-sudo docker-compose --env-file ./default.env build --no-cache
+doit build_images
 
-# Start postgres, messenger at http://localhost:9087 and zabbix at http://localhost:8080
-sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d 
+doit container
+
+# inside container in /home/dev
+
+# ignore pg_start errors
+doit pg_start
+doit pg_fill
+
+doit kafka_run
+
+doit package
+
+# messenger in foreground
+doit ms_run -m back
 ```
+
+
+For information about commands:
+
+```bash
+# list of commands
+doit list
+
+# help
+doit help ms_run
+
+# info about args
+doit info ms_run
+```
+
 
 Если вы хотите запустить сервер на определённом IP-адресе, то надо отредактировать файл *application-net.properties*, где указываете вместо localhost нужный вам IP-адрес:
 
@@ -56,13 +76,6 @@ messenger.public-url = http://localhost:9087
 messenger.websocket.url = ws://localhost:9087/ws
 ```
 
-Собрать и запустить как раньше, но с указанием другого docker-compose конфигурационного файла:
-
-```bash
-sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml build --no-cache
-
-sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up postgres_db messenger monitoring_server -d 
-```
 
 ## Описание предметной области
 

@@ -160,7 +160,7 @@ def task_pg_clear():
 
 
 def task_kafka_run():
-    """Run kafka"""
+    """Run kafka server"""
 
     def run(mode: str) -> str:
         cmd = ""
