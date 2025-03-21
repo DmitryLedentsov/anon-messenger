@@ -11,11 +11,12 @@ import com.dimka228.messenger.exceptions.CannotBanSelfException;
 import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
-import com.dimka228.messenger.services.SocketMessagingService;
+
 import com.dimka228.messenger.services.UserService;
 
 import lombok.AllArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +32,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dimka228.messenger.services.interfaces.NotificationService;
+
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping(
         consumes = {MediaType.APPLICATION_JSON_VALUE},
         produces = {MediaType.APPLICATION_JSON_VALUE})
 public class ChatController {
-    private final SocketMessagingService socketMessagingService;
+    @Qualifier("notificationService") private final NotificationService notificationService;
     private final UserService userService;
     private final ChatService chatService;
 
@@ -67,7 +72,7 @@ public class ChatController {
                             null,
                             chatDtoRequest.getUsers());
             OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-            socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+            notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
         }
         return new ChatDTO(
                 chat.getId(),
@@ -89,11 +94,11 @@ public class ChatController {
 
             chatService.deleteOrLeaveChat(user, chat);
             for (UserInChat cur : users) {
-                socketMessagingService.sendChatOperationToUser(cur.getUser().getId(), data);
+                notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
             }
         } else {
             chatService.deleteOrLeaveChat(user, chat);
-            socketMessagingService.sendChatOperationToUser(user.getId(), data);
+            notificationService.sendChatOperationToUser(user.getId(), data);
         }
 
         return chatDTO;
@@ -127,7 +132,7 @@ public class ChatController {
         if (Objects.equals(user.getId(), cur.getId())) throw new CannotBanSelfException();
         List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
-        socketMessagingService.sendChatOperationToUser(
+        notificationService.sendChatOperationToUser(
                 userId,
                 new OperationDTO<>(
                         new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
@@ -141,7 +146,7 @@ public class ChatController {
                             user.getLogin(),
                             null);
             OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
-            socketMessagingService.sendMessageOperationToChat(chatId, op);
+            notificationService.sendMessageOperationToChat(chatId, op);
         }
     }
 
