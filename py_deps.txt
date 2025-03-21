@@ -1,0 +1,3 @@
+pip install doit
+
+pip install --upgrade autopep8

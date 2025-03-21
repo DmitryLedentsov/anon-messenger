@@ -1,1 +1,5 @@
-docker-files/messenger-0.0.1-spring-boot.jar
+docker-files/*.jar
+.doit.db
+__pycache__
+.vscode
+.doit.db*
