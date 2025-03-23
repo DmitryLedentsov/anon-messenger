@@ -1,9 +1,6 @@
 package com.dimka228.messenger.config;
 
-import com.dimka228.messenger.security.jwt.JwtAuthenticationFilter;
-import com.dimka228.messenger.services.UserDetailsService;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
+import com.dimka228.messenger.security.jwt.JwtAuthenticationFilter;
+import com.dimka228.messenger.services.UserDetailsService;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -77,7 +77,7 @@ public class SecurityConfig {
                                         .requestMatchers(
                                                 "/swagger-ui/**",
                                                 "/swagger-resources/*",
-                                                "/v3/api-docs/**")
+                                                "/v3/api-docs/**","/api-docs-ui.html","/api-docs.yaml")
                                         .permitAll()
                                         .requestMatchers("/api-docs/**", "/api-docs-ui/*")
                                         .permitAll()
