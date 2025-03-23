@@ -37,8 +37,6 @@ public class RestResponseEntityExceptionHandler
 добавить рейтинг +-. для этого надо еще таблицу UserReview
 добавить время отправки сообщения. для этого в UserAction добавить ObjID. сделать получение времени сообщения так же
 
-фронт на https://pointjs.org/
-
 
 java -jar ./target/messenger-0.0.1.jar --server.port=8089 --messenger.multi-instance=true --messenger.public-url="http://localhost:8089" --messenger.websocket.url="ws://localhost:8089/ws"
 

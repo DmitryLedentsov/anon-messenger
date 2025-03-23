@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.dimka228</groupId>
 	<artifactId>eureka</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>eureka</name>
 	<description>eureka server</description>
 	<url/>
@@ -55,10 +55,25 @@
 	</dependencyManagement>
 
 	<build>
+		<directory>../../out/eureka/target</directory>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>spring-boot</classifier>
+							<mainClass>com.dimka228.eureka.EurekaApplication</mainClass>
+							<outputDirectory>../..//out</outputDirectory>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>eureka-${project.version}</finalName>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

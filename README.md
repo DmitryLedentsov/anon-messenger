@@ -4,56 +4,75 @@
 
 - [Анонимный Мессенджер AnonMessenger](#анонимный-мессенджер-anonmessenger)
   - [Table of contents](#table-of-contents)
+  - [Генерация сертификата для https](#генерация-сертификата-для-https)
   - [Хостинг](#хостинг)
-      - [**`Потребление.png`**](#потреблениеpng)
-  - [Deploy docker-compose](#deploy-docker-compose)
+    - [**`Потребление.png`**](#потреблениеpng)
+  - [Deploy](#deploy)
+    - [In the container](#in-the-container)
   - [Описание предметной области](#описание-предметной-области)
   - [Описание бизнес процессов](#описание-бизнес-процессов)
   - [Стек технологий](#стек-технологий)
   - [Этапы рефакторинга](#этапы-рефакторинга)
 
-## Хостинг
+## Генерация сертификата для https
 
-Самая последняя версия мессенджера с Apache Kafka находится по адресу: [http://195.133.8.71/](http://195.133.8.71/)
+```bash
+cd messenger/src/main/resources/keystore
+keytool -genkeypair -alias messenger -keyalg RSA -keysize 4096 -storetype PKCS12 -keystore messenger.p12 -validity 365
+```
+
+## Хостинг
 
 Текущее потребление ресурсов, при запуске без docker:
 
-#### **`Потребление.png`**
+### **`Потребление.png`**
 
 ![Потребление](tests/Потребление.png)
 
-## Deploy docker-compose
+## Deploy
+
+### In the container
 
 ```bash
-# Build application
-cd messenger
-# Put jar file into ${project_dir}/docker-files
-sudo mvn -с install
-cd ../docker-files
-# Remove old images
-sudo docker-compose --env-file ./default.env down
-sudo docker image rm -f $(sudo docker image ls -q)
+pip install doit # or for WSL: sudo apt install python3-doit
 
-# Build new (without caching, cache doesn't update after not Dockerfile changes)
-sudo docker-compose --env-file ./default.env build --no-cache
+doit build_images
 
-# Start postgres, messenger at http://localhost:9087 and zabbix at http://localhost:8080
-sudo docker-compose --env-file ./default.env up postgres_db messenger monitoring_server -d 
+doit container
+
+# inside container in /home/dev
+
+# ignore pg_start errors
+doit pg_start
+doit pg_fill
+
+doit kafka_run
+
+doit package
+
+# messenger in foreground
+doit ms_run -m back
 ```
 
-Если вы хотите запустить сервер на определённом IP-адресе, то надо отредактировать файл *application-net.properties*, где указываете вместо localhost нужный вам IP-адрес:
+
+For information about commands:
+
+```bash
+# list of commands
+doit list
+
+# help
+doit help ms_run
+
+# info about args
+doit info ms_run
+```
+
+Если вы хотите запустить сервер на определённом IP-адресе, то надо отредактировать файл *application.properties*, где указываете вместо localhost нужный вам IP-адрес:
 
 ```text
 messenger.public-url = http://localhost:9087
 messenger.websocket.url = ws://localhost:9087/ws
-```
-
-Собрать и запустить как раньше, но с указанием другого docker-compose конфигурационного файла:
-
-```bash
-sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml build --no-cache
-
-sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up postgres_db messenger monitoring_server -d 
 ```
 
 ## Описание предметной области
@@ -62,13 +81,13 @@ sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up post
 
 Для входа нужны:
 
-* Логин
-* Пароль
+- Логин
+- Пароль
 
 Для регистрации нужны:
 
-* Уникальный никнейм (логин)
-* Пароль
+- Уникальный никнейм (логин)
+- Пароль
 
 После аутентификации и авторизации пользователь имеет следующие возможности:
 
@@ -90,24 +109,24 @@ sudo docker-compose --env-file ./default.env -f ./docker-compose-net.yml up post
 
 После аутентификации и авторизации пользователя перекинет на основную страницу с списком чатов. Здесь пользователь сможет:
 
-* Создать новый чат
-* Читать сообщения в уже существующих чатах
-* Удалять чаты
-* Выйти из аккаунта
-* Удалить аккаунт
+- Создать новый чат
+- Читать сообщения в уже существующих чатах
+- Удалять чаты
+- Выйти из аккаунта
+- Удалить аккаунт
 
 При нажатии на чат будут загружаться данные о чате и сообщения пользователей.
 В чате пользователь сможет:
 
-* Удалять пользователей (если создатель)
-* Просматривать сообщения
-* Удалить текущий чат(все свои сообщения)
+- Удалять пользователей (если создатель)
+- Просматривать сообщения
+- Удалить текущий чат(все свои сообщения)
 
 При создании чата будет отображаться соответствующее окно с следующими полями:
 
-* Название чата (Не обязательно уникальное)
-* Список людей, которых пользователь собирается пригласить
-* Строка поиска, для поиска людей по никнейму
+- Название чата (Не обязательно уникальное)
+- Список людей, которых пользователь собирается пригласить
+- Строка поиска, для поиска людей по никнейму
 
 ## Стек технологий
 
@@ -117,6 +136,6 @@ Frontend: Js(Jquery) + Websockets
 
 ## Этапы рефакторинга
 
-* <strike>Внедрение шифрования по алгоритму ГОСТ</strike>
-* Переделать под SPA(все на одной странице)
-* Минимизировать и нормализовать базу данных
+- <strike>Внедрение шифрования по алгоритму ГОСТ</strike>
+- Переделать под SPA(все на одной странице)
+- Минимизировать и нормализовать базу данных
