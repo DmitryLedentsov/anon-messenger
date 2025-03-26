@@ -206,7 +206,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
-		<directory>../out/messenger/target</directory>
+		<!--<directory>../out/messenger/target</directory>-->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -225,7 +225,7 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<classifier>spring-boot</classifier>
+							<classifier></classifier>
 							<mainClass>com.dimka228.messenger.MessengerApplication</mainClass>
 							<outputDirectory>../out</outputDirectory>
 							<appendAssemblyId>false</appendAssemblyId>

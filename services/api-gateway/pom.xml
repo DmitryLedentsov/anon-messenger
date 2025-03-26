@@ -60,7 +60,7 @@
 	</dependencyManagement>
 
 	<build>
-		<directory>../../out/api-gateway/target</directory>
+		<!--<directory>../../out/api-gateway/target</directory>-->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -71,7 +71,7 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<classifier>spring-boot</classifier>
+							<classifier></classifier>
 							<mainClass>com.dimka228.api_gateway.ApiGatewayApplication</mainClass>
 							<outputDirectory>../..//out</outputDirectory>
 							<appendAssemblyId>false</appendAssemblyId>

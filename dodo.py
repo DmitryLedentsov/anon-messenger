@@ -292,9 +292,9 @@ def task_ms_run():
             proto_ws = "wss"
 
         if (mode == "back"):
-            cmd = f'cd out && java -server -jar messenger-0.0.1-spring-boot.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws" &'
+            cmd = f'cd out && java -server -jar messenger-0.0.1.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws" &'
         else:
-            cmd = f'cd out && java -server -jar messenger-0.0.1-spring-boot.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws"'
+            cmd = f'cd out && java -server -jar messenger-0.0.1.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws"'
         return cmd
 
     return {
@@ -316,9 +316,9 @@ def task_gt_run():
             proto_ws = "wss"
 
         if (mode == "back"):
-            cmd = f'cd out && java -server -jar api-gateway-0.0.1-spring-boot.jar &'
+            cmd = f'cd out && java -server -jar api-gateway-0.0.1.jar &'
         else:
-            cmd = f'cd out && java -server -jar api-gateway-0.0.1-spring-boot.jar'
+            cmd = f'cd out && java -server -jar api-gateway-0.0.1.jar'
         return cmd
 
     return {
@@ -340,9 +340,9 @@ def task_sd_run():
             proto_ws = "wss"
 
         if (mode == "back"):
-            cmd = f'cd out && java -server -jar eureka-0.0.1-spring-boot.jar &'
+            cmd = f'cd out && java -server -jar eureka-0.0.1.jar &'
         else:
-            cmd = f'cd out && java -server -jar eureka-0.0.1-spring-boot.jar'
+            cmd = f'cd out && java -server -jar eureka-0.0.1.jar'
         return cmd
 
     return {
@@ -374,7 +374,7 @@ def task_all_run():
             proto_http = "https"
             proto_ws = "wss"
 
-        cmd = f'cd out && java -server -jar eureka-0.0.1-spring-boot.jar &'
+        cmd = f'cd out && java -server -jar eureka-0.0.1.jar &'
         return cmd
 
     def gt_run(ssl: str, port: int) -> str:
@@ -386,7 +386,7 @@ def task_all_run():
             proto_http = "https"
             proto_ws = "wss"
 
-        cmd = f'cd out && java -server -jar api-gateway-0.0.1-spring-boot.jar &'
+        cmd = f'cd out && java -server -jar api-gateway-0.0.1.jar &'
         return cmd
 
     def ms_run(ssl: str, port: int) -> str:
@@ -398,7 +398,7 @@ def task_all_run():
             proto_http = "https"
             proto_ws = "wss"
 
-        cmd = f'cd out && java -server -jar messenger-0.0.1-spring-boot.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws" &'
+        cmd = f'cd out && java -server -jar messenger-0.0.1.jar --server.port={port} --server.ssl.enabled={ssl} --messenger.multi-instance=true --messenger.public-url="{proto_http}://localhost:{port}" --messenger.websocket.url="{proto_ws}://localhost:{port}/ws" &'
 
         return cmd
 
