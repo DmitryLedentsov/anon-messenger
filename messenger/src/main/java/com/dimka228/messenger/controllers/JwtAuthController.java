@@ -1,7 +1,7 @@
 package com.dimka228.messenger.controllers;
 
 import com.dimka228.messenger.dto.TokenDTO;
-import com.dimka228.messenger.dto.UserDto;
+import com.dimka228.messenger.dto.UserRegisterDTO;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.exceptions.WrongPasswordException;
 import com.dimka228.messenger.security.jwt.TokenProvider;
@@ -43,7 +43,7 @@ public class JwtAuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(
-            @RequestBody @Valid UserDto userDto, BindingResult result) {
+            @RequestBody @Valid UserRegisterDTO userDto, BindingResult result) {
         result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
         User user = userDto.getUser();
 
@@ -53,7 +53,7 @@ public class JwtAuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<TokenDTO> signIn(@RequestBody UserDto userDto) {
+    public ResponseEntity<TokenDTO> signIn(@RequestBody UserRegisterDTO userDto) {
 
         User user = userService.getUser(userDto.getLogin());
         try {

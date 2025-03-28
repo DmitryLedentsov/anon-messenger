@@ -1,5 +1,16 @@
 package com.dimka228.messenger.controllers;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dimka228.messenger.dto.UserProfileDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.User;
@@ -9,15 +20,6 @@ import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
 
 import lombok.AllArgsConstructor;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -46,5 +48,26 @@ public class UsersController {
                         DateConverter.format(userInChat.getJoinTime()));
 
         return profileDTO;
+    }
+    @GetMapping("/chat/{chatId}/users/")
+    public List<UserProfileDTO> profiles(@PathVariable Integer chatId) {
+        List<UserProfileDTO> profiles = new LinkedList<>();
+        Chat chat = chatService.getChat(chatId);
+        for(UserInChat userInChat : chatService.getUsersInChat(chat)){
+                Set<String> userStatuses =
+                        userService.getUserStatusList(userInChat.getUser()).stream()
+                                .map(s -> s.getName())
+                                .collect(Collectors.toSet());
+                UserProfileDTO profileDTO =
+                        new UserProfileDTO(
+                                userInChat.getUser().getLogin(),
+                                userInChat.getRole(),
+                                userInChat.getUser().getId(),
+                                userStatuses,
+                                DateConverter.format(userInChat.getJoinTime()));
+                profiles.add(profileDTO);
+
+        }
+        return profiles;
     }
 }

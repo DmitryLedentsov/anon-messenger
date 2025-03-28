@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
-public class UserDto {
+public class UserRegisterDTO {
     private String login;
 
     @Password(message = "password must be string containing characters and numbers")

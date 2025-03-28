@@ -14,8 +14,6 @@ import com.dimka228.messenger.services.ChatService;
 
 import com.dimka228.messenger.services.UserService;
 
-import lombok.AllArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +33,7 @@ import java.util.stream.Collectors;
 import com.dimka228.messenger.services.interfaces.NotificationService;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -149,6 +148,14 @@ public class ChatController {
             notificationService.sendMessageOperationToChat(chatId, op);
         }
     }
+
+    @PostMapping("/chat/{chatId}/add/{login}")
+    public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login){
+        User user = userService.getUser(login);
+        Chat chat = chatService.getChat(chatId);
+        chatService.addUserInChat(user, chat, "REGULAR");
+    }
+    
 
     @GetMapping("/chat/{chatId}/roles")
     public Set<String> getRoles(@PathVariable Integer chatId) {
