@@ -1,5 +1,7 @@
 package com.dimka228.messenger.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,8 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
+    @Value("${messenger.paths}")
+    private final ArrayList<String> enablePaths = new ArrayList<>();
     @Value("${messenger.websocket.path}")
     private final String websocketPath = "/ws";
 
@@ -72,7 +76,7 @@ public class SecurityConfig {
                                                 "/css/**",
                                                 "/icons/**",
                                                 "/fonts/**",
-                                                "favicon.ico")
+                                                "/favicon.ico")
                                         .permitAll()
                                         .requestMatchers(
                                                 "/swagger-ui/**",
@@ -80,6 +84,8 @@ public class SecurityConfig {
                                                 "/v3/api-docs/**","/api-docs-ui.html","/api-docs.yaml")
                                         .permitAll()
                                         .requestMatchers("/api-docs/**", "/api-docs-ui/*")
+                                        .permitAll()
+                                        .requestMatchers(enablePaths.toArray(new String[0]))
                                         .permitAll()
                                         .requestMatchers("/endpoint", "/admin/**")
                                         .hasRole("ADMIN")
