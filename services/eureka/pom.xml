@@ -68,7 +68,7 @@
 						<configuration>
 							<classifier></classifier>
 							<mainClass>com.dimka228.eureka.EurekaApplication</mainClass>
-							<outputDirectory>../..//out</outputDirectory>
+							<outputDirectory>../../out</outputDirectory>
 							<appendAssemblyId>false</appendAssemblyId>
 							<finalName>eureka-${project.version}</finalName>
 						</configuration>

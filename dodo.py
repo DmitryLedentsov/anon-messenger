@@ -69,6 +69,18 @@ def port_arg(default=9087):
     }
 
 
+def builder_arg(default="mvnd"):
+    return {
+        "name": "builder",
+        "short": "b",
+        "long": "builder",
+        "choices": (("mvn", ""), ("mvnd", "")),
+        "type": str,
+        "default": default,
+        "help": "Select the packaging tool",
+    }
+
+
 def task_build_images():
     """Build docker container development:latest"""
     def build():
@@ -86,7 +98,7 @@ def task_container():
         return cmd
 
     def build():
-        cmd = f'bash -c "docker run --name dev -i -p 127.0.0.1:9087:9087 -p 127.0.0.1:8085:8085 -p 127.0.0.1:8761:8761 -v .:/home/dev -t  development:latest /bin/bash"'
+        cmd = f'bash -c "docker run --name dev -i -p 127.0.0.1:9087:9087 -p 127.0.0.1:8085:8085 -p 127.0.0.1:8086:8086 -p 127.0.0.1:8761:8761 -v .:/home/dev -t  development:latest /bin/bash"'
         return cmd
     return {
         'actions': [
@@ -125,61 +137,79 @@ def task_clean_images():
 
 def task_ms_package():
     """Build messenger jar-archive with the crc-checking for maven packages"""
-    def package(tests: str):
-        cmd = f'bash -c "cd messenger && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd messenger && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
     return {
         'actions': [Interactive(package), Interactive(success)],
         'params': [
-            tests_arg()],
+            tests_arg(), builder_arg()],
     }
 
 
 def task_gateway_package():
     """Build api-gateway jar-archive with the crc-checking for maven packages"""
-    def package(tests: str):
-        cmd = f'bash -c "cd services/api-gateway && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/api-gateway && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
     return {
         'actions': [Interactive(package), Interactive(success)],
         'params': [
-            tests_arg()],
+            tests_arg(), builder_arg()],
+    }
+
+
+def task_admin_package():
+    """Build admin jar-archive with the crc-checking for maven packages"""
+    def package(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/admin && {builder} -C package -Dmaven.test.skip={tests}"'
+        return cmd
+    return {
+        'actions': [Interactive(package), Interactive(success)],
+        'params': [
+            tests_arg(), builder_arg()],
     }
 
 
 def task_eureka_package():
     """Build eureka jar-archive with the crc-checking for maven packages"""
-    def package(tests: str):
-        cmd = f'bash -c "cd services/eureka && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/eureka && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
     return {
         'actions': [Interactive(package), Interactive(success)],
         'params': [
-            tests_arg()],
+            tests_arg(), builder_arg()],
     }
 
 
 def task_package():
     """Build all packages with the crc-checking for maven packages"""
-    def package_ms(tests: str):
-        cmd = f'bash -c "cd messenger && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package_ms(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd messenger && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
 
-    def package_eureka(tests: str):
-        cmd = f'bash -c "cd services/eureka && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package_eureka(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/eureka && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
 
-    def package_gateway(tests: str):
-        cmd = f'bash -c "cd services/api-gateway && mvnd -C package -Dmaven.test.skip={tests}"'
+    def package_gateway(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/api-gateway && {builder} -C package -Dmaven.test.skip={tests}"'
+        return cmd
+
+    def package_admin(tests: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/admin && {builder} -C package -Dmaven.test.skip={tests}"'
         return cmd
     return {
         'actions': [
             Interactive(package_ms),
             Interactive(package_eureka),
             Interactive(package_gateway),
+            Interactive(package_admin),
             Interactive(success)],
         'params': [
-            tests_arg()],
+            tests_arg(),
+            builder_arg()],
     }
 
 
@@ -190,16 +220,20 @@ def task_rm():
         cmd = f'bash -c "rm -rf ./out"'
         return cmd
 
-    def mvn_clean_ms(version: str) -> str:
-        cmd = f'bash -c "cd messenger && mvnd clean"'
+    def mvn_clean_ms(version: str, builder: str) -> str:
+        cmd = f'bash -c "cd messenger && {builder} clean"'
         return cmd
 
-    def mvn_clean_eureka(version: str) -> str:
-        cmd = f'bash -c "cd services/eureka && mvnd clean"'
+    def mvn_clean_eureka(version: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/eureka && {builder} clean"'
         return cmd
 
-    def mvn_clean_gateway(version: str) -> str:
-        cmd = f'bash -c "cd services/api-gateway && mvnd clean"'
+    def mvn_clean_gateway(version: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/api-gateway && {builder} clean"'
+        return cmd
+
+    def mvn_clean_admin(version: str, builder: str) -> str:
+        cmd = f'bash -c "cd services/admin && {builder} clean"'
         return cmd
 
     return {
@@ -208,9 +242,11 @@ def task_rm():
             Interactive(mvn_clean_ms),
             Interactive(mvn_clean_eureka),
             Interactive(mvn_clean_gateway),
+            Interactive(mvn_clean_admin),
             Interactive(success)],
         'params': [
-            version_arg()],
+            version_arg(),
+            builder_arg()],
     }
 
 
@@ -276,6 +312,17 @@ def task_kafka_run():
     return {
         'actions': [Interactive(run), Interactive(success)],
         'params': [mode_arg("back")],
+    }
+
+
+def task_kafka_stop():
+    """Stop Apache Kafka server"""
+
+    def fill():
+        cmd = f"/kafka_2.13-4.0.0/bin/kafka-server-stop.sh"
+        return cmd
+    return {
+        'actions': [Interactive(fill), Interactive(success)],
     }
 
 
@@ -389,6 +436,18 @@ def task_all_run():
         cmd = f'cd out && java -server -jar api-gateway-0.0.1.jar &'
         return cmd
 
+    def admin_run(ssl: str, port: int) -> str:
+        cmd = ""
+        proto_http = "http"
+        proto_ws = "ws"
+
+        if (ssl == "true"):
+            proto_http = "https"
+            proto_ws = "wss"
+
+        cmd = f'cd out && java -server -jar admin-0.0.1.jar &'
+        return cmd
+
     def ms_run(ssl: str, port: int) -> str:
         cmd = ""
         proto_http = "http"
@@ -407,6 +466,7 @@ def task_all_run():
             Interactive(sd_run),
             Interactive(gt_run),
             Interactive(ms_run),
+            Interactive(admin_run),
             Interactive(success)],
         'params': [
             ssl_arg(),
