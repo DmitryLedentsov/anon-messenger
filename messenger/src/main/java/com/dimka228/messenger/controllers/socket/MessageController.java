@@ -19,7 +19,6 @@ import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
 import com.dimka228.messenger.entities.User;
-import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.services.interfaces.NotificationService;
@@ -68,10 +67,10 @@ public class MessageController {
 	}
 
 	@GetMapping("/{id}/messages")
-	List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
+	List<MessageDTO> messages(@PathVariable Integer id, Principal principal) {
 		Chat chat = chatService.getChat(id);
 		User user = userService.getUser(principal.getName());
-		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+		List<MessageDTO> messages = chatService.getMessagesForUserInChat(user, chat).stream().map(m->MessageDTO.fromMessageInfo(m)).toList();
 		return messages;
 	}
 

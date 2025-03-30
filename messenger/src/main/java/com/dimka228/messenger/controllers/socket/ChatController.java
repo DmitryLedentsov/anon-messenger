@@ -1,7 +1,7 @@
 package com.dimka228.messenger.controllers.socket;
 
 import com.dimka228.messenger.dto.ChatDTO;
-import com.dimka228.messenger.dto.ChatDtoRequest;
+import com.dimka228.messenger.dto.ChatCreateDTO;
 import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class ChatController {
 	private final ChatService chatService;
 
 	@PostMapping("/chat")
-	public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
+	public ChatDTO sendChat(@RequestBody ChatCreateDTO chatDtoRequest, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.addChat(chatDtoRequest.getName());
 		chatService.addUserInChat(user, chat, UserInChat.Roles.CREATOR);
@@ -64,19 +65,18 @@ public class ChatController {
 		chatDtoRequest.getUsers().add(user.getLogin()); // добавляем нашего
 
 		for (UserInChat cur : usersInChat) {
-			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), cur.getRole(), null, chatDtoRequest.getUsers());
+			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), cur.getRole());
 			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 			notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
 		}
-		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat), null,
-				chatDtoRequest.getUsers());
+		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
 	}
 
 	@DeleteMapping("/chat/{chatId}")
 	public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
-		ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null, null, null);
+		ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
 		if (chatService.getUserRoleInChat(user, chat).equals(UserInChat.Roles.CREATOR)) {
 
@@ -96,19 +96,26 @@ public class ChatController {
 	}
 
 	@GetMapping("/chats")
-	List<Chat> getChats(Principal principal) {
+	List<ChatDTO> getChats(Principal principal) {
 		User user = userService.getUser(principal.getName());
 		List<Chat> chats = chatService.getChatsForUser(user);
+		List<ChatDTO> result = new LinkedList<>();
+		for(Chat chat: chats){
+			UserInChat userInChat = chatService.getUserInChat(user, chat);
+			result.add(new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole()));
 
-		return chats;
+		}
+		//List<ChatDTO> result = chats.stream().map(chat->chatService.getUserInChat(user, chat)).map(userInChat->new ChatDTO(userInChat.getChat().getId(), userInChat.getChat().getName(), userInChat.getRole())).toList();
+		return result;
 	}
 
 	@GetMapping("/chat/{chatName}")
-	Chat getChats(Principal principal, @PathVariable String chatName) {
+	ChatDTO getChat(Principal principal, @PathVariable String chatName) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChatForUser(user, chatName);
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
 
-		return chat;
+		return new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole());
 	}
 
 	@DeleteMapping("/chat/{chatId}/ban/{userId}")
@@ -125,7 +132,7 @@ public class ChatController {
 		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
 		notificationService.sendChatOperationToUser(userId,
-				new OperationDTO<>(new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
+				new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
 		chatService.deleteOrLeaveChat(user, chat);
 		for (MessageInfo messageInfo : messages) {
 			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),

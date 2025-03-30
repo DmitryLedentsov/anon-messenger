@@ -11,6 +11,8 @@ import jakarta.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.dimka228.messenger.dto.UserAuthDTO;
+
 import java.util.Collection;
 
 @Entity
@@ -88,6 +90,13 @@ public class User implements UserDetails, Cloneable {
 	@Override
 	public boolean isEnabled() {
 		return false;
+	}
+
+	public static User fromAuth(UserAuthDTO auth){	
+		User user = new User();
+		user.setLogin(auth.getLogin());
+		user.setPassword(auth.getPassword());
+		return user;
 	}
 
 }

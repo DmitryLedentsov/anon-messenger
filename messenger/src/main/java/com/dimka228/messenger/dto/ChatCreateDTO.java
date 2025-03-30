@@ -7,19 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
-public class ChatDTO {
-
-	Integer id;
+public class ChatCreateDTO {
 
 	String name;
 
-	String role;
+	List<String> users;
 
-	public ChatDTO(Integer id){
-		this.id = id;
-	}
 }
