@@ -14,15 +14,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class UserRegisterDTO {
-    private String login;
 
-    @Password(message = "password must be string containing characters and numbers")
-    private String password;
+	private String login;
 
-    public User getUser() {
-        User user = new User();
-        user.setLogin(this.login);
-        user.setPassword(this.password);
-        return user;
-    }
+	@Password(message = "password must be string containing characters and numbers")
+	private String password;
+
+	public User getUser() {
+		User user = new User();
+		user.setLogin(this.login);
+		user.setPassword(this.password);
+		return user;
+	}
+
 }

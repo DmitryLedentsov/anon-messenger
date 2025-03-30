@@ -14,6 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class ChatDtoRequest {
-    String name;
-    List<String> users;
+
+	String name;
+
+	List<String> users;
+
 }

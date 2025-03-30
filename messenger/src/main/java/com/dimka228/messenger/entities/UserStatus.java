@@ -12,59 +12,57 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(
-        name = "m_user_status",
-        indexes = {
-            @Index(name = "m_user_status_user_id_idx", columnList = "user_id"),
-            @Index(name = "m_user_status_name_key", columnList = "name", unique = true)
-        })
+@Table(name = "m_user_status", indexes = { @Index(name = "m_user_status_user_id_idx", columnList = "user_id"),
+		@Index(name = "m_user_status_name_key", columnList = "name", unique = true) })
 public class UserStatus {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Integer id;
 
-    @Column(name = "name", nullable = false, length = 20)
-    private String name;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-    @Column(name = "description", length = 20)
-    private String description;
+	@Column(name = "name", nullable = false, length = 20)
+	private String name;
 
-    public String getDescription() {
-        return description;
-    }
+	@Column(name = "description", length = 20)
+	private String description;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public static final String ONLINE = "ONLINE";
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public static final String ONLINE = "ONLINE";
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 }

@@ -15,9 +15,10 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = PasswordConstraintsValidator.class)
 public @interface Password {
 
-    String message() default "Invalid password! shold contain only english letters and numbers";
+	String message() default "Invalid password! shold contain only english letters and numbers";
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
+
 }

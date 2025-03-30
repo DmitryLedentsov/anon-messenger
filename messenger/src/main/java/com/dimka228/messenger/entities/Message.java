@@ -15,62 +15,64 @@ import java.time.Instant;
 @Entity
 @Table(name = "m_message")
 public class Message {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private User sender;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "chat_id", nullable = false)
-    private Chat chat;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sender_id")
+	private User sender;
 
-    @Column(name = "data", nullable = false)
-    private String data;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "chat_id", nullable = false)
+	private Chat chat;
 
-    @Column(name = "send_time")
-    private Instant sendTime;
+	@Column(name = "data", nullable = false)
+	private String data;
 
-    public Instant getSendTime() {
-        return sendTime;
-    }
+	@Column(name = "send_time")
+	private Instant sendTime;
 
-    public void setTime(Instant sendTime) {
-        this.sendTime = sendTime;
-    }
+	public Instant getSendTime() {
+		return sendTime;
+	}
 
-    public String getData() {
-        return data;
-    }
+	public void setTime(Instant sendTime) {
+		this.sendTime = sendTime;
+	}
 
-    public void setData(String data) {
-        this.data = data;
-    }
+	public String getData() {
+		return data;
+	}
 
-    public Chat getChat() {
-        return chat;
-    }
+	public void setData(String data) {
+		this.data = data;
+	}
 
-    public void setChat(Chat chat) {
-        this.chat = chat;
-    }
+	public Chat getChat() {
+		return chat;
+	}
 
-    public User getSender() {
-        return sender;
-    }
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
 
-    public void setSender(User sender) {
-        this.sender = sender;
-    }
+	public User getSender() {
+		return sender;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public void setSender(User sender) {
+		this.sender = sender;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 }

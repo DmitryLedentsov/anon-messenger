@@ -10,36 +10,35 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(
-        name = "m_user_profile",
-        indexes = {
-            @Index(name = "m_user_profile_user_id_key", columnList = "user_id", unique = true)
-        })
+@Table(name = "m_user_profile",
+		indexes = { @Index(name = "m_user_profile_user_id_key", columnList = "user_id", unique = true) })
 public class UserProfile {
-    @Id
-    @Column(name = "user_id")
-    private Integer userId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @PrimaryKeyJoinColumn
-    private User user;
+	@Id
+	@Column(name = "user_id")
+	private Integer userId;
 
-    @Column(name = "rating")
-    private Integer rating;
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@PrimaryKeyJoinColumn
+	private User user;
 
-    public Integer getRating() {
-        return rating;
-    }
+	@Column(name = "rating")
+	private Integer rating;
 
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
+	public Integer getRating() {
+		return rating;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 }

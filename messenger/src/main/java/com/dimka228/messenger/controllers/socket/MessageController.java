@@ -29,59 +29,50 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(
-        value = "chat",
-        consumes = {MediaType.APPLICATION_JSON_VALUE},
-        produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "chat", consumes = { MediaType.APPLICATION_JSON_VALUE },
+		produces = { MediaType.APPLICATION_JSON_VALUE })
 public class MessageController {
-    @Qualifier("notificationService") private final NotificationService notificationService;
-    private final UserService userService;
-    private final ChatService chatService;
 
-    @PostMapping("/{id}/send")
-    public MessageDTO sendMessage(
-            @PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
-        User user = userService.getUser(principal.getName());
-        Chat chat = chatService.getChat(id);
+	@Qualifier("notificationService")
+	private final NotificationService notificationService;
 
-        Message added = chatService.addMessage(user, chat, chatMessage.getMessage());
-        MessageDTO fullMsg =
-                new MessageDTO(
-                        added.getId(),
-                        added.getData(),
-                        user.getId(),
-                        user.getLogin(),
-                        DateConverter.format(Instant.now()));
-        OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
-        notificationService.sendMessageOperationToChat(id, data);
-        return chatMessage;
-    }
+	private final UserService userService;
 
-    @DeleteMapping("/{id}/message/{msgId}")
-    public MessageDTO deleteMessage(
-            @PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
-        User user = userService.getUser(principal.getName());
-        Chat chat = chatService.getChat(id);
-        Message msg = chatService.getMessage(msgId);
-        chatService.deleteMessageFromUserInChat(user, chat, msg);
+	private final ChatService chatService;
 
-        MessageDTO fullMsg =
-                new MessageDTO(
-                        msgId,
-                        "aa",
-                        user.getId(),
-                        user.getLogin(),
-                        DateConverter.format(Instant.now()));
-        OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
-        notificationService.sendMessageOperationToChat(id, data);
-        return fullMsg;
-    }
+	@PostMapping("/{id}/send")
+	public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.getChat(id);
 
-    @GetMapping("/{id}/messages")
-    List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
-        Chat chat = chatService.getChat(id);
-        User user = userService.getUser(principal.getName());
-        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
-        return messages;
-    }
+		Message added = chatService.addMessage(user, chat, chatMessage.getMessage());
+		MessageDTO fullMsg = new MessageDTO(added.getId(), added.getData(), user.getId(), user.getLogin(),
+				DateConverter.format(Instant.now()));
+		OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
+		notificationService.sendMessageOperationToChat(id, data);
+		return chatMessage;
+	}
+
+	@DeleteMapping("/{id}/message/{msgId}")
+	public MessageDTO deleteMessage(@PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.getChat(id);
+		Message msg = chatService.getMessage(msgId);
+		chatService.deleteMessageFromUserInChat(user, chat, msg);
+
+		MessageDTO fullMsg = new MessageDTO(msgId, "aa", user.getId(), user.getLogin(),
+				DateConverter.format(Instant.now()));
+		OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.DELETE);
+		notificationService.sendMessageOperationToChat(id, data);
+		return fullMsg;
+	}
+
+	@GetMapping("/{id}/messages")
+	List<MessageInfo> messages(@PathVariable Integer id, Principal principal) {
+		Chat chat = chatService.getChat(id);
+		User user = userService.getUser(principal.getName());
+		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+		return messages;
+	}
+
 }

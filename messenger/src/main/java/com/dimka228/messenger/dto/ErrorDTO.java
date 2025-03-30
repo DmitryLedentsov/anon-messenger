@@ -12,9 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class ErrorDTO {
-    String message;
 
-    public ErrorDTO(Exception e) {
-        setMessage(e.getMessage());
-    }
+	String message;
+
+	public ErrorDTO(Exception e) {
+		setMessage(e.getMessage());
+	}
+
 }

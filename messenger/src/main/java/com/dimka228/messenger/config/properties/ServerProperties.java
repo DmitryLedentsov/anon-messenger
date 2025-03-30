@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "messenger")
 public class ServerProperties {
-    private String publicUrl = "";
-    private List<String> paths;
+
+	private String publicUrl = "";
+
+	private List<String> paths;
+
 }

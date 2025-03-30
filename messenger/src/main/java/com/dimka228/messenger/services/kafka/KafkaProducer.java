@@ -13,15 +13,18 @@ import lombok.AllArgsConstructor;
 
 //@Service
 @AllArgsConstructor
-public class KafkaProducer implements NotificationService{
-    private final KafkaTemplate<String, Object> simpleProducer;
+public class KafkaProducer implements NotificationService {
 
-    public void sendMessageOperationToChat(Integer chatId, OperationDTO<MessageDTO> operationDTO){
-        simpleProducer.send("messages-update", new KafkaMessageDTO<MessageDTO>(chatId,operationDTO));
-        simpleProducer.flush();
-    } ;
-    public void sendChatOperationToUser(Integer userId, OperationDTO<ChatDTO> operationDTO){
-        simpleProducer.send("chats-update", new KafkaMessageDTO<ChatDTO>(userId,operationDTO));
-        simpleProducer.flush();
-    } ;
+	private final KafkaTemplate<String, Object> simpleProducer;
+
+	public void sendMessageOperationToChat(Integer chatId, OperationDTO<MessageDTO> operationDTO) {
+		simpleProducer.send("messages-update", new KafkaMessageDTO<MessageDTO>(chatId, operationDTO));
+		simpleProducer.flush();
+	};
+
+	public void sendChatOperationToUser(Integer userId, OperationDTO<ChatDTO> operationDTO) {
+		simpleProducer.send("chats-update", new KafkaMessageDTO<ChatDTO>(userId, operationDTO));
+		simpleProducer.flush();
+	};
+
 }

@@ -398,14 +398,44 @@ def task_sd_run():
     }
 
 
+# def task_codestyle():
+#     """Fix codestyle"""
+
+#     def fill():
+#         cmd = f"autopep8 --in-place --aggressive --aggressive dodo.py"
+#         return cmd
+#     return {
+#         'actions': [Interactive(fill), Interactive(success)],
+#     }
+
 def task_codestyle():
     """Fix codestyle"""
 
-    def fill():
-        cmd = f"autopep8 --in-place --aggressive --aggressive dodo.py"
+    def fix_ms(builder: str) -> str:
+        cmd = f'bash -c "cd messenger && {builder} spring-javaformat:apply"'
         return cmd
+
+    def fix_eureka(builder: str) -> str:
+        cmd = f'bash -c "cd services/eureka && {builder} spring-javaformat:apply"'
+        return cmd
+
+    def fix_gateway(builder: str) -> str:
+        cmd = f'bash -c "cd services/api-gateway && {builder} spring-javaformat:apply"'
+        return cmd
+
+    def fix_admin(builder: str) -> str:
+        cmd = f'bash -c "cd services/admin && {builder} spring-javaformat:apply"'
+        return cmd
+
     return {
-        'actions': [Interactive(fill), Interactive(success)],
+        'actions': [
+            Interactive(fix_ms),
+            Interactive(fix_eureka),
+            Interactive(fix_gateway),
+            Interactive(fix_admin),
+            Interactive(success)],
+        'params': [
+            builder_arg()],
     }
 
 

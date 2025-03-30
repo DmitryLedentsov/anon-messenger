@@ -7,6 +7,7 @@
   - [Генерация сертификата для https](#генерация-сертификата-для-https)
   - [Хостинг](#хостинг)
     - [**`Потребление.png`**](#потреблениеpng)
+  - [Code style](#code-style)
   - [Deploy](#deploy)
     - [In the container](#in-the-container)
   - [Описание предметной области](#описание-предметной-области)
@@ -28,6 +29,20 @@ keytool -genkeypair -alias messenger -keyalg RSA -keysize 4096 -storetype PKCS12
 ### **`Потребление.png`**
 
 ![Потребление](tests/Потребление.png)
+
+## Code style
+
+The maven checkstyle plugin was integrated into project.
+The code style are checking for every package.
+
+If you get violations after `doit package`, just execute next command:
+
+```bash
+# mvnd spring-javaformat:apply
+# or 
+# mvn spring-javaformat:apply
+doit codestyle
+```
 
 ## Deploy
 

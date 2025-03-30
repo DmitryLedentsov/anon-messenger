@@ -14,14 +14,13 @@ public class ApiGatewayApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}
+
 	@Bean
-  	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-  	return builder.routes()
-  	  .route("messenger", r -> r.path("/**")
-  	    .uri("lb://messenger"))
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+		return builder.routes()
+			.route("messenger", r -> r.path("/**").uri("lb://messenger"))
 
-  	  .build();
-  	}
-
+			.build();
+	}
 
 }

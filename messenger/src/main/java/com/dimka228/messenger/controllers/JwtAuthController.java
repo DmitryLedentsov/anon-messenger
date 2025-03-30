@@ -26,45 +26,45 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("auth")
 public class JwtAuthController {
-    private final UserService userService;
 
-    private final AuthenticationManager authenticationManager;
-    private final TokenProvider jwtTokenUtil;
+	private final UserService userService;
 
-    @Autowired
-    public JwtAuthController(
-            UserService userService,
-            AuthenticationManager authenticationManager,
-            TokenProvider jwtTokenUtil) {
-        this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+	private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> signUp(
-            @RequestBody @Valid UserRegisterDTO userDto, BindingResult result) {
-        result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
-        User user = userDto.getUser();
+	private final TokenProvider jwtTokenUtil;
 
-        log.debug("POST request to register user {}", user.getUsername());
-        userService.registerUser(user);
-        return new ResponseEntity<>("User registered", HttpStatus.OK);
-    }
+	@Autowired
+	public JwtAuthController(UserService userService, AuthenticationManager authenticationManager,
+			TokenProvider jwtTokenUtil) {
+		this.userService = userService;
+		this.authenticationManager = authenticationManager;
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
 
-    @PostMapping("/signin")
-    public ResponseEntity<TokenDTO> signIn(@RequestBody UserRegisterDTO userDto) {
+	@PostMapping("/signup")
+	public ResponseEntity<String> signUp(@RequestBody @Valid UserRegisterDTO userDto, BindingResult result) {
+		result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
+		User user = userDto.getUser();
 
-        User user = userService.getUser(userDto.getLogin());
-        try {
+		log.debug("POST request to register user {}", user.getUsername());
+		userService.registerUser(user);
+		return new ResponseEntity<>("User registered", HttpStatus.OK);
+	}
 
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userDto.getLogin(), userDto.getPassword()));
-            final String token = jwtTokenUtil.generateToken(userDto.getUser());
-            return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new WrongPasswordException();
-        }
-    }
+	@PostMapping("/signin")
+	public ResponseEntity<TokenDTO> signIn(@RequestBody UserRegisterDTO userDto) {
+
+		User user = userService.getUser(userDto.getLogin());
+		try {
+
+			authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
+			final String token = jwtTokenUtil.generateToken(userDto.getUser());
+			return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			throw new WrongPasswordException();
+		}
+	}
+
 }

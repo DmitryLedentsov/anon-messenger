@@ -34,132 +34,118 @@ import com.dimka228.messenger.services.interfaces.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(
-        consumes = {MediaType.APPLICATION_JSON_VALUE},
-        produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
 public class ChatController {
-    @Qualifier("notificationService") private final NotificationService notificationService;
-    private final UserService userService;
-    private final ChatService chatService;
 
-    @PostMapping("/chat")
-    public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
-        User user = userService.getUser(principal.getName());
-        Chat chat = chatService.addChat(chatDtoRequest.getName());
-        chatService.addUserInChat(user, chat, UserInChat.Roles.CREATOR);
+	@Qualifier("notificationService")
+	private final NotificationService notificationService;
 
-        List<String> logins = chatDtoRequest.getUsers();
-        logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
-        List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
-        for (User cur : users) {
-            chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
-        }
+	private final UserService userService;
 
-        List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
+	private final ChatService chatService;
 
-        chatDtoRequest.getUsers().add(user.getLogin()); // добавляем нашего
+	@PostMapping("/chat")
+	public ChatDTO sendChat(@RequestBody ChatDtoRequest chatDtoRequest, Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.addChat(chatDtoRequest.getName());
+		chatService.addUserInChat(user, chat, UserInChat.Roles.CREATOR);
 
-        for (UserInChat cur : usersInChat) {
-            ChatDTO chatDTO =
-                    new ChatDTO(
-                            chat.getId(),
-                            chat.getName(),
-                            cur.getRole(),
-                            null,
-                            chatDtoRequest.getUsers());
-            OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-            notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
-        }
-        return new ChatDTO(
-                chat.getId(),
-                chat.getName(),
-                chatService.getUserRoleInChat(user, chat),
-                null,
-                chatDtoRequest.getUsers());
-    }
+		List<String> logins = chatDtoRequest.getUsers();
+		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
+		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
+		for (User cur : users) {
+			chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
+		}
 
-    @DeleteMapping("/chat/{chatId}")
-    public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
-        User user = userService.getUser(principal.getName());
-        Chat chat = chatService.getChat(chatId);
-        ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null, null, null);
-        OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
-        if (chatService.getUserRoleInChat(user, chat).equals(UserInChat.Roles.CREATOR)) {
+		List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
 
-            List<UserInChat> users = chatService.getUsersInChat(chat);
+		chatDtoRequest.getUsers().add(user.getLogin()); // добавляем нашего
 
-            chatService.deleteOrLeaveChat(user, chat);
-            for (UserInChat cur : users) {
-                notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
-            }
-        } else {
-            chatService.deleteOrLeaveChat(user, chat);
-            notificationService.sendChatOperationToUser(user.getId(), data);
-        }
+		for (UserInChat cur : usersInChat) {
+			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), cur.getRole(), null, chatDtoRequest.getUsers());
+			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
+			notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
+		}
+		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat), null,
+				chatDtoRequest.getUsers());
+	}
 
-        return chatDTO;
-    }
+	@DeleteMapping("/chat/{chatId}")
+	public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.getChat(chatId);
+		ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null, null, null);
+		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
+		if (chatService.getUserRoleInChat(user, chat).equals(UserInChat.Roles.CREATOR)) {
 
-    @GetMapping("/chats")
-    List<Chat> getChats(Principal principal) {
-        User user = userService.getUser(principal.getName());
-        List<Chat> chats = chatService.getChatsForUser(user);
+			List<UserInChat> users = chatService.getUsersInChat(chat);
 
-        return chats;
-    }
-    @GetMapping("/chat/{chatName}")
-    Chat getChats(Principal principal, @PathVariable String chatName) {
-        User user = userService.getUser(principal.getName());
-        Chat chat = chatService.getChatForUser(user,chatName);
+			chatService.deleteOrLeaveChat(user, chat);
+			for (UserInChat cur : users) {
+				notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
+			}
+		}
+		else {
+			chatService.deleteOrLeaveChat(user, chat);
+			notificationService.sendChatOperationToUser(user.getId(), data);
+		}
 
-        return chat;
-    }
+		return chatDTO;
+	}
 
-    @DeleteMapping("/chat/{chatId}/ban/{userId}")
-    public void banUser(
-            @PathVariable Integer chatId, @PathVariable Integer userId, Principal principal) {
-        User cur = userService.getUser(principal.getName());
-        Chat chat = chatService.getChat(chatId);
-        User user = userService.getUser(userId);
-        UserInChat userInChat = chatService.getUserInChat(cur, chat);
+	@GetMapping("/chats")
+	List<Chat> getChats(Principal principal) {
+		User user = userService.getUser(principal.getName());
+		List<Chat> chats = chatService.getChatsForUser(user);
 
-        if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
-            throw new WrongPrivilegesException();
-        if (Objects.equals(user.getId(), cur.getId())) throw new CannotBanSelfException();
-        List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+		return chats;
+	}
 
-        notificationService.sendChatOperationToUser(
-                userId,
-                new OperationDTO<>(
-                        new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
-        chatService.deleteOrLeaveChat(user, chat);
-        for (MessageInfo messageInfo : messages) {
-            MessageDTO data =
-                    new MessageDTO(
-                            messageInfo.getId(),
-                            messageInfo.getMessage(),
-                            userId,
-                            user.getLogin(),
-                            null);
-            OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
-            notificationService.sendMessageOperationToChat(chatId, op);
-        }
-    }
+	@GetMapping("/chat/{chatName}")
+	Chat getChats(Principal principal, @PathVariable String chatName) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.getChatForUser(user, chatName);
 
-    @PostMapping("/chat/{chatId}/add/{login}")
-    public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login){
-        User user = userService.getUser(login);
-        Chat chat = chatService.getChat(chatId);
-        chatService.addUserInChat(user, chat, "REGULAR");
-    }
-    
+		return chat;
+	}
 
-    @GetMapping("/chat/{chatId}/roles")
-    public Set<String> getRoles(@PathVariable Integer chatId) {
-        Chat chat = chatService.getChat(chatId);
-        return chatService.getAllRolesInChat(chat);
-    }
+	@DeleteMapping("/chat/{chatId}/ban/{userId}")
+	public void banUser(@PathVariable Integer chatId, @PathVariable Integer userId, Principal principal) {
+		User cur = userService.getUser(principal.getName());
+		Chat chat = chatService.getChat(chatId);
+		User user = userService.getUser(userId);
+		UserInChat userInChat = chatService.getUserInChat(cur, chat);
+
+		if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
+			throw new WrongPrivilegesException();
+		if (Objects.equals(user.getId(), cur.getId()))
+			throw new CannotBanSelfException();
+		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+
+		notificationService.sendChatOperationToUser(userId,
+				new OperationDTO<>(new ChatDTO(chatId, null, null, null, null), OperationDTO.DELETE));
+		chatService.deleteOrLeaveChat(user, chat);
+		for (MessageInfo messageInfo : messages) {
+			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
+					null);
+			OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
+			notificationService.sendMessageOperationToChat(chatId, op);
+		}
+	}
+
+	@PostMapping("/chat/{chatId}/add/{login}")
+	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login) {
+		User user = userService.getUser(login);
+		Chat chat = chatService.getChat(chatId);
+		chatService.addUserInChat(user, chat, "REGULAR");
+	}
+
+	@GetMapping("/chat/{chatId}/roles")
+	public Set<String> getRoles(@PathVariable Integer chatId) {
+		Chat chat = chatService.getChat(chatId);
+		return chatService.getAllRolesInChat(chat);
+	}
+
 }

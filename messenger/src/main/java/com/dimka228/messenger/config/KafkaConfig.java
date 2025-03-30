@@ -12,43 +12,41 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+
 @Configuration
-@ConditionalOnProperty({"messenger.multi-instance","messenger.kafka.auto-config-group"})
+@ConditionalOnProperty({ "messenger.multi-instance", "messenger.kafka.auto-config-group" })
 
 public class KafkaConfig {
 
-    @Value("${server.port}")
-    private String groupId;
+	@Value("${server.port}")
+	private String groupId;
 
-    private KafkaProperties properties;
-    @Autowired
-    public KafkaConfig(KafkaProperties p){
-        properties=p;
-    }
+	private KafkaProperties properties;
 
-    @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
-        
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
-    }
+	@Autowired
+	public KafkaConfig(KafkaProperties p) {
+		properties = p;
+	}
 
-    @Bean
-    public Map<String, Object> consumerConfigs() {
-        Map<String, Object> props = properties.buildConsumerProperties();
-      
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "updates_"+groupId);
-        return props;
-    }
- 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object>
-            kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
-        return factory;
-    }
+	@Bean
+	public ConsumerFactory<String, Object> consumerFactory() {
 
+		return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+	}
 
- 
+	@Bean
+	public Map<String, Object> consumerConfigs() {
+		Map<String, Object> props = properties.buildConsumerProperties();
+
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "updates_" + groupId);
+		return props;
+	}
+
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory());
+		return factory;
+	}
+
 }

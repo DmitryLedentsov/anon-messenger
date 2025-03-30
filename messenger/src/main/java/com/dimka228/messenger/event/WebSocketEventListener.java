@@ -16,22 +16,26 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @AllArgsConstructor
 @Slf4j
 public class WebSocketEventListener {
-    private final UserService userService;
 
-    @EventListener
-    public void handleSessionConnectEvent(SessionConnectEvent event) {
-        if (event.getUser() == null) return;
-        User user = userService.getUser(event.getUser().getName());
-        userService.addUserStatus(user, UserStatus.ONLINE);
+	private final UserService userService;
 
-        log.info("New session for user: " + user.getLogin());
-    }
+	@EventListener
+	public void handleSessionConnectEvent(SessionConnectEvent event) {
+		if (event.getUser() == null)
+			return;
+		User user = userService.getUser(event.getUser().getName());
+		userService.addUserStatus(user, UserStatus.ONLINE);
 
-    @EventListener
-    public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
-        if (event.getUser() == null) return;
-        User user = userService.getUser(event.getUser().getName());
-        userService.removeUserStatus(user, UserStatus.ONLINE);
-        log.info("Session disconnected user: " + user.getLogin());
-    }
+		log.info("New session for user: " + user.getLogin());
+	}
+
+	@EventListener
+	public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
+		if (event.getUser() == null)
+			return;
+		User user = userService.getUser(event.getUser().getName());
+		userService.removeUserStatus(user, UserStatus.ONLINE);
+		log.info("Session disconnected user: " + user.getLogin());
+	}
+
 }

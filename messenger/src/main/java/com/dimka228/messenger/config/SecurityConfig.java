@@ -32,89 +32,68 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final UserDetailsService userDetailsService;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${messenger.paths}")
-    private final ArrayList<String> enablePaths = new ArrayList<>();
-    @Value("${messenger.websocket.path}")
-    private final String websocketPath = "/ws";
+	private final UserDetailsService userDetailsService;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                // TODO potato: включить CORS, он не так просто существует
-                .cors(
-                        cors ->
-                                cors.configurationSource(
-                                        request -> {
-                                            var corsConfiguration = new CorsConfiguration();
-                                            corsConfiguration.setAllowedOriginPatterns(
-                                                    List.of("*"));
-                                            corsConfiguration.setAllowedMethods(
-                                                    List.of(
-                                                            "GET", "POST", "PUT", "DELETE",
-                                                            "OPTIONS"));
-                                            corsConfiguration.setAllowedHeaders(List.of("*"));
-                                            corsConfiguration.setAllowCredentials(true);
-                                            return corsConfiguration;
-                                        }))
-                .authorizeHttpRequests(
-                        request ->
-                                request.requestMatchers("/auth/**")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                "/",
-                                                "/test",
-                                                "/app",
-                                                "/welcome",
-                                                websocketPath + "/**")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                "/js/**",
-                                                "/css/**",
-                                                "/icons/**",
-                                                "/fonts/**",
-                                                "/favicon.ico")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                "/swagger-ui/**",
-                                                "/swagger-resources/*",
-                                                "/v3/api-docs/**","/api-docs-ui.html","/api-docs.yaml")
-                                        .permitAll()
-                                        .requestMatchers("/api-docs/**", "/api-docs-ui/*")
-                                        .permitAll()
-                                        .requestMatchers(enablePaths.toArray(new String[0]))
-                                        .permitAll()
-                                        .requestMatchers("/endpoint", "/admin/**")
-                                        .hasRole("ADMIN")
-                                        .anyRequest()
-                                        .authenticated())
-                .sessionManagement(
-                        manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+	@Value("${messenger.paths}")
+	private final ArrayList<String> enablePaths = new ArrayList<>();
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Value("${messenger.websocket.path}")
+	private final String websocketPath = "/ws";
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(AbstractHttpConfigurer::disable)
+			// TODO potato: включить CORS, он не так просто существует
+			.cors(cors -> cors.configurationSource(request -> {
+				var corsConfiguration = new CorsConfiguration();
+				corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+				corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+				corsConfiguration.setAllowedHeaders(List.of("*"));
+				corsConfiguration.setAllowCredentials(true);
+				return corsConfiguration;
+			}))
+			.authorizeHttpRequests(request -> request.requestMatchers("/auth/**")
+				.permitAll()
+				.requestMatchers("/", "/test", "/app", "/welcome", websocketPath + "/**")
+				.permitAll()
+				.requestMatchers("/js/**", "/css/**", "/icons/**", "/fonts/**", "/favicon.ico")
+				.permitAll()
+				.requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**", "/api-docs-ui.html",
+						"/api-docs.yaml")
+				.permitAll()
+				.requestMatchers("/api-docs/**", "/api-docs-ui/*")
+				.permitAll()
+				.requestMatchers(enablePaths.toArray(new String[0]))
+				.permitAll()
+				.requestMatchers("/endpoint", "/admin/**")
+				.hasRole("ADMIN")
+				.anyRequest()
+				.authenticated())
+			.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authenticationProvider(authenticationProvider())
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		return http.build();
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-        return config.getAuthenticationManager();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
+
 }

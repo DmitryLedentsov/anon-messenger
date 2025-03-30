@@ -23,80 +23,91 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private final UserRepository repository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final UserStatusRepository statusRepository;
-    private final UserProfileRepository profileRepository;
 
-    public boolean checkUser(String login) {
-        return repository.findByLogin(login).isPresent();
-    }
+	private final UserRepository repository;
 
-    public boolean checkUser(Integer id) {
-        return repository.findById(id).isPresent();
-    }
+	private final BCryptPasswordEncoder passwordEncoder;
 
-    public List<User> allUsers() {
-        return repository.findAll();
-    }
+	private final UserStatusRepository statusRepository;
 
-    public User addUser(User newUser) {
-        if (checkUser(newUser.getLogin())) throw new UserExistsException();
-        return repository.save(newUser);
-    }
+	private final UserProfileRepository profileRepository;
 
-    public User registerUser(User newUser) {
-        if (checkUser(newUser.getLogin())) throw new UserExistsException();
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        return repository.save(newUser);
-    }
+	public boolean checkUser(String login) {
+		return repository.findByLogin(login).isPresent();
+	}
 
-    public User getUser(String login) {
-        return getUserByLogin(login);
-    }
+	public boolean checkUser(Integer id) {
+		return repository.findById(id).isPresent();
+	}
 
-    public User getUserByLogin(String login) {
-        try {
-            return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
-        } catch (EntityNotFoundException e) {
-            throw new UserNotFoundException(login);
-        }
-    }
+	public List<User> allUsers() {
+		return repository.findAll();
+	}
 
-    public User getUser(Integer id) {
-        try {
-            return repository.findById(id).orElseThrow(() -> new UserNotFoundException());
-        } catch (EntityNotFoundException e) {
-            throw new UserNotFoundException();
-        }
-    }
+	public User addUser(User newUser) {
+		if (checkUser(newUser.getLogin()))
+			throw new UserExistsException();
+		return repository.save(newUser);
+	}
 
-    public void deleteUser(Integer id) {
-        repository.deleteById(id);
-    }
+	public User registerUser(User newUser) {
+		if (checkUser(newUser.getLogin()))
+			throw new UserExistsException();
+		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+		return repository.save(newUser);
+	}
 
-    public Set<UserStatus> getUserStatusList(User user) {
-        return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
-    }
+	public User getUser(String login) {
+		return getUserByLogin(login);
+	}
 
-    public boolean checkUserStatus(User user, String status) {
-        return getUserStatusList(user).stream().anyMatch(s -> s.getName().equals(status));
-    }
+	public User getUserByLogin(String login) {
+		try {
+			return repository.findByLogin(login).orElseThrow(() -> new UserNotFoundException());
+		}
+		catch (EntityNotFoundException e) {
+			throw new UserNotFoundException(login);
+		}
+	}
 
-    public void addUserStatus(User u, String s) {
-        if (statusRepository.existsByUserIdAndName(u.getId(), s)) return;
-        UserStatus status = new UserStatus();
-        status.setName(s);
-        status.setUser(u);
-        statusRepository.save(status);
-    }
+	public User getUser(Integer id) {
+		try {
+			return repository.findById(id).orElseThrow(() -> new UserNotFoundException());
+		}
+		catch (EntityNotFoundException e) {
+			throw new UserNotFoundException();
+		}
+	}
 
-    public void removeUserStatus(User u, String s) {
-        if (!statusRepository.existsByUserIdAndName(u.getId(), s)) return;
-        statusRepository.deleteByUserIdAndName(u.getId(), s);
-    }
+	public void deleteUser(Integer id) {
+		repository.deleteById(id);
+	}
 
-    public UserProfile getUserProfile(User user) {
-        return profileRepository.findByUserId(user.getId());
-    }
+	public Set<UserStatus> getUserStatusList(User user) {
+		return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
+	}
+
+	public boolean checkUserStatus(User user, String status) {
+		return getUserStatusList(user).stream().anyMatch(s -> s.getName().equals(status));
+	}
+
+	public void addUserStatus(User u, String s) {
+		if (statusRepository.existsByUserIdAndName(u.getId(), s))
+			return;
+		UserStatus status = new UserStatus();
+		status.setName(s);
+		status.setUser(u);
+		statusRepository.save(status);
+	}
+
+	public void removeUserStatus(User u, String s) {
+		if (!statusRepository.existsByUserIdAndName(u.getId(), s))
+			return;
+		statusRepository.deleteByUserIdAndName(u.getId(), s);
+	}
+
+	public UserProfile getUserProfile(User user) {
+		return profileRepository.findByUserId(user.getId());
+	}
+
 }

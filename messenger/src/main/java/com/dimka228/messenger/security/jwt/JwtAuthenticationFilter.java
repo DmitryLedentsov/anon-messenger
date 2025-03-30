@@ -27,54 +27,52 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    public static final String BEARER_PREFIX = "Bearer ";
-    public static final String HEADER_NAME = "Authorization";
 
-    private final TokenProvider jwtService;
-    private final UserDetailsService userService;
+	public static final String BEARER_PREFIX = "Bearer ";
 
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver resolver;
+	public static final String HEADER_NAME = "Authorization";
 
-    @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            var authHeader = request.getHeader(HEADER_NAME);
-            if (StringUtils.isEmpty(authHeader)
-                    || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+	private final TokenProvider jwtService;
 
-            String jwt = authHeader.substring(BEARER_PREFIX.length());
-            String username = jwtService.extractUserName(jwt);
+	private final UserDetailsService userService;
 
-            if (StringUtils.isNotEmpty(username)
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(username);
+	@Autowired
+	@Qualifier("handlerExceptionResolver")
+	private HandlerExceptionResolver resolver;
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+	@Override
+	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+			@NonNull FilterChain filterChain) throws ServletException, IOException {
+		try {
+			var authHeader = request.getHeader(HEADER_NAME);
+			if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+				filterChain.doFilter(request, response);
+				return;
+			}
 
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
+			String jwt = authHeader.substring(BEARER_PREFIX.length());
+			String username = jwtService.extractUserName(jwt);
 
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request));
-                    context.setAuthentication(authToken);
-                    SecurityContextHolder.setContext(context);
-                }
-                ;
-            }
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            resolver.resolveException(request, response, null, e);
-        }
-    }
+			if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
+				UserDetails userDetails = userService.loadUserByUsername(username);
+
+				if (jwtService.isTokenValid(jwt, userDetails)) {
+					SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+							null, userDetails.getAuthorities());
+
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					context.setAuthentication(authToken);
+					SecurityContextHolder.setContext(context);
+				}
+				;
+			}
+			filterChain.doFilter(request, response);
+		}
+		catch (Exception e) {
+			resolver.resolveException(request, response, null, e);
+		}
+	}
+
 }

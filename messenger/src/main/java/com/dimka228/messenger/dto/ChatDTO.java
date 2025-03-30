@@ -15,9 +15,15 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class ChatDTO {
-    Integer id;
-    String name;
-    String role;
-    MessageInfo lastMessage;
-    List<String> users;
+
+	Integer id;
+
+	String name;
+
+	String role;
+
+	MessageInfo lastMessage;
+
+	List<String> users;
+
 }

@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 
 @JsonInclude(Include.NON_DEFAULT)
 public class KafkaMessageDTO<T> {
-    Integer id;
-    OperationDTO<T> change;
+
+	Integer id;
+
+	OperationDTO<T> change;
 
 }
