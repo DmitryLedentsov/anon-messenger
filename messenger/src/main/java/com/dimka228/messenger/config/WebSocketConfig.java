@@ -33,90 +33,77 @@ import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final TokenProvider jwtTokenUtil;
-    private final UserDetailsService userDetailsService;
-    private final WebSocketProperties properties;
+	private final TokenProvider jwtTokenUtil;
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/user");
-    }
+	private final UserDetailsService userDetailsService;
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(properties.getPath()).setAllowedOrigins("*");
-        registry.setErrorHandler(
-                new StompSubProtocolErrorHandler() {
-                    @Override
-                    public Message<byte[]> handleClientMessageProcessingError(
-                            Message<byte[]> clientMessage, Throwable ex) {
-                        return super.handleClientMessageProcessingError(
-                                clientMessage, ex.getCause());
-                    }
+	private final WebSocketProperties properties;
 
-                    private Message<byte[]> prepareErrorMessage(
-                            Message<byte[]> clientMessage,
-                            AppException apiError,
-                            String errorCode) {
-                        String message = apiError.getMessage();
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry config) {
+		config.enableSimpleBroker("/topic");
+		config.setApplicationDestinationPrefixes("/app");
+		config.setUserDestinationPrefix("/user");
+	}
 
-                        StompHeaderAccessor accessor =
-                                StompHeaderAccessor.create(StompCommand.ERROR);
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint(properties.getPath()).setAllowedOrigins("*");
+		registry.setErrorHandler(new StompSubProtocolErrorHandler() {
+			@Override
+			public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
+				return super.handleClientMessageProcessingError(clientMessage, ex.getCause());
+			}
 
-                        accessor.setMessage(errorCode);
-                        accessor.setLeaveMutable(true);
+			private Message<byte[]> prepareErrorMessage(Message<byte[]> clientMessage, AppException apiError,
+					String errorCode) {
+				String message = apiError.getMessage();
 
-                        return MessageBuilder.createMessage(
-                                message != null ? message.getBytes() : "".getBytes(),
-                                accessor.getMessageHeaders());
-                    }
-                });
-    }
+				StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(
-                new ChannelInterceptor() {
-                    @Override
-                    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                        StompHeaderAccessor accessor =
-                                MessageHeaderAccessor.getAccessor(
-                                        message, StompHeaderAccessor.class);
+				accessor.setMessage(errorCode);
+				accessor.setLeaveMutable(true);
 
-                        assert accessor != null;
-                        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+				return MessageBuilder.createMessage(message != null ? message.getBytes() : "".getBytes(),
+						accessor.getMessageHeaders());
+			}
+		});
+	}
 
-                            String authorizationHeader =
-                                    accessor.getFirstNativeHeader("Authorization");
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(new ChannelInterceptor() {
+			@Override
+			public Message<?> preSend(Message<?> message, MessageChannel channel) {
+				StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-                            if (authorizationHeader == null)
-                                throw new WrongTokenException("empty token");
-                            log.debug("TOKEN: " + authorizationHeader);
-                            String token = authorizationHeader.substring(7);
+				assert accessor != null;
+				if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
-                            try {
-                                String username = jwtTokenUtil.extractUserName(token);
-                                UserDetails userDetails =
-                                        userDetailsService.loadUserByUsername(username);
-                                UsernamePasswordAuthenticationToken
-                                        usernamePasswordAuthenticationToken =
-                                                new UsernamePasswordAuthenticationToken(
-                                                        userDetails,
-                                                        null,
-                                                        userDetails.getAuthorities());
-                                SecurityContextHolder.getContext()
-                                        .setAuthentication(usernamePasswordAuthenticationToken);
+					String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
 
-                                accessor.setUser(usernamePasswordAuthenticationToken);
-                            } catch (Exception e) {
-                                throw new WrongTokenException();
-                            }
-                        }
+					if (authorizationHeader == null)
+						throw new WrongTokenException("empty token");
+					log.debug("TOKEN: " + authorizationHeader);
+					String token = authorizationHeader.substring(7);
 
-                        return message;
-                    }
-                });
-    }
+					try {
+						String username = jwtTokenUtil.extractUserName(token);
+						UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+						UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+								userDetails, null, userDetails.getAuthorities());
+						SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+						accessor.setUser(usernamePasswordAuthenticationToken);
+					}
+					catch (Exception e) {
+						throw new WrongTokenException();
+					}
+				}
+
+				return message;
+			}
+		});
+	}
+
 }

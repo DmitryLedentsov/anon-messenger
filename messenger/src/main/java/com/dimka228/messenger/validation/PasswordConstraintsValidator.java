@@ -15,30 +15,26 @@ import java.util.Arrays;
 
 public class PasswordConstraintsValidator implements ConstraintValidator<Password, String> {
 
-    @Override
-    public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
+	@Override
+	public boolean isValid(String password, ConstraintValidatorContext constraintValidatorContext) {
 
-        PasswordValidator passwordValidator =
-                new PasswordValidator(
-                        Arrays.asList(
-                                new LengthRule(5, 128),
-                                new CharacterRule(EnglishCharacterData.LowerCase, 1),
-                                new WhitespaceRule()));
+		PasswordValidator passwordValidator = new PasswordValidator(Arrays.asList(new LengthRule(5, 128),
+				new CharacterRule(EnglishCharacterData.LowerCase, 1), new WhitespaceRule()));
 
-        RuleResult result = passwordValidator.validate(new PasswordData(password));
+		RuleResult result = passwordValidator.validate(new PasswordData(password));
 
-        if (result.isValid()) {
+		if (result.isValid()) {
 
-            return true;
-        }
+			return true;
+		}
 
-        // Sending one message each time failed validation.
-        constraintValidatorContext
-                .buildConstraintViolationWithTemplate(
-                        passwordValidator.getMessages(result).stream().findFirst().get())
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
+		// Sending one message each time failed validation.
+		constraintValidatorContext
+			.buildConstraintViolationWithTemplate(passwordValidator.getMessages(result).stream().findFirst().get())
+			.addConstraintViolation()
+			.disableDefaultConstraintViolation();
 
-        return false;
-    }
+		return false;
+	}
+
 }

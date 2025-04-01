@@ -16,13 +16,16 @@ import java.security.Principal;
 @ControllerAdvice
 @AllArgsConstructor
 public class ErrorControllerAdvice {
-    private final UserService userService;
-    private final SimpMessagingTemplate msgTemplate;
 
-    @MessageExceptionHandler
-    public void handle(Principal principal, AppException e) {
-        User user = userService.getUser(principal.getName());
-        ErrorDTO errorMsg = new ErrorDTO(e);
-        msgTemplate.convertAndSend("/topic/user/" + user.getId() + "/error", errorMsg);
-    }
+	private final UserService userService;
+
+	private final SimpMessagingTemplate msgTemplate;
+
+	@MessageExceptionHandler
+	public void handle(Principal principal, AppException e) {
+		User user = userService.getUser(principal.getName());
+		ErrorDTO errorMsg = new ErrorDTO(e);
+		msgTemplate.convertAndSend("/topic/user/" + user.getId() + "/error", errorMsg);
+	}
+
 }

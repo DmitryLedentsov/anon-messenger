@@ -14,9 +14,15 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class UserProfileDTO {
-    String login;
-    String role;
-    Integer id;
-    Set<String> statuses;
-    String registrationTime;
+
+	String login;
+
+	String role;
+
+	Integer id;
+
+	Set<String> statuses;
+
+	String registrationTime;
+
 }

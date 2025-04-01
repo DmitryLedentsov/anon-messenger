@@ -9,8 +9,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class WebsocketErrorController {
 
-    @MessageExceptionHandler
-    public ErrorDTO handleException(AppException e) {
-        return new ErrorDTO(e);
-    }
+	@MessageExceptionHandler
+	public ErrorDTO handleException(AppException e) {
+		return new ErrorDTO(e);
+	}
+
 }

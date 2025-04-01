@@ -16,18 +16,21 @@ import java.security.Principal;
 @Controller
 @RequestMapping("/")
 public class IndexController {
-    private final WebSocketProperties socketProperties;
-    private final ServerProperties serverProperties;
 
-    @GetMapping("/")
-    public String app(Model model, Principal principal) {
-        model.addAttribute("socket", socketProperties);
-        model.addAttribute("server", serverProperties);
-        return "app";
-    }
+	private final WebSocketProperties socketProperties;
 
-    @GetMapping("/welcome")
-    public String intro(Model model, Principal principal) {
-        return "intro";
-    }
+	private final ServerProperties serverProperties;
+
+	@GetMapping("/")
+	public String app(Model model, Principal principal) {
+		model.addAttribute("socket", socketProperties);
+		model.addAttribute("server", serverProperties);
+		return "app";
+	}
+
+	@GetMapping("/welcome")
+	public String intro(Model model, Principal principal) {
+		return "intro";
+	}
+
 }

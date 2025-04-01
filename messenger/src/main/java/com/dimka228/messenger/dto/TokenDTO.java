@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class TokenDTO {
-    private String token;
-    private Integer userId;
+
+	private String token;
+
+	private Integer userId;
+
 }

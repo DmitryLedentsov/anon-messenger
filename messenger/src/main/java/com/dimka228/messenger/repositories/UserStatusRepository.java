@@ -12,10 +12,12 @@ import java.util.Set;
 @Repository
 @Transactional
 public interface UserStatusRepository extends JpaRepository<UserStatus, Integer> {
-    Optional<Set<UserStatus>> findAllByUserId(Integer id);
 
-    @Transactional
-    void deleteByUserIdAndName(Integer id, String s);
+	Optional<Set<UserStatus>> findAllByUserId(Integer id);
 
-    boolean existsByUserIdAndName(Integer id, String name);
+	@Transactional
+	void deleteByUserIdAndName(Integer id, String s);
+
+	boolean existsByUserIdAndName(Integer id, String name);
+
 }

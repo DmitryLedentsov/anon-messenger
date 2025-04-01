@@ -14,21 +14,21 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserRepository userRepository;
 
-    @Autowired
-    public UserDetailsServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+	private final UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user =
-                userRepository
-                        .findByLogin(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found in DB"));
-        log.debug("User {} found in DB", username);
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), user.getPassword(), user.getAuthorities());
-    }
+	@Autowired
+	public UserDetailsServiceImpl(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) {
+		User user = userRepository.findByLogin(username)
+			.orElseThrow(() -> new UsernameNotFoundException("User not found in DB"));
+		log.debug("User {} found in DB", username);
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+				user.getAuthorities());
+	}
+
 }

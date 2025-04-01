@@ -25,30 +25,31 @@ import java.util.concurrent.atomic.AtomicLong;
 @ConditionalOnProperty(name = "messenger.protection.ddos")
 public class DdosFilter implements Filter {
 
-    private final ConcurrentHashMap<String, AtomicLong> requestCount = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, AtomicLong> requestCount = new ConcurrentHashMap<>();
 
-    @Value("${messenger.protection.ddos.max-requests}")
-    private long rateLimit;
+	@Value("${messenger.protection.ddos.max-requests}")
+	private long rateLimit;
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        String ipAddress = request.getRemoteAddr();
-        AtomicLong count = requestCount.computeIfAbsent(ipAddress, k -> new AtomicLong());
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		String ipAddress = request.getRemoteAddr();
+		AtomicLong count = requestCount.computeIfAbsent(ipAddress, k -> new AtomicLong());
 
-        if (count.incrementAndGet() > rateLimit) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-            httpResponse.setStatus(429);
-            log.info("ddos attack!!!");
-            httpResponse.getWriter().write("Rate limit exceeded. Please try again later.");
-            return;
-        }
+		if (count.incrementAndGet() > rateLimit) {
+			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			httpResponse.setStatus(429);
+			log.info("ddos attack!!!");
+			httpResponse.getWriter().write("Rate limit exceeded. Please try again later.");
+			return;
+		}
 
-        chain.doFilter(request, response);
-    }
+		chain.doFilter(request, response);
+	}
 
-    @Scheduled(fixedRate = 20000)
-    public void reportCurrentTime() {
-        requestCount.clear();
-    }
+	@Scheduled(fixedRate = 20000)
+	public void reportCurrentTime() {
+		requestCount.clear();
+	}
+
 }

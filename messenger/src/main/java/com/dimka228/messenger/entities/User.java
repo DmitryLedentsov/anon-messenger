@@ -11,83 +11,92 @@ import jakarta.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.dimka228.messenger.dto.UserAuthDTO;
+
 import java.util.Collection;
 
 @Entity
-@Table(
-        name = "m_user",
-        indexes = {@Index(name = "m_user_login_key", columnList = "login", unique = true)})
+@Table(name = "m_user", indexes = { @Index(name = "m_user_login_key", columnList = "login", unique = true) })
 public class User implements UserDetails, Cloneable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Integer id;
 
-    @Column(name = "login", nullable = false, length = 20)
-    private String login;
+	@Column(name = "password", nullable = false)
+	private String password;
 
-    public String getLogin() {
-        return login;
-    }
+	@Column(name = "login", nullable = false, length = 20)
+	private String login;
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+	public String getLogin() {
+		return login;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setLogin(String login) {
+		this.login = login;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public User clone() {
-        User newUser = new User();
-        newUser.setPassword(getPassword());
-        newUser.setLogin(getLogin());
-        newUser.setId(getId());
-        return newUser;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
+	public User clone() {
+		User newUser = new User();
+		newUser.setPassword(getPassword());
+		newUser.setLogin(getLogin());
+		newUser.setId(getId());
+		return newUser;
+	}
 
-    @Override
-    public String getUsername() {
-        return getLogin();
-    }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
+	@Override
+	public String getUsername() {
+		return getLogin();
+	}
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
 
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
+
+	public static User fromAuth(UserAuthDTO auth){	
+		User user = new User();
+		user.setLogin(auth.getLogin());
+		user.setPassword(auth.getPassword());
+		return user;
+	}
+
 }

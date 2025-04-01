@@ -13,9 +13,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class MessageDTO implements MessageInfo {
-    private Integer id;
-    private String message;
-    private Integer senderId;
-    private String sender;
-    private String sendTime;
+
+	private Integer id;
+
+	private String message;
+
+	private Integer senderId;
+
+	private String sender;
+
+	private String sendTime;
+
+	public static MessageDTO fromMessageInfo(MessageInfo msg){
+		MessageDTO data = new MessageDTO(msg.getId(), msg.getMessage(), msg.getSenderId(), msg.getSender(), msg.getSendTime());
+		return data;
+	}
+
 }

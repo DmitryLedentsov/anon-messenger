@@ -1,7 +1,7 @@
 package com.dimka228.messenger.controllers;
 
 import com.dimka228.messenger.dto.TokenDTO;
-import com.dimka228.messenger.dto.UserDto;
+import com.dimka228.messenger.dto.UserAuthDTO;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.exceptions.WrongPasswordException;
 import com.dimka228.messenger.security.jwt.TokenProvider;
@@ -24,47 +24,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("auth")
 public class JwtAuthController {
-    private final UserService userService;
 
-    private final AuthenticationManager authenticationManager;
-    private final TokenProvider jwtTokenUtil;
+	private final UserService userService;
 
-    @Autowired
-    public JwtAuthController(
-            UserService userService,
-            AuthenticationManager authenticationManager,
-            TokenProvider jwtTokenUtil) {
-        this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+	private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> signUp(
-            @RequestBody @Valid UserDto userDto, BindingResult result) {
-        result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
-        User user = userDto.getUser();
+	private final TokenProvider jwtTokenUtil;
 
-        log.debug("POST request to register user {}", user.getUsername());
-        userService.registerUser(user);
-        return new ResponseEntity<>("User registered", HttpStatus.OK);
-    }
+	@Autowired
+	public JwtAuthController(UserService userService, AuthenticationManager authenticationManager,
+			TokenProvider jwtTokenUtil) {
+		this.userService = userService;
+		this.authenticationManager = authenticationManager;
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
 
-    @PostMapping("/signin")
-    public ResponseEntity<TokenDTO> signIn(@RequestBody UserDto userDto) {
+	@PostMapping("/signup")
+	public ResponseEntity<String> signUp(@RequestBody @Valid UserAuthDTO userDto, BindingResult result) {
+		result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
+		User user = User.fromAuth(userDto);
 
-        User user = userService.getUser(userDto.getLogin());
-        try {
+		log.debug("POST request to register user {}", user.getUsername());
+		userService.registerUser(user);
+		return new ResponseEntity<>("User registered", HttpStatus.OK);
+	}
 
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userDto.getLogin(), userDto.getPassword()));
-            final String token = jwtTokenUtil.generateToken(userDto.getUser());
-            return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new WrongPasswordException();
-        }
-    }
+	@PostMapping("/signin")
+	public ResponseEntity<TokenDTO> signIn(@RequestBody UserAuthDTO userDto) {
+
+		User user = userService.getUser(userDto.getLogin());
+		try {
+
+			authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
+			final String token = jwtTokenUtil.generateToken(user);
+			return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
+		}
+		catch (Exception e) {
+			throw new WrongPasswordException();
+		}
+	}
+
 }

@@ -1,13 +1,15 @@
 package com.dimka228.messenger.models;
 
 public interface MessageInfo {
-    public Integer getSenderId();
 
-    public String getSender();
+	public Integer getSenderId();
 
-    public String getMessage();
+	public String getSender();
 
-    public Integer getId();
+	public String getMessage();
 
-    public String getSendTime();
+	public Integer getId();
+
+	public String getSendTime();
+
 }

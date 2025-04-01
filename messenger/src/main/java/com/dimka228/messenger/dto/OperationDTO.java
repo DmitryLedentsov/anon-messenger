@@ -12,10 +12,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(Include.NON_DEFAULT)
 public class OperationDTO<T> {
-    T data;
-    String operation;
 
-    public static String ADD = "ADD";
-    public static String DELETE = "DELETE";
-    public static String UPDATE = "UPDATE";
+	T data;
+
+	String operation;
+
+	public static String ADD = "ADD";
+
+	public static String DELETE = "DELETE";
+
+	public static String UPDATE = "UPDATE";
+
 }

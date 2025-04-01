@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "messenger.websocket")
 public class WebSocketProperties {
 
-    private String path = "/ws";
-    private String url = "";
+	private String path = "/ws";
 
-    // standard getters and setters
+	private String url = "";
+
+	// standard getters and setters
+
 }
