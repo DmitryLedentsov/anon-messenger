@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -72,6 +73,25 @@ public class ChatController {
 		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
 	}
 
+	@PutMapping("/chat/{chatId}")
+	public ChatDTO editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,  Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.getChat(chatId);
+	
+
+		List<String> logins = chatDtoRequest.getUsers();
+		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
+		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
+		for (User cur : users) {
+			chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
+			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
+			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
+			notificationService.sendChatOperationToUser(cur.getId(), data);
+		}
+
+		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
+	}
+
 	@DeleteMapping("/chat/{chatId}")
 	public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
 		User user = userService.getUser(principal.getName());
@@ -109,10 +129,10 @@ public class ChatController {
 		return result;
 	}
 
-	@GetMapping("/chat/{chatName}")
-	ChatDTO getChat(Principal principal, @PathVariable String chatName) {
+	@GetMapping("/chat/{chatId}")
+	ChatDTO getChat(Principal principal, @PathVariable Integer chatId) {
 		User user = userService.getUser(principal.getName());
-		Chat chat = chatService.getChatForUser(user, chatName);
+		Chat chat = chatService.getChat(chatId);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 
 		return new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole());
@@ -146,7 +166,11 @@ public class ChatController {
 	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login) {
 		User user = userService.getUser(login);
 		Chat chat = chatService.getChat(chatId);
-		chatService.addUserInChat(user, chat, "REGULAR");
+		chatService.addUserInChat(user, chat, UserInChat.Roles.REGULAR);
+
+		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
+		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
+		notificationService.sendChatOperationToUser(user.getId(), data);
 	}
 
 	@GetMapping("/chat/{chatId}/roles")

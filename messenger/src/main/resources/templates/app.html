@@ -86,6 +86,11 @@
             color: red;
             cursor: pointer;
         }
+        .edit-btn {
+            margin-left: 0.5rem;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+        }
 
         .message-time {
             font-size: 0.8rem;
@@ -242,9 +247,10 @@
         </div>
     </div>
 
+
     <!-- Модальное окно профиля пользователя в чате-->
     <script id="user-in-chat-modal-template" type="x-tmpl-mustache">
-<div class="modal" id="userInChatModal" tabindex="-1" aria-labelledby="userInChatModal" aria-hidden="true"  data-bs-theme="dark">
+<div class="modal" id="user-in-chat-modal" tabindex="-1" aria-labelledby="user-in-chat-modal" aria-hidden="true"  data-bs-theme="dark">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -282,6 +288,32 @@
     </div>
 </div>
 </script>
+
+
+<script id="edit-chat-modal-template" type="x-tmpl-mustache">
+    <!-- Модальное окно для добавления пользователей -->
+    <div class="modal" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="chatName" class="form-label">Название чата</label>
+                        <input type="text" class="form-control" id="chatName" value="{{name}}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="users" class="form-label">Пользователи</label>
+                        <input type="text" class="form-control" id="users" required>
+                    </div>
+                    <button class="btn btn-primary btn-close" onclick="app.editChat()">Редактировать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </script>
 
     <!-- Основная часть приложения -->
     <div class="noise"></div>
@@ -348,7 +380,13 @@
                             <script id="chat-template" type="x-tmpl-mustache">
                         <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                             <span>{{name}}</span>
-                            <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+                            {{#isOwned}}
+                                <span class="edit-btn" onclick="event.stopPropagation(); app.editChat({{id}});"> <i class="bi bi-gear"></i> </span>
+                            {{/isOwned}}
+                            {{^isOwned}}
+                                <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+                            {{/isOwned}}
+                        
                         </div>
                         </script>
                         </div>
@@ -474,7 +512,7 @@
 
                 this.openUserInChat = (userId) => {
                     let chatId = this.currentChatId;
-                    $(`#userInChatModal`).remove();
+              
                     let user = this.api.getUserInChat(chatId, userId);
                     let roles = this.api.getAllRolesInChat(chatId);
                     roles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
@@ -482,8 +520,24 @@
                     user.current = user.id == this.token.userId;
                     user.chatId = chatId;
                     if (!user.statuses.includes('ONLINE')) user.statuses.push('OFFLINE');
-                    this.renderUserInChatModal(user);
-                    $(`#userInChatModal`).modal('show');
+                    this.openRenderModal('#user-in-chat-modal',user);
+                
+
+                }
+                this.editChat = (chatId) => {
+           
+                    let userInChat = this.api.getUserInChat(chatId,  this.token.userId);
+                    let chat = this.api.getChat(chatId);
+                    let roles = this.api.getAllRolesInChat(chatId);
+                    roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
+                    userInChat.avaibleRoles = roles;
+                    userInChat.name = chat.name;
+                    userInChat.chatId = chatId;
+                    userInChat.isOwned = userInChat.role=='CREATOR';
+                  
+                    
+                    this.openRenderModal('#edit-chat-modal',userInChat);
+               
 
                 }
 
@@ -627,17 +681,23 @@
                     this.api.banUserFromChat(id, this.currentChatId);
                 }
 
-                this.renderUserInChatModal = (user) => {
-                    const template = $('#user-in-chat-modal-template').html();
 
-                    $('body').append(Mustache.render(template, user));
+                this.openRenderModal = (modal, data) => {
+                    $(modal).remove();
+                    const template = $(`${modal}-template`).html();
+
+                    $('body').append(Mustache.render(template, data));
+                    $(modal).modal('show');
                 }
+            
+            
                 this.renderChats = () => {
                     const template = $('#chat-template').html();
                     console.log('rendering chats');
                     let $chatList = $('.chat-list');
                     $chatList.empty();
                     $.each(this.chats, function (index, el) {
+                        el.isOwned = el.role=='CREATOR';
                         const rendered = Mustache.render(template, el);
                         appendListItem('.chat-list', rendered);
 

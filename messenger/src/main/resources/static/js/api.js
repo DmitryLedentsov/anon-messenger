@@ -134,6 +134,10 @@ function MessengerApi(options) {
             return this.query('post', `/chat`, chat);
 
         }
+        this.editChat = (chatId,chat) => {
+            return this.query('put', `/chat/${chatId}`,chat);
+
+        }
         this.deleteChat = (chatId) => {
             return this.query('delete', `/chat/${chatId}`);
 
@@ -161,9 +165,9 @@ function MessengerApi(options) {
             let response = this.query('get', `/chats`);
             return response;
         }
-        this.getChat = (name) => {
+        this.getChat = (chatId) => {
 
-            let response = this.query('get', `/chat/${name}`);
+            let response = this.query('get', `/chat/${chatId}`);
             return response;
         }
         
