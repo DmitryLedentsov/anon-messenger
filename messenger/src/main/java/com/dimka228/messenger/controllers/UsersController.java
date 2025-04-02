@@ -1,5 +1,6 @@
 package com.dimka228.messenger.controllers;
 
+import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -45,10 +46,13 @@ public class UsersController {
 		return profileDTO;
 	}
 
-	@GetMapping("/chat/{chatId}/users/")
-	public List<UserProfileDTO> profiles(@PathVariable Integer chatId) {
+	@GetMapping("/chat/{chatId}/users")
+	public List<UserProfileDTO> profiles(@PathVariable Integer chatId,Principal principal) {
+		User cur = userService.getUser(principal.getName());
+
 		List<UserProfileDTO> profiles = new LinkedList<>();
 		Chat chat = chatService.getChat(chatId);
+		UserInChat cUserInChat = chatService.getUserInChat(cur, chat);
 		for (UserInChat userInChat : chatService.getUsersInChat(chat)) {
 			Set<String> userStatuses = userService.getUserStatusList(userInChat.getUser())
 				.stream()

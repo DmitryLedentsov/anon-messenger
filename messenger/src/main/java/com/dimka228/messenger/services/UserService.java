@@ -1,5 +1,12 @@
 package com.dimka228.messenger.services;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserProfile;
 import com.dimka228.messenger.entities.UserStatus;
@@ -10,15 +17,7 @@ import com.dimka228.messenger.repositories.UserRepository;
 import com.dimka228.messenger.repositories.UserStatusRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.AllArgsConstructor;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor

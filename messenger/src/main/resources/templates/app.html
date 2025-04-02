@@ -9,6 +9,7 @@
     <link th:href="@{/css/bootstrap-reboot.min.css}" rel="stylesheet">
     <link th:href="@{/css/common.css}" rel="stylesheet">
     <link th:href="@{/css/sidebar.css}" rel="stylesheet">
+    <link th:href="@{/css/tags-input.css}" rel="stylesheet">
     <style>
         .chat-list,
         .chat-messages-section {
@@ -168,6 +169,7 @@
         crossorigin="anonymous"></script>
 
 
+    <!--tags input-->
 
     <script type="text/javascript" th:src="@{/js/templates.js}"></script>
     <script type="text/javascript" th:src="@{/js/api.js}"></script>
@@ -239,7 +241,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="users" class="form-label">Пользователи</label>
-                        <input type="text" class="form-control" id="users" required>
+                        <input type="text" class="form-control tags-input" id="users" required>
                     </div>
                     <button class="btn btn-primary btn-close" onclick="app.createChat()">Создать</button>
                 </div>
@@ -306,9 +308,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="users" class="form-label">Пользователи</label>
-                        <input type="text" class="form-control" id="users" required>
+                        <input type="text" class="form-control users tags-input" id="users" value="{{users}}" required>
                     </div>
-                    <button class="btn btn-primary btn-close" onclick="app.editChat()">Редактировать</button>
+                    <button class="btn btn-primary btn-close" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
+                    <button class="btn btn-danger btn-close" onclick="app.deleteChat({{id}})">Удалить</button>
                 </div>
             </div>
         </div>
@@ -381,7 +384,7 @@
                         <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                             <span>{{name}}</span>
                             {{#isOwned}}
-                                <span class="edit-btn" onclick="event.stopPropagation(); app.editChat({{id}});"> <i class="bi bi-gear"></i> </span>
+                                <span class="edit-btn" onclick="event.stopPropagation(); app.editChatModal({{id}});"> <i class="bi bi-gear"></i> </span>
                             {{/isOwned}}
                             {{^isOwned}}
                                 <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
@@ -477,6 +480,7 @@
                 }
 
                 this.onAddChat = (data) => {
+                    data.isOwned = data.role=='CREATOR';
                     appendListItem(".chat-list", this.renderChatTemplate(data));
                 }
                 this.onDeleteChat = (data) => {
@@ -486,7 +490,8 @@
                     }
                 }
                 this.onUpdateChat = (data) => {
-
+                    data.isOwned = data.role=='CREATOR';
+                    replaceElem(`.chat-item[data-id=${data.id}]`, this.renderChatTemplate(data));
                 }
 
                 this.openChat = (id) => {
@@ -524,21 +529,33 @@
                 
 
                 }
-                this.editChat = (chatId) => {
+                this.editChatModal = (chatId) => {
            
+                    console.log(chatId);
                     let userInChat = this.api.getUserInChat(chatId,  this.token.userId);
+                    userInChat.id = chatId;
                     let chat = this.api.getChat(chatId);
                     let roles = this.api.getAllRolesInChat(chatId);
                     roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
                     userInChat.avaibleRoles = roles;
                     userInChat.name = chat.name;
-                    userInChat.chatId = chatId;
+                    
                     userInChat.isOwned = userInChat.role=='CREATOR';
+                    let users = this.api.getUsersInChat(chatId);
+                    let userNames = users.map((user)=>user.login);
+                    let usersStr = userNames.join(",");
+                    userInChat.users = usersStr;
+
                   
                     
                     this.openRenderModal('#edit-chat-modal',userInChat);
                
 
+                }
+                this.editChat= (id,chat)=>{
+                    console.log(chat);
+                    chat.users = chat.users.split(',');
+                    this.api.editChat(id, chat);
                 }
 
                 this.openCurrentUserProfile = () => {
@@ -586,6 +603,12 @@
                 function removeItem(name) {
                     $(name).fadeOut(300, function () { $(this).remove(); });
                 }
+                function replaceElem(selector, html) {
+                    var div = $(selector).hide();
+                    $(selector).replaceWith(div);
+                    $(selector).fadeIn("slow");
+                }
+
 
                 this.onError = (error) => {
                     console.log(error);
@@ -599,6 +622,7 @@
                         $(this).closest('.modal').modal('hide');
                         console.log('hide modal');
                     })
+                    $('.tags-input').tagsInput();
 
                 }
 

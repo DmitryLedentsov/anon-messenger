@@ -126,6 +126,14 @@ BEGIN
 END;  
 $$;  
 
+CREATE OR REPLACE PROCEDURE DELETE_MESSAGES_FROM_USER(_user_id int, _chat_id int)  
+language plpgsql  
+as  
+$$   
+BEGIN  
+DELETE FROM M_MESSAGE WHERE (SENDER_ID=_user_id and CHAT_ID=_chat_id);
+END;  
+$$;  
 
 CREATE OR REPLACE FUNCTION GET_MESSAGES_FROM_CHAT(_chat int)  
 returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(50), MESSAGE TEXT, SEND_TIME TEXT)  

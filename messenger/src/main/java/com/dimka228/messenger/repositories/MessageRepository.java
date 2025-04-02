@@ -1,7 +1,7 @@
 package com.dimka228.messenger.repositories;
 
-import com.dimka228.messenger.entities.Message;
-import com.dimka228.messenger.models.MessageInfo;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.dimka228.messenger.entities.Message;
+import com.dimka228.messenger.models.MessageInfo;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
@@ -27,6 +27,9 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 	@Override
 	void deleteById(Integer id);
 
+	@Transactional
+	@Query(nativeQuery = true, value = "execute delete_messages_from_user(:_user_id, :_chat_id)")
+	List<MessageInfo> deleteAllMessages(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
 	@Override
 	Optional<Message> findById(Integer id);
 

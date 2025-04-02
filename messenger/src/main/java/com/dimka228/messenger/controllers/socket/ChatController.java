@@ -77,16 +77,39 @@ public class ChatController {
 	public ChatDTO editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,  Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
-	
-
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
+		if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
+			throw new WrongPrivilegesException();
+		boolean chatNameChange = !chatDtoRequest.getName().equals(chat.getName());
+		if(chatNameChange){
+			chatService.updateChat(chat, (c)->c.setName(chatDtoRequest.getName()));
+		}
 		List<String> logins = chatDtoRequest.getUsers();
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
-		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
-		for (User cur : users) {
-			chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
-			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
-			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
-			notificationService.sendChatOperationToUser(cur.getId(), data);
+		List<User> updatedUsers = logins.stream().map(userService::getUser).collect(Collectors.toList());
+		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
+
+		for(UserInChat cur: users){
+			if(Objects.equals(user.getId(), cur.getUser().getId())) continue;
+			if (!updatedUsers.contains(cur.getUser())){
+				chatService.deleteUserFromChat(cur);
+				ChatDTO chatDTO = new ChatDTO(chat.getId());
+				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
+				notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
+			}
+		}
+		for (User cur : updatedUsers) {
+			if (chatService.isUserInChat(cur, chat)) {
+				if(!chatNameChange) continue;
+				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), chatService.getUserRoleInChat(cur, chat));
+				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
+				notificationService.sendChatOperationToUser(cur.getId(), data);
+			} else {
+				chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
+				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), UserInChat.Roles.REGULAR);
+				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
+				notificationService.sendChatOperationToUser(cur.getId(), data);
+			}
 		}
 
 		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
@@ -178,5 +201,6 @@ public class ChatController {
 		Chat chat = chatService.getChat(chatId);
 		return chatService.getAllRolesInChat(chat);
 	}
+
 
 }

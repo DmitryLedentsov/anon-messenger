@@ -1,5 +1,8 @@
 package com.dimka228.messenger.entities;
 
+import java.io.Serializable;
+import java.time.Instant;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,11 +13,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
-import java.time.Instant;
 
 @Entity
 @Table(name = "m_user_in_chat", indexes = { @Index(name = "m_user_in_chat_user_id_idx", columnList = "user_id") })
@@ -31,12 +30,12 @@ public class UserInChat {
 	}
 
 	@Id
-	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@Id
-	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "chat_id", nullable = false)
 	private Chat chat;
 

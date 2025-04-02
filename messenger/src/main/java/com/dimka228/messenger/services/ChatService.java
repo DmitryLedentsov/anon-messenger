@@ -1,5 +1,13 @@
 package com.dimka228.messenger.services;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
@@ -14,18 +22,10 @@ import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.repositories.ChatRepository;
 import com.dimka228.messenger.repositories.MessageRepository;
 import com.dimka228.messenger.repositories.UserInChatRepository;
+import com.dimka228.messenger.services.interfaces.EntityChanger;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.AllArgsConstructor;
-
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -102,6 +102,14 @@ public class ChatService {
 	public UserInChat getUserInChat(User user, Chat chat) {
 		return getUserInChat(user.getId(), chat.getId());
 	}
+	public boolean  isUserInChat(User user, Chat chat){
+		try{
+			getUserInChat(user, chat);
+		} catch(UserNotInChatException e){
+			return false;
+		}
+		return true;
+	}
 
 	public void addUserInChat(User user, Chat chat, String role) {
 		UserInChat userInChat = new UserInChat();
@@ -109,6 +117,11 @@ public class ChatService {
 		userInChat.setChat(chat);
 		userInChat.setRole(role);
 		userInChatRepository.save(userInChat);
+	}
+
+	public void updateChat(Chat chat, EntityChanger<Chat> callback){
+		callback.change(chat);
+		chatRepository.save(chat);
 	}
 
 	public Message addMessage(User sender, Chat chat, String text) {

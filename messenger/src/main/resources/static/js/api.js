@@ -156,6 +156,9 @@ function MessengerApi(options) {
         this.getUserInChat = (chatId, userId) => {
             return this.query('get', `/chat/${chatId}/user/${userId}`);
         }
+        this.getUsersInChat = (chatId)=>{
+            return this.query('get', `/chat/${chatId}/users`);
+        }
 
         this.getAllRolesInChat = (chatId) => {
             return this.query('get', `/chat/${chatId}/roles`);
