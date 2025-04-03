@@ -92,7 +92,7 @@ public class ChatController {
 
 		for(UserInChat cur: users){
 			if(Objects.equals(user.getId(), cur.getUser().getId())) continue;
-			if (!updatedUsers.stream().filter(o -> o.getId().equals(user.getId())).findFirst().isPresent()){
+			if (!updatedUsers.stream().filter(o -> o.getId().equals(cur.getUser().getId())).findFirst().isPresent()){
 				chatService.deleteUserFromChat(cur);
 				ChatDTO chatDTO = new ChatDTO(chat.getId());
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
