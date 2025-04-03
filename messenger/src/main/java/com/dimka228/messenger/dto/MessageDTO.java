@@ -29,4 +29,8 @@ public class MessageDTO implements MessageInfo {
 		return data;
 	}
 
+	public MessageDTO(Integer id){
+		this.id = id;
+	}
+
 }

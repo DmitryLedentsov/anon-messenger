@@ -442,7 +442,7 @@
                 this.chats = [];
                 this.updateChat = (id, data) => {
                     let idx = this.chats.map(o => o.id).indexOf(data.id);
-                    let messages = chats[idx].messages;
+                    let messages =  this.chats[idx].messages;
                     this.chats[idx] = data;
                     this.chats[idx].messages = messages;
                 }

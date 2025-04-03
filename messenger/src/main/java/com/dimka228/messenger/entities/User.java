@@ -17,7 +17,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name = "m_user", indexes = { @Index(name = "m_user_login_key", columnList = "login", unique = true) })
-public class User implements UserDetails, Cloneable {
+public class User implements UserDetails, Cloneable, Comparable<User> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -98,5 +98,9 @@ public class User implements UserDetails, Cloneable {
 		user.setPassword(auth.getPassword());
 		return user;
 	}
+	@Override
+    public int compareTo(User user) {
+       return this.getId().compareTo(user.getId());
+    }
 
 }

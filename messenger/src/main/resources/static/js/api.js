@@ -145,6 +145,9 @@ function MessengerApi(options) {
         this.deleteMessage = (chatId, msgId) => {
             return this.query('delete', `/chat/${chatId}/message/${msgId}`);
         }
+        this.deleteMessages = (chatId) => {
+            return this.query('delete', `/chat/${chatId}/messages`);
+        }
         this.banUserFromChat = (userId, chatId) => {
             return this.query('delete', `/chat/${chatId}/ban/${userId}`)
         }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,16 +21,22 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 	List<MessageInfo> getMessagesForUserInChat(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
 
 	@Query(nativeQuery = true, value = "select id, sender_id as senderId, sender, message, send_time as sendTime from"
+			+ " get_messages_from_user_in_chat(:_user_id, :_chat_id)")
+	List<MessageInfo> getMessagesFromUserInChat(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
+
+	@Query(nativeQuery = true, value = "select id, sender_id as senderId, sender, message, send_time as sendTime from"
 			+ " get_messages_from_chat(:_chat_id)")
 	List<MessageInfo> getMessagesFromChat(@Param("_chat_id") Integer chatId);
+	
 
 	@Transactional
 	@Override
 	void deleteById(Integer id);
 
 	@Transactional
-	@Query(nativeQuery = true, value = "execute delete_messages_from_user(:_user_id, :_chat_id)")
-	List<MessageInfo> deleteAllMessages(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
+	@Modifying
+	@Query(nativeQuery = true, value = "call delete_messages_from_user(:_user_id, :_chat_id)")
+	void deleteAllMessages(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
 	@Override
 	Optional<Message> findById(Integer id);
 

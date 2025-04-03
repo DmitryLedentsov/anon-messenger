@@ -135,6 +135,32 @@ public class ChatService {
 	private void deleteMessage(Integer id) {
 		messageRepository.deleteById(id);
 	}
+	public  void deleteMessagesFromUserInChat(User user, Chat chat){
+		messageRepository.deleteAllMessages(user.getId(), chat.getId());
+	}
+	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat) {
+		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat());
+	}
+
+	public Message addMessage(UserInChat sender, String text){
+		return addMessage(sender.getUser(),sender.getChat(),text);
+	}
+	public void deleteMessageFromUserInChat(UserInChat sender, Message msg){
+		deleteMessageFromUserInChat(sender.getUser(), sender.getChat(), msg);
+	}
+	public void deleteMessagesFromUserInChat(UserInChat sender){
+		deleteMessagesFromUserInChat(sender.getUser(), sender.getChat());
+	}
+
+	public List<MessageInfo> getMessagesFromUserInChat(User user, Chat chat){
+		return messageRepository.getMessagesFromUserInChat(user.getId(), chat.getId());
+	}
+	public List<MessageInfo> getMessagesFromUserInChat(UserInChat userInChat){
+		return getMessagesFromUserInChat(userInChat.getUser(), userInChat.getChat());
+	}
+
+
+
 
 	public void deleteMessageFromUserInChat(User user, Chat chat, Message msg) {
 		if (!Objects.equals(user.getId(), msg.getSender().getId())) {
@@ -150,11 +176,11 @@ public class ChatService {
 		return getUserInChat(user.getId(), chat.getId()).getRole();
 	}
 
-	public void deleteOrLeaveChat(User user, Chat chat) {
-		UserInChat userInChat = getUserInChat(user.getId(), chat.getId());
+	public void deleteOrLeaveChat(UserInChat userInChat) {
+	
 		if (userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
 
-			deleteChat(chat.getId());
+			deleteChat(userInChat.getChat().getId());
 
 		}
 		else {

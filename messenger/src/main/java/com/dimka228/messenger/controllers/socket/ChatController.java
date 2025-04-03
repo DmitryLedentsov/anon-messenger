@@ -58,6 +58,7 @@ public class ChatController {
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
 		for (User cur : users) {
+			if(Objects.equals(cur.getId(), user.getId())) continue;
 			chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
 		}
 
@@ -91,7 +92,7 @@ public class ChatController {
 
 		for(UserInChat cur: users){
 			if(Objects.equals(user.getId(), cur.getUser().getId())) continue;
-			if (!updatedUsers.contains(cur.getUser())){
+			if (!updatedUsers.stream().filter(o -> o.getId().equals(user.getId())).findFirst().isPresent()){
 				chatService.deleteUserFromChat(cur);
 				ChatDTO chatDTO = new ChatDTO(chat.getId());
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
@@ -119,22 +120,28 @@ public class ChatController {
 	public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
-		if (chatService.getUserRoleInChat(user, chat).equals(UserInChat.Roles.CREATOR)) {
-
-			List<UserInChat> users = chatService.getUsersInChat(chat);
-
-			chatService.deleteOrLeaveChat(user, chat);
+		List<UserInChat> users = chatService.getUsersInChat(chat);
+	
+		if (userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
+			chatService.deleteOrLeaveChat(userInChat);
 			for (UserInChat cur : users) {
 				notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
 			}
+	
+			
 		}
 		else {
-			chatService.deleteOrLeaveChat(user, chat);
 			notificationService.sendChatOperationToUser(user.getId(), data);
+			chatService.getMessagesFromUserInChat(userInChat).forEach((msg)->{
+				notificationService.sendMessageOperationToChat(chatId, new OperationDTO<>(new MessageDTO(msg.getId()),OperationDTO.DELETE));
+			});
+			chatService.deleteMessagesFromUserInChat(userInChat);
+			chatService.deleteOrLeaveChat(userInChat);
 		}
-
+		
 		return chatDTO;
 	}
 
@@ -176,7 +183,7 @@ public class ChatController {
 
 		notificationService.sendChatOperationToUser(userId,
 				new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
-		chatService.deleteOrLeaveChat(user, chat);
+		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
 		for (MessageInfo messageInfo : messages) {
 			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
 					null);
