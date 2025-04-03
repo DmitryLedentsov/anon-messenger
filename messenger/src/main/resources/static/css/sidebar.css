@@ -52,7 +52,10 @@ li {
 }
 
 .sidebar-logo {
-    padding: 1.15rem 1.5rem;
+    padding-top: 1.15rem;
+    padding-right: 15px;
+    padding-bottom: 1.15rem;
+    padding-left: 15px;
 }
 
 .sidebar-logo a {

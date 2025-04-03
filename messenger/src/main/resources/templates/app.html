@@ -167,7 +167,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
-
+    
 
     <!--tags input-->
 
@@ -177,9 +177,10 @@
     <script type="text/javascript" th:src="@{/js/socket-form-control.js}"></script>
     <script type="text/javascript" th:src="@{/js/socket-action-control.js}"></script>
 
+    
     <div class="background"></div>
     <!-- Модальное окно авторизации -->
-    <div class="modal" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true"
+    <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true"
         data-bs-theme="dark">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -207,19 +208,19 @@
 
 
     <!-- Модальное окно для ошибок -->
-    <div class="modal" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true"
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true"
         data-bs-theme="dark">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="errorModalMessage">
                     <!-- Сообщение об ошибке будет вставляться сюда -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary  btn-close" data-bs-dismiss="modal"
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         aria-label="Close">Закрыть</button>
                 </div>
             </div>
@@ -227,7 +228,7 @@
     </div>
 
     <!-- Модальное окно для создания чата -->
-    <div class="modal" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"
+    <div class="modal fade" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"
         data-bs-theme="dark">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -243,7 +244,9 @@
                         <label for="users" class="form-label">Пользователи</label>
                         <input type="text" class="form-control tags-input" id="users" required>
                     </div>
-                    <button class="btn btn-primary btn-close" onclick="app.createChat()">Создать</button>
+                    <div class="mb-3">
+                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.createChat()">Создать</button>
+                </div>
                 </div>
             </div>
         </div>
@@ -252,7 +255,7 @@
 
     <!-- Модальное окно профиля пользователя в чате-->
     <script id="user-in-chat-modal-template" type="x-tmpl-mustache">
-<div class="modal" id="user-in-chat-modal" tabindex="-1" aria-labelledby="user-in-chat-modal" aria-hidden="true"  data-bs-theme="dark">
+<div class="modal fade" id="user-in-chat-modal" tabindex="-1" aria-labelledby="user-in-chat-modal" aria-hidden="true"  data-bs-theme="dark">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -280,10 +283,10 @@
                     </ul>
                 </div>
                 {{#current}}
-                    <button class="btn btn-danger btn-close" onclick="app.deleteChat({{chatId}})">Выйти</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">Выйти</button>
                 {{/current}}
                 {{^current}}
-                    <button class="btn btn-danger btn-close" onclick="app.banUser({{id}});">Забанить</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.banUser({{id}});">Забанить</button>
                 {{/current}}
             </div>
         </div>
@@ -294,7 +297,7 @@
 
 <script id="edit-chat-modal-template" type="x-tmpl-mustache">
     <!-- Модальное окно для добавления пользователей -->
-    <div class="modal" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
+    <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
         data-bs-theme="dark">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -310,8 +313,8 @@
                         <label for="users" class="form-label">Пользователи</label>
                         <input type="text" class="form-control users tags-input" id="users" value="{{users}}" required>
                     </div>
-                    <button class="btn btn-primary btn-close" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
-                    <button class="btn btn-danger btn-close" onclick="app.deleteChat({{id}})">Удалить</button>
+                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{id}})">Удалить</button>
                 </div>
             </div>
         </div>
@@ -364,12 +367,21 @@
 
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="border-right">
+        <aside id="sidebar" class="border-end">
             <div class="h-100">
                 <div class="sidebar-logo">
-                    <a href="#">
+                    <!--<a href="#">
                         <h5>Список чатов</h5>
-                    </a>
+                    </a>-->
+                   
+                    
+                    <div class="input-group">
+                        <input class="form-control search-input" type="search" id="chat-search" placeholder="Поиск чата..." aria-label="Search">
+                        <div class="btn btn-outline-secondary  border-start-0 search-clear">
+                            <i class="bi bi-x"></i>
+                        </div>
+                    </div>
+                    
                 </div>
                 <!-- Sidebar Navigation -->
                 <ul class="sidebar-nav">
@@ -377,10 +389,13 @@
                     <li class="sidebar-item">
 
                         <div class="container-fluid">
-                            <button class="btn btn-primary add-chat-btn" data-toggle="modal"
+                            
+                            <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-bs-toggle="modal" data-bs-target="#createChatModal"
                                 data-target="#createChatModal">Создать чат</button>
                             <div class="chat-list"></div>
+                            
                             <script id="chat-template" type="x-tmpl-mustache">
+                                
                         <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
                             <span>{{name}}</span>
                             {{#isOwned}}
@@ -623,6 +638,18 @@
                         console.log('hide modal');
                     })
                     $('.tags-input').tagsInput();
+                    $(".chat-list").searcher({
+                        inputSelector: "#chat-search",
+                        itemSelector: ".chat-item",
+                        textSelector: "span",
+                        // itemSelector (tbody > tr) and textSelector (td) already have proper default values
+                    });
+                    $(".search-clear").on("click",function(e){
+                        $btn = $(this);
+                        $input = $btn.parent().find(".search-input");
+                        $input.val('');
+                        $input.trigger('change');
+                    });
 
                 }
 
