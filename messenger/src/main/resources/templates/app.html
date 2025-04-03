@@ -430,7 +430,7 @@
 
                             <script id="message-template" type="x-tmpl-mustache">
                                 <div class="message-item" data-id="{{id}}">
-                                    <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{message}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
+                                    <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{{message}}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
                                     <span class="message-time">{{sendTime}}</span>
                                 </div>
                             </script>
@@ -759,17 +759,14 @@
                     this.currentChatId = chatId;
 
                     let userId = this.token.userId;
-                    const template = $('#message-template').html();
+                   
                     console.log('rendering chat ' + chatId);
                     let chat = this.findChatById(chatId);
                     chat.messages = this.api.getMessagesFromChat(chatId);
                     $msgList = $('.message-list');
                     $msgList.empty();
-                    chat.messages && $.each(chat.messages, function (index, el) {
-                        el.isOwned = userId == el.senderId;
-
-                        const rendered = Mustache.render(template, el);
-                        appendListItem('.message-list', rendered);
+                    chat.messages && $.each(chat.messages,  (index, el)=> {
+                        appendListItem('.message-list', this.renderMsgTemplate(el),)
 
                     });
                 }
@@ -782,7 +779,7 @@
                 this.renderMsgTemplate = (msg) => {
                     let userId = this.token.userId;
                     msg.isOwned = userId == msg.senderId;
-
+                    msg.message = msg.message.replace(new RegExp('\r?\n','g'), '<br />');
                     const template = $('#message-template').html();
                     const rendered = Mustache.render(template, msg);
                     return rendered;
