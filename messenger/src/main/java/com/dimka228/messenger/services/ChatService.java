@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -23,6 +24,7 @@ import com.dimka228.messenger.repositories.ChatRepository;
 import com.dimka228.messenger.repositories.MessageRepository;
 import com.dimka228.messenger.repositories.UserInChatRepository;
 import com.dimka228.messenger.services.interfaces.EntityChanger;
+import com.dimka228.messenger.utils.HtmlTagsRemover;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -124,11 +126,14 @@ public class ChatService {
 		chatRepository.save(chat);
 	}
 
+	@Transactional
 	public Message addMessage(User sender, Chat chat, String text) {
+		String cleaned = HtmlTagsRemover.clean(text);
+		
 		Message message = new Message();
 		message.setChat(chat);
 		message.setSender(sender);
-		message.setData(text);
+		message.setData(cleaned);
 		return messageRepository.save(message);
 	}
 
