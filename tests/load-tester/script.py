@@ -8,7 +8,26 @@ import logging
 import sys
 import signal
 import csv
+from urllib3.connection import HTTPConnection
+import socket
+# Увеличиваем лимиты Windows на сокеты
+socket.setdefaulttimeout(30)  # 30 секунд таймаут
+HTTPConnection.default_socket_options = (
+    HTTPConnection.default_socket_options + [
+        (socket.SOL_SOCKET, socket.SO_REUSEADDR, 1),
+        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+    ]
+)
 
+# Настройка сессии requests
+session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(
+    pool_connections=50,
+    pool_maxsize=50,
+    max_retries=3
+)
+session.mount('http://', adapter)
+session.mount('https://', adapter)
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -34,17 +53,17 @@ class MeasuredRequests:
     @staticmethod
     @measureResponseDelay
     def post(url, **kwargs):
-        return requests.post(url, **kwargs)
+        return session.post(url, **kwargs)
     
     @staticmethod
     @measureResponseDelay
     def get(url, **kwargs):
-        return requests.get(url, **kwargs)
+        return session.get(url, **kwargs)
     
     @staticmethod
     @measureResponseDelay
     def delete(url, **kwargs):
-        return requests.delete(url, **kwargs)
+        return session.delete(url, **kwargs)
 
 class LoadTester:
     def __init__(self, args):
@@ -75,7 +94,7 @@ class LoadTester:
             "password": password
         }
         try:
-            response = requests.post(f"{self.base_url}/auth/signin", json=payload)
+            response = session.post(f"{self.base_url}/auth/signin", json=payload)
             if response.status_code == 200:
                 return response.json()["token"]
             return None
@@ -87,7 +106,7 @@ class LoadTester:
         """Удаление одного пользователя"""
         headers = {"Authorization": f"Bearer {user['token']}"}
         try:
-            response = requests.delete(f"{self.base_url}/user", headers=headers, json='')
+            response = session.delete(f"{self.base_url}/user", headers=headers, json='')
             response.raise_for_status()
             logger.info(f"Пользователь {user['login']} удален")
             return True
@@ -107,7 +126,7 @@ class LoadTester:
 
         headers = {"Authorization": f"Bearer {token}"}
         try:
-            response = requests.delete(f"{self.base_url}/chat/{self.chat_id}", headers=headers, json='')
+            response = session.delete(f"{self.base_url}/chat/{self.chat_id}", headers=headers, json='')
             response.raise_for_status()
             logger.info(f"Чат {self.chat_id} удален")
             self.chat_id = None
@@ -128,18 +147,18 @@ class LoadTester:
         if existing_token:
             headers = {"Authorization": f"Bearer {existing_token}"}
             try:
-                requests.delete(f"{self.base_url}/user", headers=headers)
+                session.delete(f"{self.base_url}/user", headers=headers)
                 logger.info(f"Существующий пользователь {login} удален")
             except requests.RequestException as e:
                 logger.error(f"Не удалось удалить существующего пользователя {login}: {e}")
 
         # Регистрация нового пользователя
         try:
-            response = requests.post(f"{self.base_url}/auth/signup", json=payload)
+            response = session.post(f"{self.base_url}/auth/signup", json=payload)
             response.raise_for_status()
             
             # Авторизация пользователя
-            response = requests.post(f"{self.base_url}/auth/signin", json=payload)
+            response = session.post(f"{self.base_url}/auth/signin", json=payload)
             response.raise_for_status()
             token_data = response.json()
             
@@ -182,7 +201,7 @@ class LoadTester:
         self.delete_chat(token=creator['token'])
         
         try:
-            response = requests.post(f"{self.base_url}/chat", json=payload, headers=headers)
+            response = session.post(f"{self.base_url}/chat", json=payload, headers=headers)
             response.raise_for_status()
             self.chat_id = response.json()["id"]
             logger.info(f"Чат '{self.chat_name}' создан с ID: {self.chat_id} пользователем {creator['login']}")
