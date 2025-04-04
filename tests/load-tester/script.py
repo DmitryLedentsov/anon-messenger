@@ -7,11 +7,44 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import sys
 import signal
-import os
+import csv
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Функция для измерения времени ответа сервера
+def measureResponseDelay(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        delay_ms = (end_time - start_time) * 1000  # Преобразуем в миллисекунды
+        
+        # Логируем в файл
+        with open('response_times.csv', 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([start_time, delay_ms])
+        
+        return result
+    return wrapper
+
+# Обертки для всех методов, выполняющих HTTP-запросы
+class MeasuredRequests:
+    @staticmethod
+    @measureResponseDelay
+    def post(url, **kwargs):
+        return requests.post(url, **kwargs)
+    
+    @staticmethod
+    @measureResponseDelay
+    def get(url, **kwargs):
+        return requests.get(url, **kwargs)
+    
+    @staticmethod
+    @measureResponseDelay
+    def delete(url, **kwargs):
+        return requests.delete(url, **kwargs)
 
 class LoadTester:
     def __init__(self, args):
@@ -24,28 +57,26 @@ class LoadTester:
         self.clear_only = args.clear
         self.user_prefix = args.user_prefix
         self.admin = args.admin
-        self.chat_name = args.chat_name
-        self.output_delay = args.output_delay  # Новый параметр для файла с задержками
+        self.chat_name = args.chat_name  # Новое поле для имени чата
         self.users = []
         self.chat_id = None
-        self.executor = None
-        self.shutdown_event = threading.Event()
-        # Инициализация файла для записи задержек, если параметр задан
-        if self.output_delay:
-            with open(self.output_delay, 'w') as f:
-                f.write("timestamp,delay_ms\n")  # Заголовок для CSV
+        self.executor = None  # Для управления ThreadPoolExecutor
+        self.shutdown_event = threading.Event()  # Для сигнализации остановки
+
+        # Инициализация файла для логирования времени ответа
+        with open('response_times.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['timestamp', 'delay_ms'])
 
     def signin_user(self, login, password="test_password"):
         """Авторизация пользователя для получения токена"""
-        payload = {"login": login, "password": password}
-        start_time = time.time()
+        payload = {
+            "login": login,
+            "password": password
+        }
         try:
             response = requests.post(f"{self.base_url}/auth/signin", json=payload)
             if response.status_code == 200:
-                delay = (time.time() - start_time) * 1000  # В миллисекундах
-                if self.output_delay:
-                    with open(self.output_delay, 'a') as f:
-                        f.write(f"{time.time()},{delay:.2f}\n")
                 return response.json()["token"]
             return None
         except requests.RequestException as e:
@@ -55,14 +86,9 @@ class LoadTester:
     def delete_user(self, user):
         """Удаление одного пользователя"""
         headers = {"Authorization": f"Bearer {user['token']}"}
-        start_time = time.time()
         try:
             response = requests.delete(f"{self.base_url}/user", headers=headers, json='')
             response.raise_for_status()
-            delay = (time.time() - start_time) * 1000  # В миллисекундах
-            if self.output_delay:
-                with open(self.output_delay, 'a') as f:
-                    f.write(f"{time.time()},{delay:.2f}\n")
             logger.info(f"Пользователь {user['login']} удален")
             return True
         except requests.RequestException as e:
@@ -80,14 +106,9 @@ class LoadTester:
             return
 
         headers = {"Authorization": f"Bearer {token}"}
-        start_time = time.time()
         try:
             response = requests.delete(f"{self.base_url}/chat/{self.chat_id}", headers=headers, json='')
             response.raise_for_status()
-            delay = (time.time() - start_time) * 1000  # В миллисекундах
-            if self.output_delay:
-                with open(self.output_delay, 'a') as f:
-                    f.write(f"{time.time()},{delay:.2f}\n")
             logger.info(f"Чат {self.chat_id} удален")
             self.chat_id = None
         except requests.RequestException as e:
@@ -97,38 +118,35 @@ class LoadTester:
         """Регистрация одного пользователя с предварительной очисткой"""
         login = f"{self.user_prefix}_{user_num}"
         password = "test_password"
-        payload = {"login": login, "password": password}
+        payload = {
+            "login": login,
+            "password": password
+        }
         
         # Проверяем, существует ли пользователь, и удаляем его
         existing_token = self.signin_user(login, password)
         if existing_token:
             headers = {"Authorization": f"Bearer {existing_token}"}
-            start_time = time.time()
             try:
                 requests.delete(f"{self.base_url}/user", headers=headers)
-                delay = (time.time() - start_time) * 1000
-                if self.output_delay:
-                    with open(self.output_delay, 'a') as f:
-                        f.write(f"{time.time()},{delay:.2f}\n")
                 logger.info(f"Существующий пользователь {login} удален")
             except requests.RequestException as e:
                 logger.error(f"Не удалось удалить существующего пользователя {login}: {e}")
 
         # Регистрация нового пользователя
-        start_time = time.time()
         try:
             response = requests.post(f"{self.base_url}/auth/signup", json=payload)
             response.raise_for_status()
-            delay_signup = (time.time() - start_time) * 1000
-            if self.output_delay:
-                with open(self.output_delay, 'a') as f:
-                    f.write(f"{time.time()},{delay_signup:.2f}\n")
             
             # Авторизация пользователя
-            return self.signin_user(login, password) and {
+            response = requests.post(f"{self.base_url}/auth/signin", json=payload)
+            response.raise_for_status()
+            token_data = response.json()
+            
+            return {
                 "login": login,
-                "token": self.signin_user(login, password),
-                "user_id": response.json().get("userId")
+                "token": token_data["token"],
+                "user_id": token_data["userId"]
             }
         except requests.RequestException as e:
             logger.error(f"Ошибка при регистрации пользователя {login}: {e}")
@@ -155,19 +173,17 @@ class LoadTester:
         if self.admin:
             users_list.append(self.admin)
         
-        payload = {"name": self.chat_name, "users": users_list}
+        payload = {
+            "name": self.chat_name,  # Используем заданное имя чата
+            "users": users_list
+        }
         
         # Удаление существующего чата, если он есть
         self.delete_chat(token=creator['token'])
         
-        start_time = time.time()
         try:
             response = requests.post(f"{self.base_url}/chat", json=payload, headers=headers)
             response.raise_for_status()
-            delay = (time.time() - start_time) * 1000
-            if self.output_delay:
-                with open(self.output_delay, 'a') as f:
-                    f.write(f"{time.time()},{delay:.2f}\n")
             self.chat_id = response.json()["id"]
             logger.info(f"Чат '{self.chat_name}' создан с ID: {self.chat_id} пользователем {creator['login']}")
         except requests.RequestException as e:
@@ -176,24 +192,21 @@ class LoadTester:
     def send_message(self, user):
         """Отправка сообщения от одного пользователя"""
         headers = {"Authorization": f"Bearer {user['token']}"}
-        payload = {"message": f"Test message from {user['login']} at {time.time()}"}
+        payload = {
+            "message": f"Test message from {user['login']} at {time.time()}"
+        }
         
         for _ in range(self.messages_count):
             if self.shutdown_event.is_set():
                 logger.info(f"Прерывание отправки сообщений для {user['login']}")
                 break
-            start_time = time.time()
             try:
-                response = requests.post(
+                response = MeasuredRequests.post(
                     f"{self.base_url}/chat/{self.chat_id}/send",
                     json=payload,
                     headers=headers
                 )
                 response.raise_for_status()
-                delay = (time.time() - start_time) * 1000
-                if self.output_delay:
-                    with open(self.output_delay, 'a') as f:
-                        f.write(f"{time.time()},{delay:.2f}\n")
                 logger.debug(f"Сообщение отправлено от {user['login']}")
             except requests.RequestException as e:
                 logger.error(f"Ошибка при отправке сообщения от {user['login']}: {e}")
@@ -217,6 +230,7 @@ class LoadTester:
         # Удаляем чат, если он существует
         if self.chat_id:
             if self.clear_only:
+                # В режиме --clear используем {prefix}_0 как возможного создателя
                 creator_login = f"{self.user_prefix}_0"
                 creator_token = self.signin_user(creator_login)
                 if creator_token:
@@ -224,8 +238,10 @@ class LoadTester:
                 else:
                     logger.warning(f"Не удалось авторизоваться под {creator_login} для удаления чата")
             elif len(existing_users) > 1:
+                # В обычном режиме используем второго пользователя как создателя
                 self.delete_chat(token=existing_users[1]["token"])
             elif self.admin:
+                # Пробуем удалить чат с использованием токена админа, если он задан
                 admin_token = self.signin_user(self.admin)
                 if admin_token:
                     self.delete_chat(token=admin_token)
@@ -248,6 +264,7 @@ class LoadTester:
             self.cleanup()
             sys.exit(0)
 
+        # Устанавливаем обработчик сигнала
         signal.signal(signal.SIGINT, signal_handler)
 
         if self.clear_only:
@@ -256,13 +273,17 @@ class LoadTester:
             return
 
         try:
+            # Регистрация пользователей
             self.register_users()
+            
+            # Создание чата
             self.create_chat()
             
             if not self.chat_id:
                 logger.error("Не удалось создать чат, тест прерван")
                 return
 
+            # Отправка сообщений
             logger.info(f"Начинаем отправку {self.messages_count} сообщений от каждого пользователя...")
             start_time = time.time()
             
@@ -271,7 +292,7 @@ class LoadTester:
                 futures = [executor.submit(self.send_message, user) for user in self.users]
                 for future in futures:
                     try:
-                        future.result()
+                        future.result()  # Ждем завершения задач, но прерываем при shutdown_event
                     except Exception as e:
                         logger.error(f"Ошибка в задаче: {e}")
             
@@ -290,6 +311,7 @@ class LoadTester:
             self.cleanup()
             sys.exit(0)
         finally:
+            # Очистка в любом случае, если не в режиме --clear
             if not self.clear_only:
                 self.cleanup()
 
@@ -305,7 +327,6 @@ def parse_args():
     parser.add_argument('--user-prefix', type=str, default='test_user', help='Prefix for test user logins')
     parser.add_argument('--admin', type=str, default=None, help='Existing admin user to add to chat')
     parser.add_argument('--chat-name', type=str, default='Test Chat', help='Name of the chat to create')
-    parser.add_argument('--output-delay', type=str, default='delays.txt', help='File to log server response delays')
     return parser.parse_args()
 
 if __name__ == "__main__":

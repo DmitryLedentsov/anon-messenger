@@ -44,3 +44,5 @@ java -jar ./target/messenger-0.0.1.jar --server.port=9087 --messenger.multi-inst
 
 
 добавить параметр /messages для количества и пагинации
+python script.py --users-count 10 --workers 30 --messages-count 10000 --min-interval 10 --random-interval 10  --admin aboba1
+ python visualizer.py delays.txt --ignore-timestamp
