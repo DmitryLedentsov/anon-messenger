@@ -1,18 +1,11 @@
 package com.dimka228.messenger.controllers.error;
 
-import com.dimka228.messenger.exceptions.AppException;
-import com.dimka228.messenger.exceptions.DBException;
-import com.dimka228.messenger.exceptions.WrongTokenException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import lombok.Data;
-
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,12 +15,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import com.dimka228.messenger.exceptions.AppException;
+import com.dimka228.messenger.exceptions.DBException;
+import com.dimka228.messenger.exceptions.UserExistsException;
+import com.dimka228.messenger.exceptions.WrongTokenException;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
 
 @Data
 @RestControllerAdvice
@@ -93,6 +91,13 @@ public class GlobalErrorHandler {
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	public Map<String, Object> handleAppException(AppException e, WebRequest webRequest) {
 		return createExceptionMessage(e, HttpStatus.BAD_REQUEST, webRequest);
+	}
+
+	
+	@ExceptionHandler(UserExistsException.class)
+	@ResponseStatus(code = HttpStatus.CONFLICT)
+	public Map<String, Object> handleUserExistsException(UserExistsException e, WebRequest webRequest) {
+		return createExceptionMessage(e, HttpStatus.CONFLICT, webRequest);
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)

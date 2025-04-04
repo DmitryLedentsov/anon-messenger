@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.utils.DateConverter;
 
 import lombok.AllArgsConstructor;
+
 
 @AllArgsConstructor
 @RestController
@@ -65,5 +67,11 @@ public class UsersController {
 		}
 		return profiles;
 	}
+	@DeleteMapping("user")
+	public void deleteUser(Principal principal) {
+		User cur = userService.getUser(principal.getName());
+		userService.deleteUser(cur.getId());
+	}
+	
 
 }
