@@ -1,17 +1,5 @@
 package com.dimka228.messenger.controllers;
 
-import com.dimka228.messenger.dto.TokenDTO;
-import com.dimka228.messenger.dto.UserAuthDTO;
-import com.dimka228.messenger.entities.User;
-import com.dimka228.messenger.exceptions.WrongPasswordException;
-import com.dimka228.messenger.security.jwt.TokenProvider;
-import com.dimka228.messenger.services.UserService;
-
-import jakarta.validation.Valid;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dimka228.messenger.dto.TokenDTO;
+import com.dimka228.messenger.dto.UserAuthDTO;
+import com.dimka228.messenger.entities.User;
+import com.dimka228.messenger.exceptions.WrongPasswordException;
+import com.dimka228.messenger.security.jwt.TokenProvider;
+import com.dimka228.messenger.services.UserService;
+
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -33,7 +31,6 @@ public class JwtAuthController {
 
 	private final TokenProvider jwtTokenUtil;
 
-	@Autowired
 	public JwtAuthController(UserService userService, AuthenticationManager authenticationManager,
 			TokenProvider jwtTokenUtil) {
 		this.userService = userService;
@@ -52,6 +49,7 @@ public class JwtAuthController {
 	}
 
 	@PostMapping("/signin")
+	@SuppressWarnings("UseSpecificCatch")
 	public ResponseEntity<TokenDTO> signIn(@RequestBody UserAuthDTO userDto) {
 
 		User user = userService.getUser(userDto.getLogin());

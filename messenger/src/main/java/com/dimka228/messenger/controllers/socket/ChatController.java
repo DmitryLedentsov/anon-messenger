@@ -1,18 +1,11 @@
 package com.dimka228.messenger.controllers.socket;
 
-import com.dimka228.messenger.dto.ChatDTO;
-import com.dimka228.messenger.dto.ChatCreateDTO;
-import com.dimka228.messenger.dto.MessageDTO;
-import com.dimka228.messenger.dto.OperationDTO;
-import com.dimka228.messenger.entities.Chat;
-import com.dimka228.messenger.entities.User;
-import com.dimka228.messenger.entities.UserInChat;
-import com.dimka228.messenger.exceptions.CannotBanSelfException;
-import com.dimka228.messenger.exceptions.WrongPrivilegesException;
-import com.dimka228.messenger.models.MessageInfo;
-import com.dimka228.messenger.services.ChatService;
-
-import com.dimka228.messenger.services.UserService;
+import java.security.Principal;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -25,13 +18,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.dimka228.messenger.dto.ChatCreateDTO;
+import com.dimka228.messenger.dto.ChatDTO;
+import com.dimka228.messenger.dto.MessageDTO;
+import com.dimka228.messenger.dto.OperationDTO;
+import com.dimka228.messenger.entities.Chat;
+import com.dimka228.messenger.entities.User;
+import com.dimka228.messenger.entities.UserInChat;
+import com.dimka228.messenger.exceptions.CannotBanSelfException;
+import com.dimka228.messenger.exceptions.WrongPrivilegesException;
+import com.dimka228.messenger.models.MessageInfo;
+import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.services.interfaces.NotificationService;
 
 import lombok.RequiredArgsConstructor;
@@ -58,7 +56,8 @@ public class ChatController {
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
 		for (User cur : users) {
-			if(Objects.equals(cur.getId(), user.getId())) continue;
+			if (Objects.equals(cur.getId(), user.getId()))
+				continue;
 			chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
 		}
 
@@ -75,24 +74,26 @@ public class ChatController {
 	}
 
 	@PutMapping("/chat/{chatId}")
-	public ChatDTO editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,  Principal principal) {
+	public ChatDTO editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
+			Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
 			throw new WrongPrivilegesException();
 		boolean chatNameChange = !chatDtoRequest.getName().equals(chat.getName());
-		if(chatNameChange){
-			chatService.updateChat(chat, (c)->c.setName(chatDtoRequest.getName()));
+		if (chatNameChange) {
+			chatService.updateChat(chat, (c) -> c.setName(chatDtoRequest.getName()));
 		}
 		List<String> logins = chatDtoRequest.getUsers();
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> updatedUsers = logins.stream().map(userService::getUser).collect(Collectors.toList());
 		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
 
-		for(UserInChat cur: users){
-			if(Objects.equals(user.getId(), cur.getUser().getId())) continue;
-			if (!updatedUsers.stream().filter(o -> o.getId().equals(cur.getUser().getId())).findFirst().isPresent()){
+		for (UserInChat cur : users) {
+			if (Objects.equals(user.getId(), cur.getUser().getId()))
+				continue;
+			if (!updatedUsers.stream().filter(o -> o.getId().equals(cur.getUser().getId())).findFirst().isPresent()) {
 				chatService.deleteUserFromChat(cur);
 				ChatDTO chatDTO = new ChatDTO(chat.getId());
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
@@ -101,11 +102,14 @@ public class ChatController {
 		}
 		for (User cur : updatedUsers) {
 			if (chatService.isUserInChat(cur, chat)) {
-				if(!chatNameChange) continue;
-				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), chatService.getUserRoleInChat(cur, chat));
+				if (!chatNameChange)
+					continue;
+				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(),
+						chatService.getUserRoleInChat(cur, chat));
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
 				notificationService.sendChatOperationToUser(cur.getId(), data);
-			} else {
+			}
+			else {
 				chatService.addUserInChat(cur, chat, UserInChat.Roles.REGULAR);
 				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), UserInChat.Roles.REGULAR);
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
@@ -124,42 +128,46 @@ public class ChatController {
 		ChatDTO chatDTO = new ChatDTO(chatId, chat.getName(), null);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
 		List<UserInChat> users = chatService.getUsersInChat(chat);
-	
+
 		if (userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
 			chatService.deleteOrLeaveChat(userInChat);
 			for (UserInChat cur : users) {
 				notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
 			}
-	
-			
+
 		}
 		else {
 			notificationService.sendChatOperationToUser(user.getId(), data);
-			chatService.getMessagesFromUserInChat(userInChat).forEach((msg)->{
-				notificationService.sendMessageOperationToChat(chatId, new OperationDTO<>(new MessageDTO(msg.getId()),OperationDTO.DELETE));
+			chatService.getMessagesFromUserInChat(userInChat).forEach((msg) -> {
+				notificationService.sendMessageOperationToChat(chatId,
+						new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE));
 			});
 			chatService.deleteMessagesFromUserInChat(userInChat);
 			chatService.deleteOrLeaveChat(userInChat);
 		}
-		
+
 		return chatDTO;
 	}
 
 	@GetMapping("/chats")
+	@SuppressWarnings("unused")
 	List<ChatDTO> getChats(Principal principal) {
 		User user = userService.getUser(principal.getName());
 		List<Chat> chats = chatService.getChatsForUser(user);
 		List<ChatDTO> result = new LinkedList<>();
-		for(Chat chat: chats){
+		for (Chat chat : chats) {
 			UserInChat userInChat = chatService.getUserInChat(user, chat);
 			result.add(new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole()));
 
 		}
-		//List<ChatDTO> result = chats.stream().map(chat->chatService.getUserInChat(user, chat)).map(userInChat->new ChatDTO(userInChat.getChat().getId(), userInChat.getChat().getName(), userInChat.getRole())).toList();
+		// List<ChatDTO> result = chats.stream().map(chat->chatService.getUserInChat(user,
+		// chat)).map(userInChat->new ChatDTO(userInChat.getChat().getId(),
+		// userInChat.getChat().getName(), userInChat.getRole())).toList();
 		return result;
 	}
 
 	@GetMapping("/chat/{chatId}")
+	@SuppressWarnings("unused")
 	ChatDTO getChat(Principal principal, @PathVariable Integer chatId) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
@@ -187,7 +195,7 @@ public class ChatController {
 		for (MessageInfo messageInfo : messages) {
 			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
 					null);
-			OperationDTO<MessageDTO> op = new OperationDTO<MessageDTO>(data, OperationDTO.DELETE);
+			OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
 			notificationService.sendMessageOperationToChat(chatId, op);
 		}
 	}
@@ -208,6 +216,5 @@ public class ChatController {
 		Chat chat = chatService.getChat(chatId);
 		return chatService.getAllRolesInChat(chat);
 	}
-
 
 }

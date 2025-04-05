@@ -1,13 +1,6 @@
 package com.dimka228.messenger.security.jwt;
 
-import com.dimka228.messenger.services.UserDetailsService;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +15,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.io.IOException;
+import com.dimka228.messenger.services.UserDetailsService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private HandlerExceptionResolver resolver;
 
 	@Override
+	@SuppressWarnings("UseSpecificCatch")
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 			@NonNull FilterChain filterChain) throws ServletException, IOException {
 		try {
@@ -66,7 +66,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					context.setAuthentication(authToken);
 					SecurityContextHolder.setContext(context);
 				}
-				;
 			}
 			filterChain.doFilter(request, response);
 		}

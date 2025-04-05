@@ -3,7 +3,6 @@ package com.dimka228.messenger.config;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -21,9 +20,8 @@ public class KafkaConfig {
 	@Value("${server.port}")
 	private String groupId;
 
-	private KafkaProperties properties;
+	private final KafkaProperties properties;
 
-	@Autowired
 	public KafkaConfig(KafkaProperties p) {
 		properties = p;
 	}

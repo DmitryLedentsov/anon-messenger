@@ -23,7 +23,6 @@ import com.dimka228.messenger.utils.DateConverter;
 
 import lombok.AllArgsConstructor;
 
-
 @AllArgsConstructor
 @RestController
 @RequestMapping(consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
@@ -49,12 +48,10 @@ public class UsersController {
 	}
 
 	@GetMapping("/chat/{chatId}/users")
-	public List<UserProfileDTO> profiles(@PathVariable Integer chatId,Principal principal) {
-		User cur = userService.getUser(principal.getName());
+	public List<UserProfileDTO> profiles(@PathVariable Integer chatId, Principal principal) {
 
 		List<UserProfileDTO> profiles = new LinkedList<>();
 		Chat chat = chatService.getChat(chatId);
-		UserInChat cUserInChat = chatService.getUserInChat(cur, chat);
 		for (UserInChat userInChat : chatService.getUsersInChat(chat)) {
 			Set<String> userStatuses = userService.getUserStatusList(userInChat.getUser())
 				.stream()
@@ -67,11 +64,11 @@ public class UsersController {
 		}
 		return profiles;
 	}
+
 	@DeleteMapping("user")
 	public void deleteUser(Principal principal) {
 		User cur = userService.getUser(principal.getName());
 		userService.deleteUser(cur.getId());
 	}
-	
 
 }

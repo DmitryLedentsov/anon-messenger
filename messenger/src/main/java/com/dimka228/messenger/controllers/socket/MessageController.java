@@ -44,7 +44,7 @@ public class MessageController {
 	public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
-		
+
 		Message added = chatService.addMessage(chatService.getUserInChat(user, chat), chatMessage.getMessage());
 		MessageDTO fullMsg = new MessageDTO(added.getId(), added.getData(), user.getId(), user.getLogin(),
 				DateConverter.format(Instant.now()));
@@ -57,34 +57,39 @@ public class MessageController {
 	public void deleteMessage(@PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
-		
+
 		Message msg = chatService.getMessage(msgId);
 		chatService.deleteMessageFromUserInChat(chatService.getUserInChat(user, chat), msg);
 
-	
 		OperationDTO<MessageDTO> data = new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE);
 		notificationService.sendMessageOperationToChat(id, data);
 	}
 
 	@GetMapping("/{id}/messages")
+	@SuppressWarnings("unused")
 	List<MessageDTO> messages(@PathVariable Integer id, Principal principal) {
 		Chat chat = chatService.getChat(id);
 		User user = userService.getUser(principal.getName());
-	
-		List<MessageDTO> messages = chatService.getMessagesForUserInChat(chatService.getUserInChat(user, chat)).stream().map(m->MessageDTO.fromMessageInfo(m)).toList();
+
+		List<MessageDTO> messages = chatService.getMessagesForUserInChat(chatService.getUserInChat(user, chat))
+			.stream()
+			.map(m -> MessageDTO.fromMessageInfo(m))
+			.toList();
 		return messages;
 	}
+
 	@DeleteMapping("/{id}/messages")
+	@SuppressWarnings("unused")
 	void clear(@PathVariable Integer id, Principal principal) {
 		Chat chat = chatService.getChat(id);
 		User user = userService.getUser(principal.getName());
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		chatService.deleteMessagesFromUserInChat(chatService.getUserInChat(user, chat));
-		chatService.getMessagesFromUserInChat(userInChat).forEach((msg)->{
+		chatService.getMessagesFromUserInChat(userInChat).forEach((msg) -> {
 			OperationDTO<MessageDTO> data = new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE);
 			notificationService.sendMessageOperationToChat(id, data);
 		});
-		
+
 	}
 
 }

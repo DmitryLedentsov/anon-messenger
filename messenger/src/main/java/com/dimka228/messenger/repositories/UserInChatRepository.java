@@ -15,6 +15,7 @@ public interface UserInChatRepository extends JpaRepository<UserInChat, Integer>
 	Optional<UserInChat> findByUserIdAndChatId(Integer userId, Integer chatId);
 
 	Optional<List<UserInChat>> findAllByChatId(Integer id);
+
 	@Transactional
 	@Override
 	void delete(UserInChat userInChat);

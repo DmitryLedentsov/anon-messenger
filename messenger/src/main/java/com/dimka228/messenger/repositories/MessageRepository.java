@@ -27,7 +27,6 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 	@Query(nativeQuery = true, value = "select id, sender_id as senderId, sender, message, send_time as sendTime from"
 			+ " get_messages_from_chat(:_chat_id)")
 	List<MessageInfo> getMessagesFromChat(@Param("_chat_id") Integer chatId);
-	
 
 	@Transactional
 	@Override
@@ -37,6 +36,7 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 	@Modifying
 	@Query(nativeQuery = true, value = "call delete_messages_from_user(:_user_id, :_chat_id)")
 	void deleteAllMessages(@Param("_user_id") Integer userId, @Param("_chat_id") Integer chatId);
+
 	@Override
 	Optional<Message> findById(Integer id);
 
