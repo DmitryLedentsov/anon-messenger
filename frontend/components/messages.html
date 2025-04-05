@@ -1,0 +1,32 @@
+<!-- Main Component -->
+<div class="main">
+    <nav class="navbar navbar-expand px-3 border-bottom">
+        <!-- Button for sidebar toggle -->
+        <button class=" btn btn-primary open-sidebar" type="button" data-bs-theme="dark">
+            <i class="bi bi-list"></i>
+        </button>
+    </nav>
+    <main class="content px-3 py-2 messages-wrapper">
+        <div class="container-fluid">
+            <div class="mb-3">
+                <div class="chat-messages-section">
+
+                    <script id="message-template" type="x-tmpl-mustache">
+                        <div class="message-item" data-id="{{id}}">
+                            <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{{message}}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
+                            <span class="message-time">{{sendTime}}</span>
+                        </div>
+                    </script>
+                    <div class="message-list"></div>
+                    <div class="input-group mt-3">
+                        <textarea type="text" id="messageInput" class="form-control auto-grow"
+                            placeholder="Напишите сообщение..."></textarea>
+                        <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i
+                                class="bi bi-send"></i></button>
+
+                    </div>
+
+                </div>
+            </div>
+    </main>
+</div>

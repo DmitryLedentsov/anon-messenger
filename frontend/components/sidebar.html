@@ -1,0 +1,49 @@
+<!-- Sidebar -->
+<aside id="sidebar" class="border-end">
+    <div class="h-100">
+        <div class="sidebar-logo">
+            <!--<a href="#">
+                <h5>Список чатов</h5>
+            </a>-->
+           
+            
+            <div class="input-group">
+                <input class="form-control search-input" type="search" id="chat-search" placeholder="Поиск чата..." aria-label="Search">
+                <div class="btn btn-outline-secondary  border-start-0 search-clear">
+                    <i class="bi bi-x"></i>
+                </div>
+            </div>
+            
+        </div>
+        <!-- Sidebar Navigation -->
+        <ul class="sidebar-nav">
+
+            <li class="sidebar-item">
+
+                <div class="container-fluid">
+                    
+                    <button class="btn btn-primary add-chat-btn" data-toggle="modal" data-bs-toggle="modal" data-bs-target="#createChatModal"
+                        data-target="#createChatModal">Создать чат</button>
+                    <div class="chat-list"></div>
+                    
+                    <script id="chat-template" type="x-tmpl-mustache">
+                        
+                <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
+                    <span>{{name}}</span>
+                    {{#isOwned}}
+                        <span class="edit-btn" onclick="event.stopPropagation(); app.editChatModal({{id}});"> <i class="bi bi-gear"></i> </span>
+                    {{/isOwned}}
+                    {{^isOwned}}
+                        <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+                    {{/isOwned}}
+                
+                </div>
+                </script>
+                </div>
+            </li>
+
+
+
+        </ul>
+    </div>
+</aside>
