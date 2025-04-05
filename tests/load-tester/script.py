@@ -33,21 +33,34 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Функция для измерения времени ответа сервера
+# Функция для измерения времени ответа сервера
 def measureResponseDelay(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        delay_ms = (end_time - start_time) * 1000  # Преобразуем в миллисекунды
-        
-        # Логируем в файл
-        with open('response_times.csv', 'a', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([start_time, delay_ms])
-        
-        return result
+        try:
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            delay_ms = (end_time - start_time) * 1000  # Преобразуем в миллисекунды
+            error_flag = 0  # Успешный запрос
+            
+            # Логируем в файл
+            with open('response_times.csv', 'a', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow([delay_ms, error_flag])
+            
+            return result
+        except Exception as e:
+            end_time = time.time()
+            delay_ms = (end_time - start_time) * 1000
+            error_flag = 1  # Ошибочный запрос
+            
+            # Логируем в файл
+            with open('response_times.csv', 'a', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow([delay_ms, error_flag])
+            
+            raise  # Пробрасываем исключение дальше
     return wrapper
-
 # Обертки для всех методов, выполняющих HTTP-запросы
 class MeasuredRequests:
     @staticmethod
@@ -85,7 +98,7 @@ class LoadTester:
         # Инициализация файла для логирования времени ответа
         with open('response_times.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['timestamp', 'delay_ms'])
+            writer.writerow(['delay_ms', 'error'])
 
     def signin_user(self, login, password="test_password"):
         """Авторизация пользователя для получения токена"""
