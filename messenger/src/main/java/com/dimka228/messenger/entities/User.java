@@ -27,7 +27,7 @@ public class User implements UserDetails, Cloneable, Comparable<User> {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "login", nullable = false, length = 20)
+	@Column(name = "login", nullable = false, length = 20, unique = true)
 	private String login;
 
 	public String getLogin() {
