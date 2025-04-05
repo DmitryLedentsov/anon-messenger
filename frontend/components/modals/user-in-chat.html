@@ -1,0 +1,40 @@
+  <!-- Модальное окно профиля пользователя в чате-->
+  <script id="user-in-chat-modal-template" type="x-tmpl-mustache">
+    <div class="modal fade" id="user-in-chat-modal" tabindex="-1" aria-labelledby="user-in-chat-modal" aria-hidden="true"  data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userinChatLogin">{{login}}</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Роль в чате:</label>
+                        <select name="role" id="role" class="form-control" disabled>
+                            {{#avaibleRoles}}
+                                <option value="{{role}}" {{selected}}>{{role}}</option>
+                            {{/avaibleRoles}}
+                        </select>
+                      
+                    </div>
+                    <div class="mb-3">
+                        <label  class="form-label">Дата регистрации: <span class="message-time">{{registrationTime}}</span></label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusList" class="form-label">Статусы:</label>
+                        <ul name="statusList">
+                            {{#statuses}}
+                                <li>{{.}}</li>
+                            {{/statuses}}
+                        </ul>
+                    </div>
+                    {{#current}}
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">Выйти</button>
+                    {{/current}}
+                    {{^current}}
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.banUser({{id}});">Забанить</button>
+                    {{/current}}
+                </div>
+            </div>
+        </div>
+    </div>
+    </script>

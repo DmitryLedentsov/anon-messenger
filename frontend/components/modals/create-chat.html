@@ -1,0 +1,23 @@
+<div class="modal fade" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createChatModalLabel">Создать чат</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="chatName" class="form-label">Название чата</label>
+                        <input type="text" class="form-control" id="chatName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="users" class="form-label">Пользователи</label>
+                        <input type="text" class="form-control tags-input" id="users" required>
+                    </div>
+                    <div class="mb-3">
+                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.createChat()">Создать</button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>

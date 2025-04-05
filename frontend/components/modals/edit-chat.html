@@ -1,0 +1,25 @@
+<script id="edit-chat-modal-template" type="x-tmpl-mustache">
+    <!-- Модальное окно для добавления пользователей -->
+    <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
+        data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="chatName" class="form-label">Название чата</label>
+                        <input type="text" class="form-control" id="chatName" value="{{name}}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="users" class="form-label">Пользователи</label>
+                        <input type="text" class="form-control users tags-input" id="users" value="{{users}}" required>
+                    </div>
+                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{id}})">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </script>

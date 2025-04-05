@@ -1,0 +1,25 @@
+<script type="text/javascript" src="../js/lib/include.js"></script>
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true"
+data-bs-theme="dark">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="authModalLabel">Авторизация</h5>
+        </div>
+        <div class="modal-body">
+            <div id="authForm">
+                <div class="mb-3">
+                    <label for="login" class="form-label">Логин</label>
+                    <input type="text" class="form-control" id="login" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button class="btn btn-primary" onclick="app.auth()">Войти</button>
+                <button class="btn btn-primary" onclick="app.register()">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

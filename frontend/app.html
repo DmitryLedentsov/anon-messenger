@@ -11,6 +11,7 @@
     <link href="css/tags-input.css" rel="stylesheet">
 
     <script type="text/javascript" src="js/lib/jquery.js"></script>
+    <script type="text/javascript" src="js/include.js"></script>
     <script type="text/javascript" src="js/lib/jquery.serializejson.js"></script>
     <script type="text/javascript" src="js/lib/jquery.formvalidation.js"></script>
     <script type="text/javascript" src="js/validation.js"></script>
@@ -173,146 +174,22 @@
     
     <div class="background"></div>
     <!-- Модальное окно авторизации -->
-    <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true"
-        data-bs-theme="dark">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="authModalLabel">Авторизация</h5>
-                </div>
-                <div class="modal-body">
-                    <div id="authForm">
-                        <div class="mb-3">
-                            <label for="login" class="form-label">Логин</label>
-                            <input type="text" class="form-control" id="login" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Пароль</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-                        <button class="btn btn-primary" onclick="app.auth()">Войти</button>
-                        <button class="btn btn-primary" onclick="app.register()">Зарегистрироваться</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
+    <include src="components/auth.html"></include>
+    <div include="components/modals/auth.html"></div>
+
+    <include src="components/modals/error.html"></include>
+    <include src="components/modals/create-chat.html"></include>
+
+    <include src="components/modals/edit-chat.html"></include>
+    <include src="components/modals/user-in-chat.html"></include>
+
+    
 
 
-    <!-- Модальное окно для ошибок -->
-    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true"
-        data-bs-theme="dark">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="errorModalMessage">
-                    <!-- Сообщение об ошибке будет вставляться сюда -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        aria-label="Close">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для создания чата -->
-    <div class="modal fade" id="createChatModal" tabindex="-1" aria-labelledby="createChatModalLabel" aria-hidden="true"
-        data-bs-theme="dark">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createChatModalLabel">Создать чат</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="chatName" class="form-label">Название чата</label>
-                        <input type="text" class="form-control" id="chatName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="users" class="form-label">Пользователи</label>
-                        <input type="text" class="form-control tags-input" id="users" required>
-                    </div>
-                    <div class="mb-3">
-                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.createChat()">Создать</button>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
-    <!-- Модальное окно профиля пользователя в чате-->
-    <script id="user-in-chat-modal-template" type="x-tmpl-mustache">
-<div class="modal fade" id="user-in-chat-modal" tabindex="-1" aria-labelledby="user-in-chat-modal" aria-hidden="true"  data-bs-theme="dark">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userinChatLogin">{{login}}</h5>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="role" class="form-label">Роль в чате:</label>
-                    <select name="role" id="role" class="form-control" disabled>
-                        {{#avaibleRoles}}
-                            <option value="{{role}}" {{selected}}>{{role}}</option>
-                        {{/avaibleRoles}}
-                    </select>
-                  
-                </div>
-                <div class="mb-3">
-                    <label  class="form-label">Дата регистрации: <span class="message-time">{{registrationTime}}</span></label>
-                </div>
-                <div class="mb-3">
-                    <label for="statusList" class="form-label">Статусы:</label>
-                    <ul name="statusList">
-                        {{#statuses}}
-                            <li>{{.}}</li>
-                        {{/statuses}}
-                    </ul>
-                </div>
-                {{#current}}
-                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">Выйти</button>
-                {{/current}}
-                {{^current}}
-                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.banUser({{id}});">Забанить</button>
-                {{/current}}
-            </div>
-        </div>
-    </div>
-</div>
-</script>
 
-
-<script id="edit-chat-modal-template" type="x-tmpl-mustache">
-    <!-- Модальное окно для добавления пользователей -->
-    <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
-        data-bs-theme="dark">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="chatName" class="form-label">Название чата</label>
-                        <input type="text" class="form-control" id="chatName" value="{{name}}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="users" class="form-label">Пользователи</label>
-                        <input type="text" class="form-control users tags-input" id="users" value="{{users}}" required>
-                    </div>
-                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{id}})">Удалить</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    </script>
 
     <!-- Основная часть приложения -->
     <div class="noise"></div>
@@ -788,6 +665,7 @@
 
             }
             $(() => {
+                includeHTML();
                 app = new App();
                 app.init();
 
