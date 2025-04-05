@@ -48,3 +48,8 @@ python script.py --users-count 10 --workers 30 --messages-count 10000 --min-inte
  python visualizer.py response_times.csv --ignore-timestamp --real-time
 
  taskkill /f /IM python.exe
+
+
+фронт сделать отдельно красиво по файлам раскидать
+api-notifier(?надо ли)
+отрефакторить контроллеры
