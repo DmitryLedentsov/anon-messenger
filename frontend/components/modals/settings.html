@@ -1,0 +1,21 @@
+<script id="settings-modal-template" type="x-tmpl-mustache">
+<div class="modal fade" id="settings-modal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true" data-bs-theme="dark">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="authModalLabel">Настройки</h5>
+        </div>
+        <div class="modal-body">
+            <div id="authForm">
+                <div class="mb-3">
+                    <label for="host" class="form-label">Адрес сервера</label>
+                    <input type="text" class="form-control" name="host" value={{host}} required>
+                </div>
+               
+                    <button class="btn btn-primary" onclick="app.saveSettings()">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</script>

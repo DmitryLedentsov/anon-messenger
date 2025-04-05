@@ -88,7 +88,7 @@ function App() {
         user.current = user.id == this.token.userId;
         user.chatId = chatId;
         if (!user.statuses.includes('ONLINE')) user.statuses.push('OFFLINE');
-        this.openRenderModal('#user-in-chat-modal',user);
+        openRenderModal('#user-in-chat-modal',user);
     
 
     }
@@ -111,7 +111,7 @@ function App() {
 
       
         
-        this.openRenderModal('#edit-chat-modal',userInChat);
+        openRenderModal('#edit-chat-modal',userInChat);
    
 
     }
@@ -153,25 +153,6 @@ function App() {
             //this.renderMessages(chatId);
         }
     }
-
-    function appendListItem(listName, listItemHTML) {
-        $(listItemHTML)
-            .hide()
-            .css('opacity', 0.0)
-            .appendTo(listName)
-            .slideDown(100)
-            .animate({ opacity: 1.0 })
-    }
-
-    function removeItem(name) {
-        $(name).fadeOut(300, function () { $(this).remove(); });
-    }
-    function replaceElem(selector, html) {
-        var div = $(selector).hide();
-        $(selector).replaceWith(html);
-        $(selector).fadeIn("slow");
-    }
-
 
     this.onError = (error) => {
         console.log(error);
@@ -281,7 +262,7 @@ function App() {
     }
 
 
-    this.openRenderModal = (modal, data) => {
+    openRenderModal = (modal, data) => {
         $(modal).remove();
         const template = $(`${modal}-template`).html();
 
