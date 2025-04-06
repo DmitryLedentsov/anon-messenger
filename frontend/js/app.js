@@ -339,7 +339,7 @@ function App() {
     this.renderMsgTemplate = (msg) => {
         let userId = this.token.userId;
         msg.isOwned = userId == msg.senderId;
-        msg.message = msg.message.replace(new RegExp('\r?\n','g'), '<br />');
+        //msg.message = msg.message.replace(new RegExp('\r?\n','g'), '<br />');
         const template = $('#message-template').html();
         const rendered = Mustache.render(template, msg);
         return rendered;

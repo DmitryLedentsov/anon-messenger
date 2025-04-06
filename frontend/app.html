@@ -76,18 +76,16 @@
 
 
     <div class="app-container terminal wrapper">
-        <include src="components/sidebar.html"></include>
-        <!-- Main Component -->
-        <div class="main">
-            <nav class="navbar navbar-expand px-2 px-sm-3 border-bottom">
-                <div class="container-fluid g-0">
-                    <!-- Button for sidebar toggle -->
-                    <button class="btn btn-primary open-sidebar me-2" type="button" data-bs-theme="dark">
-                        <i class="bi bi-list"></i>
-                    </button>
-                   
-                    <div class="nav navbar-nav navbar-right ms-auto">
-                        <button class="btn btn-primary me-2" onclick="app.editSettingsModal()" type="button" data-bs-theme="dark">
+    <include src="components/sidebar.html"></include>
+    <div class="main">
+        <nav class="navbar navbar-expand px-3 border-bottom">
+            <div class="container-fluid">
+                <button class="btn btn-primary open-sidebar me-2" type="button" data-bs-theme="dark">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="ms-auto">
+                    <div class="nav navbar-nav navbar-right d-flex flex-row gap-2">
+                        <button class="btn btn-primary" onclick="app.editSettingsModal()" type="button" data-bs-theme="dark">
                             <i class="bi bi-gear"></i>
                         </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#auth-modal" type="button" data-bs-theme="dark">
@@ -95,12 +93,32 @@
                         </button>
                     </div>
                 </div>
-            </nav>
-            <main class="content px-2 px-sm-3 py-2 messages-wrapper">
-                <include src="components/messages.html"></include>
-            </main>
-        </div>
+            </div>
+        </nav>
+        <main class="content px-3 py-2 messages-wrapper">
+            <include src="components/messages.html"></include>
+        </main>
     </div>
+</div>
+
+<style>
+@media (max-width: 768px) {
+    .app-container {
+        position: relative;
+        flex-direction: row;
+    }
+    .main {
+        width: 100%;
+    }
+   
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+    i {
+        font-size: 1.75rem; /* Увеличенная иконка отправки */
+    }
+}
+</style>
     
 </body>
 
