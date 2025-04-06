@@ -58,13 +58,6 @@ public class SecurityConfig {
 				.permitAll()
 				.requestMatchers("/", "/test", "/app", "/welcome", websocketPath + "/**")
 				.permitAll()
-				.requestMatchers("/js/**", "/css/**", "/icons/**", "/fonts/**", "/favicon.ico")
-				.permitAll()
-				.requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**", "/api-docs-ui.html",
-						"/api-docs.yaml")
-				.permitAll()
-				.requestMatchers("/api-docs/**", "/api-docs-ui/*")
-				.permitAll()
 				.requestMatchers(getEnablePaths().toArray(String[]::new))
 				.permitAll()
 				.requestMatchers("/endpoint", "/admin/**")

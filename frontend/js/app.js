@@ -271,7 +271,7 @@ function App() {
         await this.api.init(this.token);
         this.api.socketClientConnect();
         saveCookie('token',this.token);
-        //$("#auth-modal").modal('hide');
+        $("#auth-modal").modal('hide');
      
         }catch(e){}
 
