@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dimka228.messenger.dto.ChatDTO;
-import com.dimka228.messenger.dto.MessageDTO;
 import com.dimka228.messenger.dto.OperationDTO;
 import com.dimka228.messenger.dto.UserProfileDTO;
 import com.dimka228.messenger.entities.Chat;
@@ -25,7 +24,6 @@ import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.CannotBanSelfException;
 import com.dimka228.messenger.exceptions.WrongPrivilegesException;
-import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.services.ChatService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.services.interfaces.NotificationService;
@@ -70,17 +68,17 @@ public class UsersController {
 			throw new WrongPrivilegesException();
 		if (Objects.equals(user.getId(), cur.getId()))
 			throw new CannotBanSelfException();
-		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
-
-		notificationService.sendChatOperationToUser(userId,
-				new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
+		notificationService.sendChatOperationToUser(userId, new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
 		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
+		/*List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+
+		
 		for (MessageInfo messageInfo : messages) {
 			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
 					null);
 			OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
 			notificationService.sendMessageOperationToChat(chatId, op);
-		}
+		}*/
 	}
 
 	@PostMapping("/chat/{chatId}/user/{login}")

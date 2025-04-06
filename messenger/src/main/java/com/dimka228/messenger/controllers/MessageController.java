@@ -3,17 +3,19 @@ package com.dimka228.messenger.controllers;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dimka228.messenger.dto.MessageDTO;
@@ -69,12 +71,14 @@ public class MessageController {
 
 	@GetMapping("/{id}/messages")
 	@SuppressWarnings("unused")
-	List<MessageDTO> messages(@PathVariable Integer id, Principal principal) {
+	List<MessageDTO> messages(@PathVariable Integer id, Principal principal, 
+	@RequestParam(defaultValue = "0", name="page") int pageNumber, @RequestParam(defaultValue = "100", name="count") int pageSize,@RequestParam(defaultValue = "" ,name="filter") String filter) {
 		Chat chat = chatService.getChat(id);
 		User user = userService.getUser(principal.getName());
-
-		List<MessageDTO> messages = chatService.getMessagesForUserInChat(chatService.getUserInChat(user, chat))
+		Pageable page = PageRequest.of(pageNumber, pageSize, Sort.by("SEND_TIME").descending());
+		List<MessageDTO> messages = chatService.getMessagesForUserInChat(chatService.getUserInChat(user, chat), page)
 			.stream()
+			.filter((m)->filter!=null?m.getMessage().contains(filter):true)
 			.map(m -> MessageDTO.fromMessageInfo(m))
 			.toList();
 		return messages;

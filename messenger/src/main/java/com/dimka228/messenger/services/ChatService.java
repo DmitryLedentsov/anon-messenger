@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,9 @@ public class ChatService {
 			.orElseThrow(ChatNotFoundException::new);
 	}
 
+	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat, Pageable pageable) {
+		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId(), pageable);
+	}
 	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat) {
 		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId());
 	}
@@ -147,6 +151,9 @@ public class ChatService {
 		messageRepository.deleteAllMessages(user.getId(), chat.getId());
 	}
 
+	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat, Pageable page) {
+		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat(), page);
+	}
 	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat) {
 		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat());
 	}

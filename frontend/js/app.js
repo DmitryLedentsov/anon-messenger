@@ -331,6 +331,62 @@ function App() {
 
         });
     }
+    this.renderMessages = async (chatId, page = 0, count = 100) => {
+        this.currentChatId = chatId;
+        let userId = this.token.userId;
+        
+        console.log('rendering chat ' + chatId);
+        let chat = this.findChatById(chatId);
+        
+        // Если это первая загрузка, очищаем список
+        if (page === 0) {
+            chat.messages = await this.api.getMessagesFromChat(chatId, page, count);
+            $('.message-list').empty();
+        } else {
+            // Для последующих страниц добавляем к существующим сообщениям
+            const newMessages = await this.api.getMessagesFromChat(chatId, page, count);
+            chat.messages = [...newMessages, ...chat.messages];
+        }
+        
+        // Рендерим сообщения
+        const $msgList = $('.message-list');
+        if (page === 0) {
+            $msgList.empty();
+        }
+        
+        chat.messages && $.each(chat.messages, (index, el) => {
+            appendListItem('.message-list', this.renderMsgTemplate(el));
+        });
+        
+        // Если это первая загрузка, добавляем обработчик скролла
+        if (page === 0) {
+            this.setupScrollHandler(chatId);
+        }
+    };
+    
+    this.setupScrollHandler = (chatId) => {
+        const $msgList = $('.message-list');
+        let isLoading = false;
+        let currentPage = 0;
+        
+        $msgList.off('scroll').on('scroll', async function() {
+            if ($(this).scrollTop() === 0 && !isLoading) {
+                isLoading = true;
+                
+                // Показываем индикатор загрузки
+                const $loader = $('<div class="loader">Загрузка...</div>');
+                $msgList.prepend($loader);
+                
+                try {
+                    currentPage++;
+                    await this.renderMessages(chatId, currentPage);
+                } finally {
+                    $loader.remove();
+                    isLoading = false;
+                }
+            }
+        }.bind(this));
+    };
 
     this.renderChatTemplate = (chat) => {
         const template = $('#chat-template').html();

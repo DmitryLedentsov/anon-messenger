@@ -27,6 +27,14 @@ function MessengerApi(options) {
         }
     }
 
+    this.toUrlParams = (obj) => {
+        var str = [];
+        for (var p in obj)
+          if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+          }
+        return str.length>0?'?'+str.join("&"):'';
+    }
     this.query = async function (method, path, data,headers=ajaxHeaders) {
         let response = null;
         console.log(`sending ${method} request on ${options.serverUrl}${path} ${data ? JSON.stringify(data) : ''}`);
@@ -180,8 +188,8 @@ function MessengerApi(options) {
             return response;
         }
         
-        this.getMessagesFromChat = async (chatId) => {
-            let messages = this.query('get', `/chat/${chatId}/messages`);
+        this.getMessagesFromChat = async (chatId, params=null) => {
+            let messages = this.query('get', `/chat/${chatId}/messages`+this.toUrlParams(params));
 
             return messages;
         }
