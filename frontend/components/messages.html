@@ -2,12 +2,6 @@
     <div class="mb-3">
         <div class="chat-messages-section">
 
-            <script id="message-template" type="x-tmpl-mustache">
-                <div class="message-item" data-id="{{id}}">
-                    <span><span class="link" onclick="app.openUserInChat({{senderId}})">{{sender}}</span>: {{{message}}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
-                    <span class="message-time">{{sendTime}}</span>
-                </div>
-            </script>
             <div class="message-list"></div>
             <div class="input-group mt-3">
             <textarea type="text" id="messageInput" class="form-control auto-grow"
@@ -18,3 +12,19 @@
 
     </div>
 </div>
+
+<style>
+  
+ 
+    
+    .auto-grow {
+        min-height: 38px;
+      
+        resize: none;
+        overflow-y: auto;
+    }
+    
+   
+</style>
+    
+    

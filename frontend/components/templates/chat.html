@@ -1,0 +1,11 @@
+<script id="chat-template" type="x-tmpl-mustache">               
+    <div class="btn chat-item" data-id="{{id}}" onclick="app.openChat({{id}})">
+        <span>{{name}}</span>
+        {{#isOwned}}
+            <span class="edit-btn" onclick="event.stopPropagation(); app.editChatModal({{id}});"> <i class="bi bi-gear"></i> </span>
+        {{/isOwned}}
+        {{^isOwned}}
+            <span class="remove-btn" onclick="event.stopPropagation(); app.deleteChat({{id}});"> <i class="bi bi-x"></i> </span>
+        {{/isOwned}}
+    </div>
+</script>
