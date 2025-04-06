@@ -12,7 +12,7 @@ EXPOSE 8080/tcp
 RUN apt-get update -y && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
     && localedef -i ru_RU -c -f UTF-8 -A /usr/share/locale/locale.alias ru_RU.UTF-8
 
-RUN apt-get -y update && apt-get upgrade
+RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get install -y wget git
 RUN wget https://download.java.net/java/GA/jdk21.0.2/f2283984656d49d69e91c558476027ac/13/GPL/openjdk-21.0.2_linux-x64_bin.tar.gz
 
