@@ -3,18 +3,19 @@
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="authModalLabel">Настройки</h5>
+            <h5 class="modal-title">Настройки</h5>
         </div>
         <div class="modal-body">
-            <div id="authForm">
+            <div id="settings-form">
                 <div class="mb-3">
                     <label for="host" class="form-label">Адрес сервера</label>
-                    <input type="text" class="form-control" name="host" value={{host}} required>
+                    <input type="text" class="form-control" name="serverUrl" value="{{serverUrl}}">
                 </div>
                
-                    <button class="btn btn-primary" onclick="app.saveSettings()">Сохранить</button>
-                </form>
+                <button class="btn btn-primary" onclick="app.saveSettings(getFormData($('#settings-form')))" data-bs-dismiss="modal" >Сохранить</button>
+                <button class="btn btn-danger" data-bs-dismiss="modal" >Отмена</button>
             </div>
+         
         </div>
     </div>
 </div>

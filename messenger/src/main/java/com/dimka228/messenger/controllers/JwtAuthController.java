@@ -39,18 +39,17 @@ public class JwtAuthController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> signUp(@RequestBody @Valid UserAuthDTO userDto, BindingResult result) {
+	public void signUp(@RequestBody @Valid UserAuthDTO userDto, BindingResult result) {
 		result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
 		User user = User.fromAuth(userDto);
 
 		log.debug("POST request to register user {}", user.getUsername());
 		userService.registerUser(user);
-		return new ResponseEntity<>("User registered", HttpStatus.OK);
 	}
 
 	@PostMapping("/signin")
 	@SuppressWarnings("UseSpecificCatch")
-	public ResponseEntity<TokenDTO> signIn(@RequestBody UserAuthDTO userDto) {
+	public TokenDTO signIn(@RequestBody UserAuthDTO userDto) {
 
 		User user = userService.getUser(userDto.getLogin());
 		try {
@@ -58,7 +57,7 @@ public class JwtAuthController {
 			authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
 			final String token = jwtTokenUtil.generateToken(user);
-			return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
+			return new TokenDTO(token, user.getId());
 		}
 		catch (Exception e) {
 			throw new WrongPasswordException();

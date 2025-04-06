@@ -18,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.dimka228.messenger.exceptions.AppException;
 import com.dimka228.messenger.exceptions.DBException;
 import com.dimka228.messenger.exceptions.UserExistsException;
+import com.dimka228.messenger.exceptions.WrongTokenException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -58,19 +59,19 @@ public class GlobalErrorHandler {
 	@ExceptionHandler(JwtException.class)
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	public Map<String, Object> handleJwtException(JwtException e, WebRequest webRequest) {
-		return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
+		return createExceptionMessage(new WrongTokenException(), HttpStatus.FORBIDDEN, webRequest);
 	}
 
 	@ExceptionHandler(MalformedJwtException.class)
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	public Map<String, Object> handleMalformedJwtException(MalformedJwtException e, WebRequest webRequest) {
-		return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
+		return createExceptionMessage(new WrongTokenException(), HttpStatus.FORBIDDEN, webRequest);
 	}
 
 	@ExceptionHandler(ExpiredJwtException.class)
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	public Map<String, Object> handleExpiredJwtException(ExpiredJwtException e, WebRequest webRequest) {
-		return createExceptionMessage(e, HttpStatus.FORBIDDEN, webRequest);
+		return createExceptionMessage(new WrongTokenException(), HttpStatus.FORBIDDEN, webRequest);
 	}
 
 	@ExceptionHandler(BadCredentialsException.class)

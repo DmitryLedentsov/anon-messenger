@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserProfile;
@@ -49,6 +50,7 @@ public class UserService {
 		return repository.save(newUser);
 	}
 
+	@Transactional
 	public User registerUser(User newUser) {
 		if (checkUser(newUser.getLogin()))
 			throw new UserExistsException();
@@ -99,6 +101,7 @@ public class UserService {
 		statusRepository.save(status);
 	}
 
+	@Transactional
 	public void removeUserStatus(User u, String s) {
 		if (!statusRepository.existsByUserIdAndName(u.getId(), s))
 			return;

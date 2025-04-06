@@ -78,11 +78,11 @@ function App() {
 
     };
 
-    this.openUserInChat = (userId) => {
+    this.openUserInChat = async (userId) => {
         let chatId = this.currentChatId;
   
-        let user = this.api.getUserInChat(chatId, userId);
-        let roles = this.api.getAllRolesInChat(chatId);
+        let user = await this.api.getUserInChat(chatId, userId);
+        let roles = await this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
         user.avaibleRoles = roles;
         user.current = user.id == this.token.userId;
@@ -92,19 +92,19 @@ function App() {
     
 
     }
-    this.editChatModal = (chatId) => {
+    this.editChatModal = async (chatId) => {
 
         console.log(chatId);
-        let userInChat = this.api.getUserInChat(chatId,  this.token.userId);
+        let userInChat = await this.api.getUserInChat(chatId,  this.token.userId);
         userInChat.id = chatId;
-        let chat = this.api.getChat(chatId);
+        let chat = await this.api.getChat(chatId);
         let roles = this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
         userInChat.avaibleRoles = roles;
         userInChat.name = chat.name;
         
         userInChat.isOwned = userInChat.role=='CREATOR';
-        let users = this.api.getUsersInChat(chatId);
+        let users = await this.api.getUsersInChat(chatId);
         let userNames = users.map((user)=>user.login);
         let usersStr = userNames.join(",");
         userInChat.users = usersStr;
@@ -114,6 +114,21 @@ function App() {
         openRenderModal('#edit-chat-modal',userInChat);
    
 
+    }
+    this.saveSettings = (data)=>{
+        let old = this.settings;
+        this.settings = data;
+        updateObject(this.api.getOptions(), data);
+        console.log(data.serverUrl);
+        if(old.serverUrl!=data.serverUrl)  this.init(true);
+ 
+       
+       
+        saveCookie('settings',this.settings);
+
+    }
+    this.editSettingsModal = ()=>{
+        openRenderModal('#settings-modal', this.settings);
     }
     this.editChat= (id,chat)=>{
         console.log(chat);
@@ -157,9 +172,20 @@ function App() {
     this.onError = (error) => {
         console.log(error);
         if (error.message) error = error.message;
+        this.showError(error);
+    }
+
+    this.showError = (error) => {
         $("#errorModalMessage").html(error);
         $("#errorModal").modal('show');;
     }
+    this.showAlert = (title, msg='') => {
+        $("#alert-modal-title").html(title);
+        $("#alert-modal-msg").html(msg);
+        $("#alert-modal").modal('msg');
+    }
+
+
 
     this.initEvents = () => {
         $('.btn-close').on('click', function (e) {
@@ -183,11 +209,11 @@ function App() {
     }
 
 
-    this.init = () => {
-        let $settings = $('#settings');
+    this.init = async (firstTime = false) => {
+        this.settings = getNotEmpty(this.settings, window.settings, getCookie('settings')) || {};
         this.api = new MessengerApi({
-            serverUrl: $settings.attr('server-url'), brokerUrl: $settings.attr('socket-url'), onConnect: (m) => {
-                this.chats = this.api.getChats();
+            serverUrl: this.settings.serverUrl, brokerUrl: this.settings.serverUrl+'/ws', onConnect: async(m) => {
+                this.chats = await this.api.getChats();
                 this.api.subscribeOnChats((m) => {
                     let op = m.operation;
                     let data = m.data;
@@ -214,7 +240,12 @@ function App() {
             onError: this.onError
         });
 
-        $("#authModal").modal('show');
+        if(!firstTime) return;
+        this.token = getCookie('token');
+        if(this.token!=null){
+            await this.api.init(this.token);
+            this.api.socketClientConnect();
+        }else  $("#auth-modal").modal('show');
 
         this.initEvents();
 
@@ -231,20 +262,28 @@ function App() {
 
 
     }
-    this.auth = () => {
-        this.token = this.api.authUser({ "login": $('#login').val(), "password": $('#password').val() });
+    this.auth = async () => {
+        
+        try{
+        this.token = await this.api.authUser({ "login": $('#login').val(), "password": $('#password').val() });
         if (!this.token) return;
-        this.api.init(this.token);
+        
+        await this.api.init(this.token);
         this.api.socketClientConnect();
-
-        $("#authModal").modal('hide');
+        saveCookie('token',this.token);
+        //$("#auth-modal").modal('hide');
+     
+        }catch(e){}
 
     }
 
-    this.register = () => {
+    this.register = async () => {
         let data = { "login": $('#login').val(), "password": $('#password').val() };
-        let result = this.api.registerUser(data);
-        if (result) this.auth();
+        try{
+        let result = await this.api.registerUser(data);
+        await this.auth();
+        } catch(e){};
+        
 
     }
 
@@ -262,14 +301,6 @@ function App() {
     }
 
 
-    openRenderModal = (modal, data) => {
-        $(modal).remove();
-        const template = $(`${modal}-template`).html();
-
-        $('body').append(Mustache.render(template, data));
-        $(modal).modal('show');
-    }
-
 
     this.renderChats = () => {
         const template = $('#chat-template').html();
@@ -284,14 +315,14 @@ function App() {
 
         });
     }
-    this.renderMessages = (chatId) => {
+    this.renderMessages = async (chatId) => {
         this.currentChatId = chatId;
 
         let userId = this.token.userId;
        
         console.log('rendering chat ' + chatId);
         let chat = this.findChatById(chatId);
-        chat.messages = this.api.getMessagesFromChat(chatId);
+        chat.messages = await this.api.getMessagesFromChat(chatId);
         $msgList = $('.message-list');
         $msgList.empty();
         chat.messages && $.each(chat.messages,  (index, el)=> {
@@ -323,10 +354,10 @@ function App() {
     }
 
 }
-$(() => {
+$(async () => {
     includeHTML();
     app = new App();
-    app.init();
+    await app.init(true);
 
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {

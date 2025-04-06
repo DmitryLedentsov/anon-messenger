@@ -51,8 +51,14 @@ public class ChatController {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.addChat(chatDtoRequest.getName());
 		chatService.addUserInChat(user, chat, UserInChat.Roles.CREATOR);
-
+		
 		List<String> logins = chatDtoRequest.getUsers();
+		if(logins==null){
+			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
+			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
+			notificationService.sendChatOperationToUser(user.getId(), data);
+			return new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
+		}
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
 		for (User cur : users) {
@@ -74,7 +80,7 @@ public class ChatController {
 	}
 
 	@PutMapping("/chat/{chatId}")
-	public ChatDTO editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
+	public void editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
 			Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
@@ -86,10 +92,23 @@ public class ChatController {
 			chatService.updateChat(chat, (c) -> c.setName(chatDtoRequest.getName()));
 		}
 		List<String> logins = chatDtoRequest.getUsers();
+		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
+		
+		if(logins==null){
+			if(chatNameChange){
+				for (UserInChat cur : users) {
+					ChatDTO chatDTO = new ChatDTO(chat.getId(),chatDtoRequest.getName(), cur.getRole());
+					OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
+					notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
+				}
+					
+			}
+			return;
+		}
+		
+
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> updatedUsers = logins.stream().map(userService::getUser).collect(Collectors.toList());
-		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
-
 		for (UserInChat cur : users) {
 			if (Objects.equals(user.getId(), cur.getUser().getId()))
 				continue;
@@ -116,8 +135,6 @@ public class ChatController {
 				notificationService.sendChatOperationToUser(cur.getId(), data);
 			}
 		}
-
-		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
 	}
 
 	@DeleteMapping("/chat/{chatId}")

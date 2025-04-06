@@ -13,8 +13,9 @@
     <link rel="stylesheet" href="css/app.css">
 
     <script type="text/javascript" src="js/lib/jquery.js"></script>
-    <script type="text/javascript" src="js/include.js"></script>
     <script type="text/javascript" src="js/utils/utils.js"></script>
+    <script type="text/javascript" src="js/include.js"></script>
+
     <script type="text/javascript" src="js/lib/jquery.serializejson.js"></script>
     <script type="text/javascript" src="js/lib/jquery.formvalidation.js"></script>
     <script type="text/javascript" src="js/validation.js"></script>
@@ -37,9 +38,14 @@
 
 <body>
 
-    <div id="settings" th:attr="socket-url=${socket.url},server-url=${server.publicUrl}"> </div>
-
-
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        
+            var settings = /*[[${settings}]]*/ {};
+            console.log(settings);
+        
+        /*]]>*/
+    </script>
 
     
     <div class="background"></div>
@@ -75,10 +81,21 @@
     <!-- Main Component -->
     <div class="main">
         <nav class="navbar navbar-expand px-3 border-bottom">
+            <div class="container-fluid">
             <!-- Button for sidebar toggle -->
             <button class=" btn btn-primary open-sidebar" type="button" data-bs-theme="dark">
                 <i class="bi bi-list"></i>
             </button>
+           
+            <div class="nav navbar-nav navbar-right">
+                <button class="btn btn-primary" onclick="app.editSettingsModal()"  type="button" data-bs-theme="dark" >
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="btn btn-primary float-right" data-bs-toggle="modal" data-bs-target="#auth-modal"type="button" data-bs-theme="dark" >
+                    <i class="bi bi-person"></i>
+                </button>
+            </div>
+        </div>
         </nav>
         <main class="content px-3 py-2 messages-wrapper">
             <include src="components/messages.html"></include>

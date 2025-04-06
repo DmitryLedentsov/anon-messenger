@@ -10,14 +10,14 @@ function MessengerApi(options) {
     const publishUrl = '/app';
 
     let ajaxHeaders = [];
-    this.authUser = function (user) {
-        response = this.query('post', signInUrl, user);
+    this.authUser = async function (user) {
+        response = await this.query('post', signInUrl, user);
         if (response) this.setAuth(response);
         return response;
     }
 
-    this.registerUser = function (user) {
-        return this.query('post', signUpUrl, user);
+    this.registerUser = async function (user) {
+        return await this.query('post', signUpUrl, user);
     }
 
 
@@ -27,34 +27,34 @@ function MessengerApi(options) {
         }
     }
 
-    this.query = function (method, path, data, async = false) {
+    this.query = async function (method, path, data,headers=ajaxHeaders) {
         let response = null;
         console.log(`sending ${method} request on ${options.serverUrl}${path} ${data ? JSON.stringify(data) : ''}`);
-        $.ajax({
+        let request = {
             url: `${options.serverUrl}${path}`,
             method: method,
             headers: ajaxHeaders,
             dataType: 'json',
             data: JSON.stringify(data),
-            async: async,
             contentType: 'application/json',
-            success: function (res) {
-                response = res || {};
-                console.log(res);
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                if (xhr.status == 200) return xhr.responseText;
-                console.log([xhr, ajaxOptions, thrownError])
-                options.onError && thrownError.name == 'NetworkError' ? options.onError({ message: "connection error" }) : options.onError(xhr.responseJSON || xhr.responseText);
-                throw new Error(xhr.responseJSON || xhr.responseText || 'connection error');
-            }
-        });
-        return response;
+            
+        };
+        try{
+            response = await $.ajax(request);
+            return response;
+        } catch (e){
+            if(e.status==200) return;
+            let error = e.responseJSON;
+            if(error==null)  error = { message: "connection error" , type:'ConnectionError'}
+            options.onError(error);
+            throw error;
+        }
     }
 
     this.setOptions= (o)=>{
         options=o;
     }
+    this.getOptions = ()=>options;
     this.init = (login)=>{
         this.initLogic(login);
         this.initSocketClient(login);
@@ -133,54 +133,54 @@ function MessengerApi(options) {
     }
 
     this.initLogic = (userId) => {
-        this.createChat = (chat) => {
+        this.createChat = async (chat) => {
             return this.query('post', `/chat`, chat);
 
         }
-        this.editChat = (chatId,chat) => {
+        this.editChat = async (chatId,chat) => {
             return this.query('put', `/chat/${chatId}`,chat);
 
         }
-        this.deleteChat = (chatId) => {
+        this.deleteChat = async (chatId) => {
             return this.query('delete', `/chat/${chatId}`);
 
         }
-        this.deleteMessage = (chatId, msgId) => {
+        this.deleteMessage = async (chatId, msgId) => {
             return this.query('delete', `/chat/${chatId}/message/${msgId}`);
         }
-        this.deleteMessages = (chatId) => {
+        this.deleteMessages = async (chatId) => {
             return this.query('delete', `/chat/${chatId}/messages`);
         }
-        this.banUserFromChat = (userId, chatId) => {
+        this.banUserFromChat = async (userId, chatId) => {
             return this.query('delete', `/chat/${chatId}/ban/${userId}`)
         }
-        this.sendMessageToChat = (chatId, msg) => {
+        this.sendMessageToChat = async (chatId, msg) => {
             msg.senderId = userId;
             return this.query('post', `/chat/${chatId}/send`, { message: msg });
         }
 
-        this.getUserInChat = (chatId, userId) => {
+        this.getUserInChat = async (chatId, userId) => {
             return this.query('get', `/chat/${chatId}/user/${userId}`);
         }
-        this.getUsersInChat = (chatId)=>{
+        this.getUsersInChat = async (chatId)=>{
             return this.query('get', `/chat/${chatId}/users`);
         }
 
-        this.getAllRolesInChat = (chatId) => {
+        this.getAllRolesInChat = async (chatId) => {
             return this.query('get', `/chat/${chatId}/roles`);
         }
-        this.getChats = () => {
+        this.getChats = async () => {
 
             let response = this.query('get', `/chats`);
             return response;
         }
-        this.getChat = (chatId) => {
+        this.getChat = async (chatId) => {
 
             let response = this.query('get', `/chat/${chatId}`);
             return response;
         }
         
-        this.getMessagesFromChat = (chatId) => {
+        this.getMessagesFromChat = async (chatId) => {
             let messages = this.query('get', `/chat/${chatId}/messages`);
 
             return messages;

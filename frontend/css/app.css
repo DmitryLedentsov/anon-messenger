@@ -130,3 +130,7 @@ fade.in {
     background-color: var(--background-color);
     filter: blur(5px)
 }
+
+.app-container, main{
+    overflow-x: hidden !important;
+}
