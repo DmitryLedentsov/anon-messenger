@@ -93,12 +93,7 @@ public class UserService {
 	}
 
 	public void addUserStatus(User u, String s) {
-		if (statusRepository.existsByUserIdAndName(u.getId(), s))
-			return;
-		UserStatus status = new UserStatus();
-		status.setName(s);
-		status.setUser(u);
-		statusRepository.save(status);
+		statusRepository.insertUnique(u.getId(), s);
 	}
 
 	@Transactional

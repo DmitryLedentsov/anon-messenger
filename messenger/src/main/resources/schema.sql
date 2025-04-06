@@ -152,6 +152,16 @@ DELETE FROM M_MESSAGE WHERE (SENDER_ID=_user_id and CHAT_ID=_chat_id);
 END;  
 $$;  
 
+
+CREATE OR REPLACE PROCEDURE add_user_status_unique(_user_id int, _status varchar(20))  
+language plpgsql  
+as  
+$$   
+BEGIN  
+INSERT INTO M_USER_STATUS(USER_ID, NAME) VALUES (_user_id, _status) ON CONFLICT DO NOTHING;
+END;  
+$$;  
+
 CREATE OR REPLACE FUNCTION GET_MESSAGES_FROM_CHAT(_chat int)  
 returns TABLE(ID int, SENDER_ID int, SENDER VARCHAR(50), MESSAGE TEXT, SEND_TIME TEXT)  
 language plpgsql  
