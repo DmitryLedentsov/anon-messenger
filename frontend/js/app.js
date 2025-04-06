@@ -98,7 +98,7 @@ function App() {
         let userInChat = await this.api.getUserInChat(chatId,  this.token.userId);
         userInChat.id = chatId;
         let chat = await this.api.getChat(chatId);
-        let roles = this.api.getAllRolesInChat(chatId);
+        let roles = await this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
         userInChat.avaibleRoles = roles;
         userInChat.name = chat.name;
@@ -182,7 +182,7 @@ function App() {
     this.showAlert = (title, msg='') => {
         $("#alert-modal-title").html(title);
         $("#alert-modal-msg").html(msg);
-        $("#alert-modal").modal('msg');
+        $("#alert-modal").modal('show');
     }
 
 
@@ -272,6 +272,7 @@ function App() {
         this.api.socketClientConnect();
         saveCookie('token',this.token);
         $("#auth-modal").modal('hide');
+        $(".modal-backdrop").modal('hide');
      
         }catch(e){}
 

@@ -152,7 +152,7 @@ function MessengerApi(options) {
             return this.query('delete', `/chat/${chatId}/messages`);
         }
         this.banUserFromChat = async (userId, chatId) => {
-            return this.query('delete', `/chat/${chatId}/ban/${userId}`)
+            return this.query('delete', `/chat/${chatId}/user/${userId}`)
         }
         this.sendMessageToChat = async (chatId, msg) => {
             msg.senderId = userId;

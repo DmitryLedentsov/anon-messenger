@@ -1,4 +1,4 @@
-package com.dimka228.messenger.controllers.socket;
+package com.dimka228.messenger.controllers;
 
 import java.security.Principal;
 import java.time.Instant;

@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.dimka228.messenger.config.properties.FrontendSettings;
 import com.dimka228.messenger.config.properties.ServerProperties;
-import com.dimka228.messenger.config.properties.WebSocketProperties;
-
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -19,8 +17,6 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/")
 @ConditionalOnProperty({ "messenger.embedded-frontend" })
 public class IndexController {
-
-	private final WebSocketProperties socketProperties;
 
 	private final ServerProperties serverProperties;
 

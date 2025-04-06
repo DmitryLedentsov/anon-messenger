@@ -1,4 +1,4 @@
-package com.dimka228.messenger.controllers.socket;
+package com.dimka228.messenger.controllers;
 
 import java.security.Principal;
 import java.util.LinkedList;
@@ -193,40 +193,7 @@ public class ChatController {
 		return new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole());
 	}
 
-	@DeleteMapping("/chat/{chatId}/ban/{userId}")
-	public void banUser(@PathVariable Integer chatId, @PathVariable Integer userId, Principal principal) {
-		User cur = userService.getUser(principal.getName());
-		Chat chat = chatService.getChat(chatId);
-		User user = userService.getUser(userId);
-		UserInChat userInChat = chatService.getUserInChat(cur, chat);
-
-		if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
-			throw new WrongPrivilegesException();
-		if (Objects.equals(user.getId(), cur.getId()))
-			throw new CannotBanSelfException();
-		List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
-
-		notificationService.sendChatOperationToUser(userId,
-				new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
-		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
-		for (MessageInfo messageInfo : messages) {
-			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
-					null);
-			OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
-			notificationService.sendMessageOperationToChat(chatId, op);
-		}
-	}
-
-	@PostMapping("/chat/{chatId}/add/{login}")
-	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login) {
-		User user = userService.getUser(login);
-		Chat chat = chatService.getChat(chatId);
-		chatService.addUserInChat(user, chat, UserInChat.Roles.REGULAR);
-
-		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
-		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-		notificationService.sendChatOperationToUser(user.getId(), data);
-	}
+	
 
 	@GetMapping("/chat/{chatId}/roles")
 	public Set<String> getRoles(@PathVariable Integer chatId) {
