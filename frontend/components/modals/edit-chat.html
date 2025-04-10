@@ -2,6 +2,7 @@
     <!-- Модальное окно для добавления пользователей -->
     <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
         data-bs-theme="dark">
+        {{#data}}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -15,12 +16,21 @@
                     </div>
                     <div class="mb-3">
                         <label for="users" class="form-label">Пользователи</label>
-                        <input type="text" class="form-control users tags-input" id="users" value="{{users}}" required>
+                        <table>
+                        {{#users}} 
+                        <span class="form-control modal-item user-item" data-id="{{id}}">
+                            <span class="link" onclick="app.openUserInChat({{data.chatId}},{{id}})">{{login}}</span> <span class="remove-btn" onclick="event.stopPropagation(); app.banUser({{data.chatId}},{{id}});"> <i class="bi bi-x"></i> </span> 
+                        </span>
+                            <br>
+                        {{/users}} 
+                        </table>
+                       
                     </div>
                     <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
                     <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{id}})">Удалить</button>
                 </div>
             </div>
         </div>
+        {{/data}}
     </div>
     </script>

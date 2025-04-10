@@ -96,7 +96,7 @@
 				}
 
 				if (value !='' && skipTag != true) {
-                    $('<span>').addClass('tag').append(
+                    $('<span>').addClass('tag').addClass('form-control').append(
                         $('<span>').text(value).append('&nbsp;&nbsp;'),
                         $('<i class="bi bi-x"></i>').click(function () {
                             return $('#' + id).removeTag(escape(value));

@@ -78,15 +78,15 @@ function App() {
 
     };
 
-    this.openUserInChat = async (userId) => {
-        let chatId = this.currentChatId;
-  
+    this.openUserInChat = async (chatId, userId) => {
+
         let user = await this.api.getUserInChat(chatId, userId);
         let roles = await this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
         user.avaibleRoles = roles;
         user.current = user.id == this.token.userId;
         user.chatId = chatId;
+        
         if (!user.statuses.includes('ONLINE')) user.statuses.push('OFFLINE');
         openRenderModal('#user-in-chat-modal',user);
     
@@ -96,7 +96,7 @@ function App() {
 
         console.log(chatId);
         let userInChat = await this.api.getUserInChat(chatId,  this.token.userId);
-        userInChat.id = chatId;
+        userInChat.chatId = chatId;
         let chat = await this.api.getChat(chatId);
         let roles = await this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
@@ -107,11 +107,11 @@ function App() {
         let users = await this.api.getUsersInChat(chatId);
         let userNames = users.map((user)=>user.login);
         let usersStr = userNames.join(",");
-        userInChat.users = usersStr;
+        userInChat.users = users;
 
       
         
-        openRenderModal('#edit-chat-modal',userInChat);
+        openRenderModal('#edit-chat-modal',{data:userInChat});
    
 
     }
@@ -137,7 +137,7 @@ function App() {
     }
 
     this.openCurrentUserProfile = () => {
-        this.openUserInChat(this.token.userId);
+        this.openUserInChat(this.currentChatId,this.token.userId);
     }
 
     this.createChat = () => {
@@ -260,7 +260,6 @@ function App() {
 
 
 
-
     }
     this.auth = async () => {
         
@@ -297,8 +296,12 @@ function App() {
         this.api.deleteMessage(this.currentChatId, id);
     }
 
-    this.banUser = (id) => {
-        this.api.banUserFromChat(id, this.currentChatId);
+    this.banUser = (chatId, id) => {
+
+        this.api.banUserFromChat(id, chatId);
+        if(isModalShown('#edit-chat-modal')){
+            removeItem(`.user-item[data-id=${id}]`);
+        }
     }
 
 
@@ -394,6 +397,7 @@ function App() {
         return rendered;
     }
     this.renderMsgTemplate = (msg) => {
+        msg.chatId=this.currentChatId;
         let userId = this.token.userId;
         msg.isOwned = userId == msg.senderId;
         //msg.message = msg.message.replace(new RegExp('\r?\n','g'), '<br />');

@@ -32,7 +32,7 @@
                         <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">Выйти</button>
                     {{/current}}
                     {{^current}}
-                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.banUser({{id}});">Забанить</button>
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.banUser({{chatId}},{{id}});">Забанить</button>
                     {{/current}}
                 </div>
             </div>

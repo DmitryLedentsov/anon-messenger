@@ -69,6 +69,11 @@ openRenderModal = (modal, data) => {
     $(modal).modal('show');
 }
 
+isModalShown = (modal)=>{
+    return $(modal).hasClass('show');
+}
+
+
 function saveLocalStorage(key, data) {
     const dataString = JSON.stringify(data);
     localStorage.setItem(key, dataString);

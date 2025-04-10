@@ -68,6 +68,15 @@ textarea {
 .chat-item:hover {
     border-color: var(--main-color);
 }
+.modal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+ 
+}
+
+
 
 .remove-btn {
     margin-left: 0.5rem;
