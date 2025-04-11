@@ -1,11 +1,11 @@
 package com.dimka228.messenger.config;
 
-import java.util.List;
+import java.util.Set;
 
 import lombok.Data;
 
 @Data
 public class RoleConfig {
-    private List<String> permissions;
+    private Set<String> permissions;
     private Integer priority;
 }

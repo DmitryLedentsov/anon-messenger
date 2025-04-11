@@ -2,6 +2,7 @@ package com.dimka228.messenger.config.properties;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import lombok.Data;
 public class RolesProperties {
     private Map<String, RoleConfig> roles = new HashMap<>();
 
-    public List<String> getPermissionsForRole(String roleName) {
+    public Set<String> getPermissionsForRole(String roleName) {
         return roles.getOrDefault(roleName, new RoleConfig()).getPermissions();
     }
     public RoleConfig getRoleConfig(String name){
