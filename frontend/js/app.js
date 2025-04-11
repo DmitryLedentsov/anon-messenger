@@ -241,7 +241,7 @@ function App() {
         });
 
         if(!firstTime) return;
-        this.token = getCookie('token');
+        this.token = null;//getCookie('token');
         if(this.token!=null){
             await this.api.init(this.token);
             this.api.socketClientConnect();

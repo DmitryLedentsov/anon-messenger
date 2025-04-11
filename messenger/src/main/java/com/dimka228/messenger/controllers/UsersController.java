@@ -25,6 +25,7 @@ import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.CannotBanSelfException;
 import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.RoleService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.services.interfaces.NotificationService;
 import com.dimka228.messenger.utils.DateConverter;
@@ -39,6 +40,7 @@ public class UsersController {
 	private final UserService userService;
 
 	private final ChatService chatService;
+	private final RoleService roleService;
 
 	@Qualifier("notificationService")
 	private final NotificationService notificationService;
@@ -64,12 +66,13 @@ public class UsersController {
 		User user = userService.getUser(userId);
 		UserInChat userInChat = chatService.getUserInChat(cur, chat);
 
-		if (!userInChat.getRole().equals(UserInChat.Roles.CREATOR))
+		if (!roleService.checkPrivilege(userInChat, "BAN_USER"))
 			throw new WrongPrivilegesException();
 		if (Objects.equals(user.getId(), cur.getId()))
 			throw new CannotBanSelfException();
-		notificationService.sendChatOperationToUser(userId, new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
+	
 		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
+		notificationService.sendChatOperationToUser(userId, new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
 		/*List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
 		
@@ -82,9 +85,12 @@ public class UsersController {
 	}
 
 	@PostMapping("/chat/{chatId}/user/{login}")
-	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login) {
+	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login, Principal principal) {
 		User user = userService.getUser(login);
 		Chat chat = chatService.getChat(chatId);
+		User cur = userService.getUser(principal.getName());
+		UserInChat userInChat = chatService.getUserInChat(cur, chat);
+		if (!roleService.checkPrivilege(userInChat, "ADD_USER")) throw new WrongPrivilegesException();
 		chatService.addUserInChat(user, chat, UserInChat.Roles.REGULAR);
 
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);

@@ -26,8 +26,8 @@
                         </table>
                        
                     </div>
-                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{id}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{id}})">Удалить</button>
+                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{data.chatId}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{data.chatId}})">Удалить</button>
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dimka228.messenger.config.properties.RolesProperties;
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
@@ -118,7 +119,7 @@ public class ChatService {
 		}
 		return true;
 	}
-
+	
 	public void addUserInChat(User user, Chat chat, String role) {
 		UserInChat userInChat = new UserInChat();
 		userInChat.setUser(user);
@@ -126,7 +127,12 @@ public class ChatService {
 		userInChat.setRole(role);
 		userInChatRepository.save(userInChat);
 	}
-
+	@Transactional
+	public void updateUserRoleInChat(UserInChat userInChat, String newRole){
+		userInChat.setRole(newRole);
+		userInChatRepository.save(userInChat);
+	}
+	@Transactional
 	public void updateChat(Chat chat, EntityChanger<Chat> callback) {
 		callback.change(chat);
 		chatRepository.save(chat);

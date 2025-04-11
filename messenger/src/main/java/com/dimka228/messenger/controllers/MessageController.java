@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,9 @@ import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserInChat;
+import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.services.ChatService;
+import com.dimka228.messenger.services.RoleService;
 import com.dimka228.messenger.services.UserService;
 import com.dimka228.messenger.services.interfaces.NotificationService;
 import com.dimka228.messenger.utils.DateConverter;
@@ -46,12 +49,15 @@ public class MessageController {
 
 	private final ChatService chatService;
 
+	private final RoleService roleService;
+
 	@PostMapping("/{id}/send")
 	public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
-
-		Message added = chatService.addMessage(chatService.getUserInChat(user, chat), chatMessage.getMessage());
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
+		if(!roleService.checkPrivilege(userInChat, "SEND_MESSAGE")) throw new WrongPrivilegesException();
+		Message added = chatService.addMessage(userInChat, chatMessage.getMessage());
 		MessageDTO fullMsg = new MessageDTO(added.getId(), added.getData(), user.getId(), user.getLogin(),
 				DateConverter.format(Instant.now()));
 		OperationDTO<MessageDTO> data = new OperationDTO<>(fullMsg, OperationDTO.ADD);
@@ -63,9 +69,10 @@ public class MessageController {
 	public void deleteMessage(@PathVariable Integer id, @PathVariable Integer msgId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
-
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		Message msg = chatService.getMessage(msgId);
-		chatService.deleteMessageFromUserInChat(chatService.getUserInChat(user, chat), msg);
+		if(!roleService.checkPrivilege(userInChat, "DELETE_MESSAGE") && !Objects.equals(user.getId(), msg.getSender().getId())) throw new WrongPrivilegesException();
+		chatService.deleteMessageFromUserInChat(userInChat, msg);
 
 		OperationDTO<MessageDTO> data = new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE);
 		notificationService.sendMessageOperationToChat(id, data);
