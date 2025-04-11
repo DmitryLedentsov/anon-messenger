@@ -78,6 +78,17 @@ public class ChatController {
 		}
 		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
 	}
+	@PostMapping("/chat/create/{name}")
+	public ChatDTO createEmptyChat(@PathVariable String name, Principal principal) {
+		User user = userService.getUser(principal.getName());
+		Chat chat = chatService.addChat(name);
+		chatService.addUserInChat(user, chat, UserInChat.Roles.CREATOR);
+		
+		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
+		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
+		notificationService.sendChatOperationToUser(user.getId(), data);
+		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat));
+	}
 
 	@PutMapping("/chat/{chatId}")
 	public void editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
@@ -140,7 +151,7 @@ public class ChatController {
 	}
 
 	@DeleteMapping("/chat/{chatId}")
-	public ChatDTO deleteChat(@PathVariable Integer chatId, Principal principal) {
+	public void deleteChat(@PathVariable Integer chatId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
@@ -165,7 +176,6 @@ public class ChatController {
 			chatService.deleteOrLeaveChat(userInChat);
 		}
 
-		return chatDTO;
 	}
 
 	@GetMapping("/chats")
