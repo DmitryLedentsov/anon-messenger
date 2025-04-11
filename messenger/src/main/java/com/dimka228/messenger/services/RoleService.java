@@ -1,5 +1,8 @@
 package com.dimka228.messenger.services;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.dimka228.messenger.config.RoleConfig;
@@ -21,6 +24,9 @@ public class RoleService {
 	}
 	public RoleConfig getRoleConfig(UserInChat user){
 		return getRoleConfig(user.getRole());
+	}
+	public Set<String> getRolesNames(){
+		return rolesConfig.getRoles().keySet();
 	}
 
 	public boolean isHigherPriority(RoleConfig firstRole, RoleConfig secondRole){

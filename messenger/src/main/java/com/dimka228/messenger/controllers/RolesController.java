@@ -45,7 +45,8 @@ public class RolesController {
 		Chat chat = chatService.getChat(chatId);
         chatService.getUserInChat(userService.getUser(principal.getName()),chat);
 
-		return chatService.getAllRolesInChat(chat);
+		//return chatService.getAllRolesInChat(chat);
+        return roleService.getRolesNames();
 	}
     @GetMapping("chat/{chatId}/role/{role}")
 	public RoleConfig getRoleConfig(@PathVariable Integer chatId, @PathVariable String role, Principal principal) {
