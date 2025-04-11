@@ -1,44 +1,37 @@
 package com.dimka228.messenger.services;
 
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.dimka228.messenger.config.RoleConfig;
-import com.dimka228.messenger.config.properties.RolesProperties;
+import com.dimka228.messenger.entities.Role;
 import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.RoleNotFoundException;
+import com.dimka228.messenger.repositories.RoleRepository;
 
 import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class RoleService {
-    private final RolesProperties rolesConfig;
-	public boolean checkPrivilege(UserInChat userInChat, String permission){
-		return rolesConfig.getPermissionsForRole(userInChat.getRole()).contains(permission);
-	}
-	public RoleConfig getRoleConfig(String name){
-		if(!checkRoleExists(name)) throw new RoleNotFoundException();
-		return rolesConfig.getRoleConfig(name);
-	}
-	public RoleConfig getRoleConfig(UserInChat user){
-		return getRoleConfig(user.getRole());
+	private final RoleRepository roleRepository;
+
+	public final Role getRole(String name){
+		return roleRepository.findByName(name).orElseThrow(RoleNotFoundException::new);
 	}
 	public Set<String> getRolesNames(){
-		return rolesConfig.getRoles().keySet();
+		return roleRepository.findAll().stream().map(Role::getName).collect(Collectors.toSet());
 	}
 
-	public boolean isHigherPriority(RoleConfig firstRole, RoleConfig secondRole){
+
+	public boolean isHigherPriority(Role firstRole, Role secondRole){
 		return firstRole.getPriority() > secondRole.getPriority();
 	}
 	public boolean isHigherPriority(UserInChat first, UserInChat second){
-		RoleConfig firstRole = getRoleConfig(first);
-		RoleConfig secondRole = getRoleConfig(second);
-		return isHigherPriority(firstRole, secondRole);
+		return isHigherPriority(first.getRole(), second.getRole());
 	}
 
 	public boolean checkRoleExists(String name){
-		return rolesConfig.getRoles().containsKey(name);
+		return roleRepository.findByName(name).isPresent();
 	}
 }

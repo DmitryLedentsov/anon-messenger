@@ -10,10 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dimka228.messenger.config.properties.RolesProperties;
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
+import com.dimka228.messenger.entities.Role;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.ChatNotFoundException;
@@ -120,7 +120,7 @@ public class ChatService {
 		return true;
 	}
 	
-	public void addUserInChat(User user, Chat chat, String role) {
+	public void addUserInChat(User user, Chat chat, Role role) {
 		UserInChat userInChat = new UserInChat();
 		userInChat.setUser(user);
 		userInChat.setChat(chat);
@@ -128,8 +128,8 @@ public class ChatService {
 		userInChatRepository.save(userInChat);
 	}
 	@Transactional
-	public void updateUserRoleInChat(UserInChat userInChat, String newRole){
-		userInChat.setRole(newRole);
+	public void updateUserInChat(UserInChat userInChat, EntityChanger<UserInChat> callback){
+		callback.change(userInChat);
 		userInChatRepository.save(userInChat);
 	}
 	@Transactional
@@ -194,13 +194,13 @@ public class ChatService {
 		deleteMessage(msg.getId());
 	}
 
-	public String getUserRoleInChat(User user, Chat chat) {
+	public Role getUserRoleInChat(User user, Chat chat) {
 		return getUserInChat(user.getId(), chat.getId()).getRole();
 	}
 
 	public void deleteOrLeaveChat(UserInChat userInChat) {
 
-		if (userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
+		if (userInChat.getRole().getName().equals(UserInChat.Roles.CREATOR)) {
 
 			deleteChat(userInChat.getChat().getId());
 
@@ -225,7 +225,7 @@ public class ChatService {
 	public Set<String> getAllRolesInChat(Chat chat) {
 		Set<String> list = new HashSet<>();
 		for (UserInChat userInChat : getUsersInChat(chat)) {
-			list.add(userInChat.getRole());
+			list.add(userInChat.getRole().getName());
 		}
 		return list;
 	}

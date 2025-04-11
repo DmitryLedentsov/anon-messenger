@@ -56,7 +56,7 @@ public class MessageController {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
-		if(!roleService.checkPrivilege(userInChat, "SEND_MESSAGE")) throw new WrongPrivilegesException();
+		if(!userInChat.getRole().isSendMessage()) throw new WrongPrivilegesException();
 		Message added = chatService.addMessage(userInChat, chatMessage.getMessage());
 		MessageDTO fullMsg = new MessageDTO(added.getId(), added.getData(), user.getId(), user.getLogin(),
 				DateConverter.format(Instant.now()));
@@ -71,7 +71,7 @@ public class MessageController {
 		Chat chat = chatService.getChat(id);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		Message msg = chatService.getMessage(msgId);
-		if(!roleService.checkPrivilege(userInChat, "DELETE_MESSAGE") && !Objects.equals(user.getId(), msg.getSender().getId())) throw new WrongPrivilegesException();
+		if(!userInChat.getRole().isDeleteMessage() && !Objects.equals(user.getId(), msg.getSender().getId())) throw new WrongPrivilegesException();
 		chatService.deleteMessageFromUserInChat(userInChat, msg);
 
 		OperationDTO<MessageDTO> data = new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE);

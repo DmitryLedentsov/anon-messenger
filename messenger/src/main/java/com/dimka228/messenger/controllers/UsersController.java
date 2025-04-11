@@ -54,7 +54,7 @@ public class UsersController {
 			.map(s -> s.getName())
 			.collect(Collectors.toSet());
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
-		UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(), userInChat.getRole(), user.getId(),
+		UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(), userInChat.getRole().getName(), user.getId(),
 				userStatuses, DateConverter.format(userInChat.getJoinTime()));
 
 		return profileDTO;
@@ -66,7 +66,9 @@ public class UsersController {
 		User user = userService.getUser(userId);
 		UserInChat userInChat = chatService.getUserInChat(cur, chat);
 
-		if (!roleService.checkPrivilege(userInChat, "BAN_USER"))
+		if (!userInChat.getRole().isBanUser())
+			throw new WrongPrivilegesException();
+		if (!roleService.isHigherPriority(userInChat, chatService.getUserInChat(user, chat)))
 			throw new WrongPrivilegesException();
 		if (Objects.equals(user.getId(), cur.getId()))
 			throw new CannotBanSelfException();
@@ -90,8 +92,8 @@ public class UsersController {
 		Chat chat = chatService.getChat(chatId);
 		User cur = userService.getUser(principal.getName());
 		UserInChat userInChat = chatService.getUserInChat(cur, chat);
-		if (!roleService.checkPrivilege(userInChat, "ADD_USER")) throw new WrongPrivilegesException();
-		chatService.addUserInChat(user, chat, UserInChat.Roles.REGULAR);
+		if (!userInChat.getRole().isAddUser()) throw new WrongPrivilegesException();
+		chatService.addUserInChat(user, chat, roleService.getRole(UserInChat.Roles.REGULAR));
 
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
@@ -111,7 +113,7 @@ public class UsersController {
 				.stream()
 				.map(s -> s.getName())
 				.collect(Collectors.toSet());
-			UserProfileDTO profileDTO = new UserProfileDTO(userInChat.getUser().getLogin(), userInChat.getRole(),
+			UserProfileDTO profileDTO = new UserProfileDTO(userInChat.getUser().getLogin(), userInChat.getRole().getName(),
 					userInChat.getUser().getId(), userStatuses, DateConverter.format(userInChat.getJoinTime()));
 			profiles.add(profileDTO);
 

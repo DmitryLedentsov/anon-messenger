@@ -34,9 +34,12 @@ public class RolesController {
 		User user = userService.getUser(userId);
         User cur = userService.getUser(principal.getName());
         UserInChat userInChat = chatService.getUserInChat(user, chat);
+		Role newRole = roleService.getRole(role);
         if(!roleService.isHigherPriority(chatService.getUserInChat(cur, chat), userInChat)) throw new WrongPrivilegesException();//проверяем что текущий пользователь выше в ранге чем изменяемый
-        if(!roleService.isHigherPriority(roleService.getRoleConfig(chatService.getUserInChat(cur, chat)), roleService.getRoleConfig(role))) throw new WrongPrivilegesException(); //проверяем что текущий пользователь выше в ранге чем новая роль
-        chatService.updateUserRoleInChat(userInChat, role);
+        if(!roleService.isHigherPriority(chatService.getUserInChat(cur, chat).getRole(), newRole)) throw new WrongPrivilegesException(); //проверяем что текущий пользователь выше в ранге чем новая роль
+        chatService.updateUserInChat(userInChat, (c)->{
+			c.setRole(newRole);
+		});
         
 	}
 
@@ -49,9 +52,9 @@ public class RolesController {
         return roleService.getRolesNames();
 	}
     @GetMapping("chat/{chatId}/role/{role}")
-	public RoleConfig getRoleConfig(@PathVariable Integer chatId, @PathVariable String role, Principal principal) {
+	public Role getRoleConfig(@PathVariable Integer chatId, @PathVariable String role, Principal principal) {
 		Chat chat = chatService.getChat(chatId);
         chatService.getUserInChat(userService.getUser(principal.getName()),chat);
-		return roleService.getRoleConfig(role);
+		return roleService.getRole(role);
 	}
 }
