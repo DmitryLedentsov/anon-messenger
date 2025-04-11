@@ -143,11 +143,22 @@ function MessengerApi(options) {
     this.initLogic = (userId) => {
         this.createChat = async (chat) => {
             return this.query('post', `/chat`, chat);
-
+        }
+        this.createChatWithoutUsers = async (chat) => {
+            return this.query('post', `/chat/create/${chat}`);
         }
         this.editChat = async (chatId,chat) => {
             return this.query('put', `/chat/${chatId}`,chat);
 
+        }
+        this.renameChat = async (chatId,name) => {
+            return this.query('post', `/chat/${chatId}/set-name/${name}`);
+        }
+        this.setUserRole = async (chatId,userId,role) => {
+            return this.query('post', `/chat/${chatId}/user/${userId}set-role/${role}`);
+        }
+        this.getRole = async (chatId,role) => {
+            return this.query('get', `/chat/${chatId}/role/${role}`);
         }
         this.deleteChat = async (chatId) => {
             return this.query('delete', `/chat/${chatId}`);
@@ -161,6 +172,9 @@ function MessengerApi(options) {
         }
         this.banUserFromChat = async (userId, chatId) => {
             return this.query('delete', `/chat/${chatId}/user/${userId}`)
+        }
+        this.addUserInChat = async (chatId, user) => {
+            return this.query('post', `/chat/${chatId}/user/${user}`)
         }
         this.sendMessageToChat = async (chatId, msg) => {
             msg.senderId = userId;

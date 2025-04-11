@@ -103,7 +103,10 @@ public class UsersController {
 
 		List<UserProfileDTO> profiles = new LinkedList<>();
 		Chat chat = chatService.getChat(chatId);
+		UserInChat curUserInChat = chatService.getUserInChat(userService.getUser(principal.getName()), chat);
+		
 		for (UserInChat userInChat : chatService.getUsersInChat(chat)) {
+			if (userInChat.getUser().equals(curUserInChat.getUser())) continue; //себя пропускаем
 			Set<String> userStatuses = userService.getUserStatusList(userInChat.getUser())
 				.stream()
 				.map(s -> s.getName())
