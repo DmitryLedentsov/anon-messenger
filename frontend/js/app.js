@@ -240,7 +240,7 @@ function App() {
         $('.messages-wrapper').on('scroll', () => {
             // Проверяем, достигли ли верха wrapper'а
             if ($('.messages-wrapper').scrollTop() < 100 && !this.isLoading && this.hasMoreMessages) {
-                //this.loadMoreMessages();
+                this.loadMoreMessages();//вместо кнопки
             }
         });
 
@@ -393,7 +393,8 @@ function App() {
             console.log(messages);
             
             let chat = this.findChatById(this.currentChatId);
-            
+            const scrollHeight = $('.message-list')[0].scrollHeight;
+            const scrollTop = $('.messages-wrapper').scrollTop();
             // Check if we have more messages to load
             if (messages.length < this.messagesPerPage) {
                 this.hasMoreMessages = false;
@@ -407,6 +408,10 @@ function App() {
                 chat.messages.unshift(msg); // Add to beginning to maintain order
                 prependListItem('.message-list', this.renderMsgTemplate(msg));
             });
+            // Восстанавливаем позицию скролла
+            if (this.page > 1) {
+                $('.messages-wrapper').scrollTop($('.message-list')[0].scrollHeight - scrollHeight + scrollTop);
+            }
             
             this.page++;
             
