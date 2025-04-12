@@ -87,7 +87,7 @@ li {
 .element,
 .btn,
 .modal-content,
-.form-control {
+.form-control, .form-select {
     color: white;
     filter: drop-shadow(1px 1px 1px rgb(255, 255, 255, 0.1));
     border-radius: 15px;
@@ -311,7 +311,7 @@ input[type="password"]:focus {
 }
 
 
-.form-control:focus {
+.form-control:focus, .form-select:focus {
     background-color: var(--background-color);
     border-color: #BAB9B9;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);

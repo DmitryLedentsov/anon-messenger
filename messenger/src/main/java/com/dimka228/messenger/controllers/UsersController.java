@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -49,10 +48,7 @@ public class UsersController {
 	public UserProfileDTO profile(@PathVariable Integer chatId, @PathVariable Integer id) {
 		User user = userService.getUser(id);
 		Chat chat = chatService.getChat(chatId);
-		Set<String> userStatuses = userService.getUserStatusList(user)
-			.stream()
-			.map(s -> s.getName())
-			.collect(Collectors.toSet());
+		Set<String> userStatuses = userService.getUserStatusNames(user);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		UserProfileDTO profileDTO = new UserProfileDTO(user.getLogin(), userInChat.getRole().getName(), user.getId(),
 				userStatuses, DateConverter.format(userInChat.getJoinTime()));
@@ -87,7 +83,7 @@ public class UsersController {
 	}
 
 	@PostMapping("/chat/{chatId}/user/{login}")
-	public void addUserInChat(@PathVariable Integer chatId, @PathVariable String login, Principal principal) {
+	public UserProfileDTO addUserInChat(@PathVariable Integer chatId, @PathVariable String login, Principal principal) {
 		User user = userService.getUser(login);
 		Chat chat = chatService.getChat(chatId);
 		User cur = userService.getUser(principal.getName());
@@ -98,6 +94,9 @@ public class UsersController {
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 		notificationService.sendChatOperationToUser(user.getId(), data);
+		
+		return new UserProfileDTO(user.getLogin(), UserInChat.Roles.REGULAR, user.getId(),
+				userService.getUserStatusNames(user), DateConverter.format(chatService.getUserInChat(user, chat).getJoinTime()));
 	}
 
 	@GetMapping("/chat/{chatId}/users")
@@ -109,10 +108,7 @@ public class UsersController {
 		
 		for (UserInChat userInChat : chatService.getUsersInChat(chat)) {
 			if (userInChat.getUser().equals(curUserInChat.getUser())) continue; //себя пропускаем
-			Set<String> userStatuses = userService.getUserStatusList(userInChat.getUser())
-				.stream()
-				.map(s -> s.getName())
-				.collect(Collectors.toSet());
+			Set<String> userStatuses = userService.getUserStatusNames(userInChat.getUser());
 			UserProfileDTO profileDTO = new UserProfileDTO(userInChat.getUser().getLogin(), userInChat.getRole().getName(),
 					userInChat.getUser().getId(), userStatuses, DateConverter.format(userInChat.getJoinTime()));
 			profiles.add(profileDTO);

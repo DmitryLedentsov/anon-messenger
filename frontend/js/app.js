@@ -99,21 +99,42 @@ function App() {
         userInChat.chatId = chatId;
         let chat = await this.api.getChat(chatId);
         let roles = await this.api.getAllRolesInChat(chatId);
-        roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
-        userInChat.avaibleRoles = roles;
+        //roles = roles.map(el => ({ role: el, selected: el == userInChat.role ? 'selected' : '' }))
+        //userInChat.avaibleRoles = roles;
         userInChat.name = chat.name;
         
         userInChat.isOwned = userInChat.role=='CREATOR';
         let users = await this.api.getUsersInChat(chatId);
+        users.forEach(user=>{
+            user.avaibleRoles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
+        });
         let userNames = users.map((user)=>user.login);
         let usersStr = userNames.join(",");
         userInChat.users = users;
 
       
         
-        openRenderModal('#edit-chat-modal',{data:userInChat});
+        openRenderModal('#edit-chat-modal',userInChat,{
+            'userInChat':$('#user-in-chat-template').html()
+        });
    
 
+    }
+
+    this.addUserModal = (chatId) => {
+        console.log(chatId);
+        let data={chatId: chatId};
+        openRenderModal('#add-user-modal',data);
+    }
+
+    this.addUsersInChat = async(chatId, login) => {
+        let roles = await this.api.getAllRolesInChat(chatId);
+        this.api.addUserInChat(chatId,login).then((user)=>{
+            user.avaibleRoles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
+            user.chatId = chatId;
+            console.log(user);
+            appendListItem('.chat-users',render('#user-in-chat-template',user));
+        });
     }
     this.saveSettings = (data)=>{
         let old = this.settings;
@@ -130,11 +151,12 @@ function App() {
     this.editSettingsModal = ()=>{
         openRenderModal('#settings-modal', this.settings);
     }
-    this.editChat= (id,chat)=>{
-        console.log(chat);
-        chat.users = chat.users.split(',');
-        this.api.editChat(id, chat);
+    this.renameChat= (id,chat)=>{
+
+        this.api.renameChat(id, chat);
     }
+
+    this.setUserRole= (chatId, userId, role)=>this.api.setUserRole(chatId, userId, role);
 
     this.openCurrentUserProfile = () => {
         this.openUserInChat(this.currentChatId,this.token.userId);

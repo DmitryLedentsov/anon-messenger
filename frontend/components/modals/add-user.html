@@ -1,0 +1,22 @@
+<script id="add-user-modal-template" type="x-tmpl-mustache">
+<div class="modal fade" id="add-user-modal" tabindex="-1" aria-labelledby="add-user-modal-label" aria-hidden="true"
+        data-bs-theme="dark">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-user-modal-label">Добавить пользователей</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                   
+                    <input type="text" class="form-control tags-input" id="add-users" required>
+                </div>
+                <div class="mb-3">
+                <button class="btn btn-primary form-control" data-bs-dismiss="modal" onclick="app.addUsersInChat({{chatId}},$('#add-user-modal #add-users').val())">Добавить</button>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+</script>

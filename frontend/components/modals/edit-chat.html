@@ -2,35 +2,55 @@
     <!-- Модальное окно для добавления пользователей -->
     <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
         data-bs-theme="dark">
-        {{#data}}
-        <div class="modal-dialog">
+        
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат</h5>
+                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="chatName" class="form-label">Название чата</label>
-                        <input type="text" class="form-control" id="chatName" value="{{name}}" required>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="chatName" value="{{name}}" required>
+                            <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.renameChat({{chatId}},$('#edit-chat-modal #chatName').val())">
+                                <i class="bi bi-check"></i> Сохранить
+                            </button>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="users" class="form-label">Пользователи</label>
-                        <table>
-                        {{#users}} 
-                        <span class="form-control modal-item user-item" data-id="{{id}}">
-                            <span class="link" onclick="app.openUserInChat({{data.chatId}},{{id}})">{{login}}</span> <span class="remove-btn" onclick="event.stopPropagation(); app.banUser({{data.chatId}},{{id}});"> <i class="bi bi-x"></i> </span> 
-                        </span>
-                            <br>
-                        {{/users}} 
-                        </table>
-                       
+                    
+                    <div class="mb-4">
+                        <h6>Участники чата</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Логин</th>
+                                        <th>Роль</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="chat-users">
+                                    {{#users}}
+                                    {{> userInChat}}
+                                    {{/users}}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.editChat({{data.chatId}},{users:$('#edit-chat-modal .users').val(), name:$('#edit-chat-modal #chatName').val()})">Редактировать</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{data.chatId}})">Удалить</button>
+                  
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="app.addUserModal({{chatId}})">
+                            <i class="bi bi-plus"></i> Добавить пользователя
+                        </button>
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">
+                            <i class="bi bi-trash"></i> Удалить чат
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        {{/data}}
+     
     </div>
-    </script>
+</script>

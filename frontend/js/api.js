@@ -155,7 +155,7 @@ function MessengerApi(options) {
             return this.query('post', `/chat/${chatId}/set-name/${name}`);
         }
         this.setUserRole = async (chatId,userId,role) => {
-            return this.query('post', `/chat/${chatId}/user/${userId}set-role/${role}`);
+            return this.query('post', `/chat/${chatId}/user/${userId}/set-role/${role}`);
         }
         this.getRole = async (chatId,role) => {
             return this.query('get', `/chat/${chatId}/role/${role}`);

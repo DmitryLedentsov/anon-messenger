@@ -61,14 +61,18 @@ function replaceElem(selector, html) {
 }
 
 
-openRenderModal = (modal, data) => {
+openRenderModal = (modal, data,fragments) => {
     $(modal).remove();
     const template = $(`${modal}-template`).html();
 
-    $('body').append(Mustache.render(template, data));
+    $('body').append(Mustache.render(template, data,fragments));
     $(modal).modal('show');
 }
 
+render = (selector, data, fragments)=>{
+    const template = $(selector).html();
+    return Mustache.render(template, data,fragments);
+}
 isModalShown = (modal)=>{
     return $(modal).hasClass('show');
 }

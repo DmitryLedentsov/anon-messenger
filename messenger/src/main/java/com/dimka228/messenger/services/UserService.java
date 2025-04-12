@@ -3,6 +3,7 @@ package com.dimka228.messenger.services;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -87,6 +88,13 @@ public class UserService {
 
 	public Set<UserStatus> getUserStatusList(User user) {
 		return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
+	}
+
+	public Set<String> getUserStatusNames(User user){
+		return getUserStatusList(user)
+			.stream()
+			.map(s -> s.getName())
+			.collect(Collectors.toSet());
 	}
 
 	public boolean checkUserStatus(User user, String status) {
