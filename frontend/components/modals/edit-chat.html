@@ -10,6 +10,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    {{#role.editChat}}
                     <div class="mb-3">
                         <label for="chatName" class="form-label">Название чата</label>
                         <div class="input-group mb-3">
@@ -19,6 +20,7 @@
                             </button>
                         </div>
                     </div>
+                    {{/role.editChat}}
                     
                     <div class="mb-4">
                         <h6>Участники чата</h6>
@@ -41,12 +43,23 @@
                     </div>
                   
                     <div class="d-flex justify-content-between">
+                        {{#role.addUser}}
                         <button class="btn btn-primary" onclick="app.addUserModal({{chatId}})">
                             <i class="bi bi-plus"></i> Добавить пользователя
                         </button>
+                        {{/role.addUser}}
+                        {{#isOwned}}
                         <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">
                             <i class="bi bi-trash"></i> Удалить чат
                         </button>
+                        {{/isOwned}}
+                        {{^isOwned}}
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">
+                            <i class="bi bi-trash"></i> Выйти
+                        </button>
+                        {{/isOwned}}
+
+                        
                     </div>
                 </div>
             </div>

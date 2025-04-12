@@ -42,9 +42,8 @@ function App() {
 
     }
 
-    this.onAddChat = (data) => {
-        data.isOwned = data.role=='CREATOR';
-        appendListItem(".chat-list", this.renderChatTemplate(data));
+    this.onAddChat = async (data) => {
+        appendListItem(".chat-list", await this.renderChat(data));
     }
     this.onDeleteChat = (data) => {
         removeItem(`.chat-item[data-id=${data.id}]`);
@@ -52,9 +51,8 @@ function App() {
             $('.message-list').empty();
         }
     }
-    this.onUpdateChat = (data) => {
-        data.isOwned = data.role=='CREATOR';
-        replaceElem(`.chat-item[data-id=${data.id}]`, this.renderChatTemplate(data));
+    this.onUpdateChat = async (data) => {
+        replaceElem(`.chat-item[data-id=${data.id}]`, await this.renderChat(data));
     }
 
     this.openChat = (id) => {
@@ -75,6 +73,7 @@ function App() {
         console.log(chat);
         this.api.subscribeOnMessagesInChat(id, (msg) => this.receiveMsg(id, msg));
         this.renderMessages(id);
+        
 
     };
 
@@ -103,7 +102,8 @@ function App() {
         //userInChat.avaibleRoles = roles;
         userInChat.name = chat.name;
         
-        userInChat.isOwned = userInChat.role=='CREATOR';
+        userInChat.role = await this.api.getRole(chatId,chat.role);
+        userInChat.isOwned = userInChat.role.name=='CREATOR';
         let users = await this.api.getUsersInChat(chatId);
         users.forEach(user=>{
             user.avaibleRoles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
@@ -128,6 +128,7 @@ function App() {
     }
 
     this.addUsersInChat = async(chatId, login) => {
+        console.log(login);
         let roles = await this.api.getAllRolesInChat(chatId);
         this.api.addUserInChat(chatId,login).then((user)=>{
             user.avaibleRoles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
@@ -320,23 +321,27 @@ function App() {
 
     this.banUser = (chatId, id) => {
 
-        this.api.banUserFromChat(id, chatId);
-        if(isModalShown('#edit-chat-modal')){
-            removeItem(`.user-item[data-id=${id}]`);
-        }
+        this.api.banUserFromChat(id, chatId).then(_=>{
+            if(isModalShown('#edit-chat-modal')){
+                removeItem(`.user-item[data-id=${id}]`);
+            }
+        });
+     
     }
 
 
-
+    this.renderChat= async (el)=>{
+        let role = await this.api.getRole(el.id,el.role);
+        el.isOwned = role.banUser || role.addUser || role.editChat || role.deleteMessage;
+        return this.renderChatTemplate(el);
+    }
     this.renderChats = () => {
         const template = $('#chat-template').html();
         console.log('rendering chats');
         let $chatList = $('.chat-list');
         $chatList.empty();
-        $.each(this.chats, function (index, el) {
-            el.isOwned = el.role=='CREATOR';
-            const rendered = Mustache.render(template, el);
-            appendListItem('.chat-list', rendered);
+        $.each(this.chats, async  (index, el) =>{
+            appendListItem('.chat-list', await this.renderChat(el));
 
 
         });
@@ -357,7 +362,7 @@ function App() {
         });
     }
     this.renderMessages = async (chatId, page = 0, count = 100) => {
-        this.currentChatId = chatId;
+        
         let userId = this.token.userId;
         
         console.log('rendering chat ' + chatId);

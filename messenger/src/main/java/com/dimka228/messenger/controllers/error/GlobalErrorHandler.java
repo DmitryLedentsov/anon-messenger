@@ -117,7 +117,7 @@ public class GlobalErrorHandler {
 		error.put("code", status.value());
 		error.put("timestamp", timestamp);
 		error.put("reason", status.getReasonPhrase());
-		error.put("type", e.getClass().getSimpleName());
+		error.put("error", e.getClass().getSimpleName());
 		return error;
 	}
 

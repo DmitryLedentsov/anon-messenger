@@ -20,6 +20,7 @@ import com.dimka228.messenger.exceptions.ChatNotFoundException;
 import com.dimka228.messenger.exceptions.MessageNotFoundException;
 import com.dimka228.messenger.exceptions.MessageNotFromUserException;
 import com.dimka228.messenger.exceptions.MessageNotInChat;
+import com.dimka228.messenger.exceptions.UserAlreadyInChatException;
 import com.dimka228.messenger.exceptions.UserNotInChatException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.repositories.ChatRepository;
@@ -121,6 +122,7 @@ public class ChatService {
 	}
 	
 	public void addUserInChat(User user, Chat chat, Role role) {
+		if(isUserInChat(user,chat)) throw new UserAlreadyInChatException();
 		UserInChat userInChat = new UserInChat();
 		userInChat.setUser(user);
 		userInChat.setChat(chat);
