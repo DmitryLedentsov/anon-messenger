@@ -1,18 +1,18 @@
 <div class="container-fluid">
     <div class="mb-3">
         <div class="chat-messages-section">
-
+            <div class="load" style="text-align: center; padding: 10px;">
+                <div class="btn btn-primary" onclick="app.loadMoreMessages()">Load More</div>
+            </div>
             <div class="message-list"></div>
             <div class="input-group mt-3">
-            <textarea type="text" id="messageInput" class="form-control auto-grow"
-                    placeholder="Напишите сообщение..."></textarea>
-            <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i class="bi bi-send"></i></button>
-
+                <textarea type="text" id="messageInput" class="form-control auto-grow"
+                        placeholder="Напишите сообщение..."></textarea>
+                <button class="btn btn-primary send-button" onclick="app.sendMessage()"><i class="bi bi-send"></i></button>
+            </div>
         </div>
-
     </div>
 </div>
-
 <style>
   
  

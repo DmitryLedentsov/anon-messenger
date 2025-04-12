@@ -3,6 +3,11 @@ var app = window.app || {};
 window.currentChatId = -1;
 function App() {
     this.chats = [];
+    this.page = 1;
+    this.messagesPerPage = 20; // Number of messages to load per page
+    this.isLoading = false;
+    this.hasMoreMessages = true;
+
     this.updateChat = (id, data) => {
         let idx = this.chats.map(o => o.id).indexOf(data.id);
         let messages =  this.chats[idx].messages;
@@ -57,7 +62,7 @@ function App() {
 
     this.openChat = (id) => {
         this.api.unsubscribeOnMessagesInChat(this.currentChatId);
-
+        
         if (id !== window.currentChatId) {
             this.currentChatId = parseInt(id);
         }
@@ -66,15 +71,17 @@ function App() {
             this.currentChatId = id;
         }
         window.currentChatId = this.currentChatId;
-        console.log(this.currentChatId);
+        
         $(`.chat-item`).removeClass('selected-item');
         $(`.chat-item[data-id=${id}]`).addClass('selected-item');
         let chat = this.findChatById(id);
-        console.log(chat);
-        this.api.subscribeOnMessagesInChat(id, (msg) => this.receiveMsg(id, msg));
-        this.renderMessages(id);
         
-
+        this.api.subscribeOnMessagesInChat(id, (msg) => this.receiveMsg(id, msg));
+        
+        // Reset pagination and load messages
+        this.page = 1;
+        this.hasMoreMessages = true;
+        this.renderMessages(id);
     };
 
     this.openUserInChat = async (chatId, userId) => {
@@ -210,6 +217,7 @@ function App() {
 
 
 
+
     this.initEvents = () => {
         $('.btn-close').on('click', function (e) {
             $(this).closest('.modal').modal('hide');
@@ -227,6 +235,13 @@ function App() {
             $input = $btn.parent().find(".search-input");
             $input.val('');
             $input.trigger('change');
+        });
+
+        $('.messages-wrapper').on('scroll', () => {
+            // Проверяем, достигли ли верха wrapper'а
+            if ($('.messages-wrapper').scrollTop() < 100 && !this.isLoading && this.hasMoreMessages) {
+                //this.loadMoreMessages();
+            }
         });
 
     }
@@ -346,77 +361,62 @@ function App() {
 
         });
     }
+
     this.renderMessages = async (chatId) => {
         this.currentChatId = chatId;
-
+        this.page = 0;
+        this.hasMoreMessages = true;
+        
         let userId = this.token.userId;
-       
-        console.log('rendering chat ' + chatId);
         let chat = this.findChatById(chatId);
-        chat.messages = await this.api.getMessagesFromChat(chatId);
-        $msgList = $('.message-list');
-        $msgList.empty();
-        chat.messages && $.each(chat.messages,  (index, el)=> {
-            appendListItem('.message-list', this.renderMsgTemplate(el),)
-
-        });
+        
+        // Clear existing messages
+        chat.messages = [];
+        $('.message-list').empty();
+        
+        // Load first page
+        await this.loadMoreMessages(chatId);
+        $('.messages-wrapper').scrollTop($('.message-list')[0].scrollHeight);
     }
-    this.renderMessages = async (chatId, page = 0, count = 100) => {
+
+    this.loadMoreMessages = async (chatId=this.currentChatId) => {
+        if (this.isLoading || !this.hasMoreMessages) return;
         
-        let userId = this.token.userId;
+        this.isLoading = true;
+        $('.load .btn').prop('disabled', true);
         
-        console.log('rendering chat ' + chatId);
-        let chat = this.findChatById(chatId);
-        
-        // Если это первая загрузка, очищаем список
-        if (page === 0) {
-            chat.messages = await this.api.getMessagesFromChat(chatId, page, count);
-            $('.message-list').empty();
-        } else {
-            // Для последующих страниц добавляем к существующим сообщениям
-            const newMessages = await this.api.getMessagesFromChat(chatId, page, count);
-            chat.messages = [...newMessages, ...chat.messages];
-        }
-        
-        // Рендерим сообщения
-        const $msgList = $('.message-list');
-        if (page === 0) {
-            $msgList.empty();
-        }
-        
-        chat.messages && $.each(chat.messages, (index, el) => {
-            appendListItem('.message-list', this.renderMsgTemplate(el));
-        });
-        
-        // Если это первая загрузка, добавляем обработчик скролла
-        if (page === 0) {
-            this.setupScrollHandler(chatId);
-        }
-    };
-    
-    this.setupScrollHandler = (chatId) => {
-        const $msgList = $('.message-list');
-        let isLoading = false;
-        let currentPage = 0;
-        
-        $msgList.off('scroll').on('scroll', async function() {
-            if ($(this).scrollTop() === 0 && !isLoading) {
-                isLoading = true;
-                
-                // Показываем индикатор загрузки
-                const $loader = $('<div class="loader">Загрузка...</div>');
-                $msgList.prepend($loader);
-                
-                try {
-                    currentPage++;
-                    await this.renderMessages(chatId, currentPage);
-                } finally {
-                    $loader.remove();
-                    isLoading = false;
-                }
+        try {
+            let messages = await this.api.getMessagesFromChat(chatId, {
+                page: this.page,
+                count: this.messagesPerPage
+            });
+            console.log(messages);
+            
+            let chat = this.findChatById(this.currentChatId);
+            
+            // Check if we have more messages to load
+            if (messages.length < this.messagesPerPage) {
+                this.hasMoreMessages = false;
+                $('.load').hide();
+            } else {
+                $('.load').show();
             }
-        }.bind(this));
-    };
+            
+            // Append new messages
+            messages.forEach(msg => {
+                chat.messages.unshift(msg); // Add to beginning to maintain order
+                prependListItem('.message-list', this.renderMsgTemplate(msg));
+            });
+            
+            this.page++;
+            
+        } catch (error) {
+            this.showError('Failed to load messages');
+        } finally {
+            this.isLoading = false;
+            $('.load .btn').prop('disabled', false);
+        }
+    }
 
     this.renderChatTemplate = (chat) => {
         const template = $('#chat-template').html();

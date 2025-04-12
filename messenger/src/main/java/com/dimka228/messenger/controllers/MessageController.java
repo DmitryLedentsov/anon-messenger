@@ -2,8 +2,6 @@ package com.dimka228.messenger.controllers;
 
 import java.security.Principal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -90,8 +88,8 @@ public class MessageController {
 			.filter((m)->filter!=null?m.getMessage().contains(filter):true)
 			.map(m -> MessageDTO.fromMessageInfo(m))
 			.toList();
-		messages = new ArrayList<>(messages);
-		Collections.reverse(messages);
+		//messages = new ArrayList<>(messages);
+		//Collections.reverse(messages);
 		return messages;
 	}
 

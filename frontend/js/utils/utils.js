@@ -60,6 +60,9 @@ function replaceElem(selector, html) {
     $(selector).fadeIn("slow");
 }
 
+function prependListItem(selector, html) {
+    $(selector).prepend(html);
+}
 
 openRenderModal = (modal, data,fragments) => {
     $(modal).remove();
