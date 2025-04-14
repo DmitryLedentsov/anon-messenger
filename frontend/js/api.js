@@ -75,9 +75,7 @@ function MessengerApi(options) {
         }
         this.client = new StompJs.Client({
             brokerURL: options.brokerUrl,
-            connectHeaders: {
-                Authorization: `Bearer ${login.token}`,
-            },
+            connectHeaders: ajaxHeaders
         });
 
 
