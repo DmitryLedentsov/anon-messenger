@@ -53,7 +53,7 @@ function MessengerApi(options) {
         } catch (e){
             if(e.status==200) return;
             let error = e.responseJSON;
-            if(error==null)  error = { message: "connection error" , type:'ConnectionError'}
+            if(error==null)  error = { message: "connection error" , error:'ConnectionError'}
             options.onError(error);
             throw error;
         }
@@ -90,7 +90,7 @@ function MessengerApi(options) {
         };
 
         this.client.onWebSocketError = (error) => {
-            options.onError && options.onError("connection error");
+            options.onError && options.onError({ message: "connection error" , error:'ConnectionError'});
             console.error('Error with websocket', error);
         };
 

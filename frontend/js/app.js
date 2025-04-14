@@ -87,12 +87,17 @@ function App() {
     this.openUserInChat = async (chatId, userId) => {
 
         let user = await this.api.getUserInChat(chatId, userId);
+        let current =  await this.api.getUserInChat(chatId,this.token.userId);
         let roles = await this.api.getAllRolesInChat(chatId);
         roles = roles.map(el => ({ role: el, selected: el == user.role ? 'selected' : '' }))
         user.avaibleRoles = roles;
         user.current = user.id == this.token.userId;
         user.chatId = chatId;
-        
+       
+
+        let currentRole =  await this.api.getRole(chatId, current.role);
+        user.role = await this.api.getRole(chatId,user.role);
+        user.canBeBanned = currentRole.priority>user.role.priority && currentRole.banUser;
         if (!user.statuses.includes('ONLINE')) user.statuses.push('OFFLINE');
         openRenderModal('#user-in-chat-modal',user);
     
@@ -204,6 +209,7 @@ function App() {
             clearCookie('token');
 
             this.init(true);
+            return;
         }
         console.log(error);
         if (error.message) error = error.message;
@@ -310,12 +316,12 @@ function App() {
         try{
         this.token = await this.api.authUser({ "login": $('#login').val(), "password": $('#password').val() });
         if (!this.token) return;
-        
+        //this.api.socketClientDisconnect();
         await this.api.init(this.token);
         this.api.socketClientConnect();
         saveCookie('token',this.token);
         $("#auth-modal").modal('hide');
-        $(".modal-backdrop").modal('hide');
+        $(".modal-backdrop").hide();
      
         }catch(e){}
 

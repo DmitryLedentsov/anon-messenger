@@ -101,6 +101,7 @@ public class UserService {
 		return getUserStatusList(user).stream().anyMatch(s -> s.getName().equals(status));
 	}
 
+	@Transactional
 	public void addUserStatus(User u, String s) {
 		statusRepository.insertUnique(u.getId(), s);
 	}
