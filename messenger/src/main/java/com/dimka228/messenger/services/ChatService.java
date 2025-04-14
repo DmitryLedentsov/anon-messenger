@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,10 @@ public class ChatService {
 	private final MessageRepository messageRepository;
 
 	private final UserInChatRepository userInChatRepository;
+
+	private final UserService userService;
+
+	private final RoleService roleService;
 
 	public List<Chat> getChatsForUser(User user) {
 		return chatRepository.getChatsForUser(user.getId());
@@ -120,7 +125,7 @@ public class ChatService {
 		}
 		return true;
 	}
-	
+	@Transactional
 	public void addUserInChat(User user, Chat chat, Role role) {
 		if(isUserInChat(user,chat)) throw new UserAlreadyInChatException();
 		UserInChat userInChat = new UserInChat();
@@ -128,6 +133,17 @@ public class ChatService {
 		userInChat.setChat(chat);
 		userInChat.setRole(role);
 		userInChatRepository.save(userInChat);
+	}
+
+	@Transactional
+	public void addUsersInChat(Chat chat, List<String> logins){
+		logins = logins.stream().distinct().filter(userService::checkUser).collect(Collectors.toList());
+		List<User> users = logins.stream().distinct().map(userService::getUser).collect(Collectors.toList());
+		for (User cur : users) {
+		
+			addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
+		}
+
 	}
 	@Transactional
 	public void updateUserInChat(UserInChat userInChat, EntityChanger<UserInChat> callback){

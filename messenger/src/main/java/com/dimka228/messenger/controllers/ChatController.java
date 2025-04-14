@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,13 +58,8 @@ public class ChatController {
 			notificationService.sendChatOperationToUser(user.getId(), data);
 			return new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
 		}
-		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
-		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
-		for (User cur : users) {
-			if (Objects.equals(cur.getId(), user.getId()))
-				continue;
-			chatService.addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
-		}
+		logins = logins.stream().filter((login)->!login.equals(user.getLogin())).toList();
+		chatService.addUsersInChat(chat, logins);
 
 		List<UserInChat> usersInChat = chatService.getUsersInChat(chat);
 
@@ -90,65 +84,6 @@ public class ChatController {
 		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat).getName());
 	}
 
-	@PutMapping("/chat/{chatId}")
-	public void editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
-			Principal principal) {
-		User user = userService.getUser(principal.getName());
-		Chat chat = chatService.getChat(chatId);
-		UserInChat userInChat = chatService.getUserInChat(user, chat);
-	
-		boolean chatNameChange = !chatDtoRequest.getName().equals(chat.getName());
-		if (chatNameChange) {
-			if (!userInChat.getRole().isEditChat()) throw new WrongPrivilegesException();
-			chatService.updateChat(chat, (c) -> c.setName(chatDtoRequest.getName()));
-		}
-		List<String> logins = chatDtoRequest.getUsers();
-		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
-		
-		if(logins==null){
-			if(chatNameChange){
-				for (UserInChat cur : users) {
-					ChatDTO chatDTO = new ChatDTO(chat.getId(),chatDtoRequest.getName(), cur.getRole().getName());
-					OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
-					notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
-				}
-					
-			}
-			return;
-		}
-		
-
-		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
-		List<User> updatedUsers = logins.stream().map(userService::getUser).collect(Collectors.toList());
-		for (UserInChat cur : users) {
-			if (Objects.equals(user.getId(), cur.getUser().getId()))
-				continue;
-			if (!updatedUsers.stream().filter(o -> o.getId().equals(cur.getUser().getId())).findFirst().isPresent()) {
-				if (!userInChat.getRole().isBanUser()) throw new WrongPrivilegesException();
-				chatService.deleteUserFromChat(cur);
-				ChatDTO chatDTO = new ChatDTO(chat.getId());
-				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
-				notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
-			}
-		}
-		for (User cur : updatedUsers) {
-			if (chatService.isUserInChat(cur, chat)) {
-				if (!chatNameChange)
-					continue;
-				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(),
-						chatService.getUserRoleInChat(cur, chat).getName());
-				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
-				notificationService.sendChatOperationToUser(cur.getId(), data);
-			}
-			else {
-				if (!userInChat.getRole().isAddUser()) throw new WrongPrivilegesException();
-				chatService.addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
-				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), roleService.getRole(UserInChat.Roles.REGULAR).getName());
-				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
-				notificationService.sendChatOperationToUser(cur.getId(), data);
-			}
-		}
-	}
 
 	@DeleteMapping("/chat/{chatId}")
 	public void deleteChat(@PathVariable Integer chatId, Principal principal) {
