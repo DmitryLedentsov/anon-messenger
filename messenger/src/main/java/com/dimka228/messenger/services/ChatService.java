@@ -138,7 +138,7 @@ public class ChatService {
 	@Transactional
 	public void addUsersInChat(Chat chat, List<String> logins){
 		logins = logins.stream().distinct().filter(userService::checkUser).collect(Collectors.toList());
-		List<User> users = logins.stream().distinct().map(userService::getUser).collect(Collectors.toList());
+		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
 		for (User cur : users) {
 		
 			addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
