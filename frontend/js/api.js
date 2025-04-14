@@ -69,6 +69,10 @@ function MessengerApi(options) {
     }
     this.initSocketClient = (login) => {
         this.setAuth(login);
+        if(this.client){
+            this.socketClientDisconnect();
+            this.client=null;
+        }
         this.client = new StompJs.Client({
             brokerURL: options.brokerUrl,
             connectHeaders: {

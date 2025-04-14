@@ -22,7 +22,7 @@ public interface UserStatusRepository extends JpaRepository<UserStatus, Integer>
 	@Modifying
 	@Query(nativeQuery = true, value = "call add_user_status_unique(:_user_id, :_status)")
 	void insertUnique(@Param("_user_id") Integer userId, @Param("_status") String _status);
-
+	@Transactional
 	void deleteByUserIdAndName(Integer id, String s);
 
 	boolean existsByUserIdAndName(Integer id, String name);

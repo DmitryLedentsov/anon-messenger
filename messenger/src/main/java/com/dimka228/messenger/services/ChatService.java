@@ -166,11 +166,12 @@ public class ChatService {
 		message.setData(cleaned);
 		return messageRepository.save(message);
 	}
-
+	@Transactional
 	private void deleteMessage(Integer id) {
 		messageRepository.deleteById(id);
 	}
 
+	@Transactional
 	public void deleteMessagesFromUserInChat(User user, Chat chat) {
 		messageRepository.deleteAllMessages(user.getId(), chat.getId());
 	}
@@ -185,11 +186,11 @@ public class ChatService {
 	public Message addMessage(UserInChat sender, String text) {
 		return addMessage(sender.getUser(), sender.getChat(), text);
 	}
-
+	@Transactional
 	public void deleteMessageFromUserInChat(UserInChat sender, Message msg) {
 		deleteMessageFromUserInChat(sender.getUser(), sender.getChat(), msg);
 	}
-
+	@Transactional
 	public void deleteMessagesFromUserInChat(UserInChat sender) {
 		deleteMessagesFromUserInChat(sender.getUser(), sender.getChat());
 	}
@@ -201,7 +202,7 @@ public class ChatService {
 	public List<MessageInfo> getMessagesFromUserInChat(UserInChat userInChat) {
 		return getMessagesFromUserInChat(userInChat.getUser(), userInChat.getChat());
 	}
-
+	@Transactional
 	public void deleteMessageFromUserInChat(User user, Chat chat, Message msg) {
 		if (!Objects.equals(user.getId(), msg.getSender().getId())) {
 			throw new MessageNotFromUserException(msg.getId(), user.getId());
