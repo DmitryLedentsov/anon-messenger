@@ -57,7 +57,7 @@ public class TokenProvider {
 			.claims(extraClaims)
 			.subject(userDetails.getUsername())
 			.issuedAt(new Date(System.currentTimeMillis()))
-			.expiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 60 * 24))
+			.expiration(new Date(System.currentTimeMillis() + 1000 * TOKEN_VALIDITY * 60))
 			.signWith(getSigningKey())
 			.compact();
 	}

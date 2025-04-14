@@ -96,8 +96,8 @@ function MessengerApi(options) {
 
         this.client.onStompError = (frame) => {
             console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-            options.onError && options.onError(frame.headers['message']);
+            console.error('Additional details: ' + frame);
+            options.onError && options.onError(frame.headers);
 
         };
 
@@ -141,6 +141,12 @@ function MessengerApi(options) {
     }
 
     this.initLogic = (userId) => {
+        this.getSelf = async ()=>{
+            return this.query('get', `/user`);
+        }
+        this.deleteSelf = async ()=>{
+            return this.query('delete', `/user`);
+        }
         this.createChat = async (chat) => {
             return this.query('post', `/chat`, chat);
         }

@@ -123,4 +123,9 @@ public class UsersController {
 		userService.deleteUser(cur.getId());
 	}
 
+	@GetMapping("user")
+	public User checkAuth(Principal principal) {
+		return userService.getUser(principal.getName());
+	}
+
 }

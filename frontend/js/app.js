@@ -200,6 +200,11 @@ function App() {
     }
 
     this.onError = (error) => {
+        if(error.error=='TokenExpiredException'){
+            clearCookie('token');
+
+            this.init(true);
+        }
         console.log(error);
         if (error.message) error = error.message;
         this.showError(error);
@@ -279,7 +284,8 @@ function App() {
         });
 
         if(!firstTime) return;
-        this.token = null;//getCookie('token');
+        this.token =getCookie('token');
+        if(!getCookie('settings')['remember']) this.token=null;
         if(this.token!=null){
             await this.api.init(this.token);
             this.api.socketClientConnect();

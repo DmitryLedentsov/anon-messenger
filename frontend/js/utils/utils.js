@@ -1,14 +1,33 @@
 function getFormData($element) {
-    var unindexed_array = $element.find(':input').serializeArray();
-    var indexed_array = {};
-
-    $.map(unindexed_array, function(n, i) {
-        indexed_array[n['name']] = n['value'];
+    var formData = {};
+    
+    $element.find(':input').each(function() {
+        var $input = $(this);
+        var name = $input.attr('name');
+        
+        // Пропускаем элементы без name
+        if (!name) return;
+        
+        // Обработка чекбоксов
+        if ($input.is(':checkbox')) {
+            // Если чекбокс не отмечен, сохраняем false (или можно пропустить)
+            formData[name] = $input.is(':checked');
+        } 
+        // Обработка radio-кнопок
+        else if ($input.is(':radio')) {
+            // Добавляем только если radio выбран
+            if ($input.is(':checked')) {
+                formData[name] = $input.val();
+            }
+        }
+        // Обработка остальных элементов
+        else {
+            formData[name] = $input.val();
+        }
     });
-
-    return indexed_array;
+    
+    return formData;
 }
-
 function getNotEmpty(...args) {
     for (const arg of args) {
         if (isNotEmpty(arg)) {
@@ -115,4 +134,8 @@ function getCookie(key, defaultValue = null) {
     const dataString = decodeURIComponent(encodedData);
 
     return JSON.parse(dataString);
+}
+function clearCookie(key) {
+    // Устанавливаем cookie с истекшим сроком действия
+    document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
 }

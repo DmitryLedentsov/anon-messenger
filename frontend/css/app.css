@@ -95,6 +95,10 @@ textarea {
     color: gray;
 }
 
+.message-item{
+    overflow-x: auto;
+}
+
 .add-chat-btn {
     margin-bottom: 1rem;
     width: 100%;
