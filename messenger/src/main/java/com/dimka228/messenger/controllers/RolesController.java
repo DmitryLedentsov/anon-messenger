@@ -27,47 +27,56 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(consumes = { MediaType.APPLICATION_JSON_VALUE },
-		produces = { MediaType.APPLICATION_JSON_VALUE })
+@RequestMapping(consumes = { MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
 public class RolesController {
-    private final UserService userService;
+
+	private final UserService userService;
+
 	private final ChatService chatService;
-    private final RoleService roleService;
+
+	private final RoleService roleService;
 
 	@Qualifier("notificationService")
 	private final NotificationService notificationService;
 
-    @PostMapping("chat/{chatId}/user/{userId}/set-role/{role}")
-	public void setRole(@PathVariable Integer chatId, @PathVariable Integer userId, @PathVariable String role, Principal principal) {
+	@PostMapping("chat/{chatId}/user/{userId}/set-role/{role}")
+	public void setRole(@PathVariable Integer chatId, @PathVariable Integer userId, @PathVariable String role,
+			Principal principal) {
 		Chat chat = chatService.getChat(chatId);
 		User user = userService.getUser(userId);
-        User cur = userService.getUser(principal.getName());
-        UserInChat userInChat = chatService.getUserInChat(user, chat);
+		User cur = userService.getUser(principal.getName());
+		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		Role newRole = roleService.getRole(role);
-        if(!roleService.isHigherPriority(chatService.getUserInChat(cur, chat), userInChat)) throw new WrongPrivilegesException();//проверяем что текущий пользователь выше в ранге чем изменяемый
-        if(!roleService.isHigherPriority(chatService.getUserInChat(cur, chat).getRole(), newRole)) throw new WrongPrivilegesException(); //проверяем что текущий пользователь выше в ранге чем новая роль
-        chatService.updateUserInChat(userInChat, (c)->{
+		if (!roleService.isHigherPriority(chatService.getUserInChat(cur, chat), userInChat))
+			throw new WrongPrivilegesException();// проверяем что текущий пользователь
+													// выше в ранге чем изменяемый
+		if (!roleService.isHigherPriority(chatService.getUserInChat(cur, chat).getRole(), newRole))
+			throw new WrongPrivilegesException(); // проверяем что текущий пользователь
+													// выше в ранге чем новая роль
+		chatService.updateUserInChat(userInChat, (c) -> {
 			c.setRole(newRole);
 		});
 
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), newRole.getName());
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
 		notificationService.sendChatOperationToUser(user.getId(), data);
-        
+
 	}
 
-    @GetMapping("chat/{chatId}/roles")
+	@GetMapping("chat/{chatId}/roles")
 	public Set<String> getRoles(@PathVariable Integer chatId, Principal principal) {
 		Chat chat = chatService.getChat(chatId);
-        chatService.getUserInChat(userService.getUser(principal.getName()),chat);
+		chatService.getUserInChat(userService.getUser(principal.getName()), chat);
 
-		//return chatService.getAllRolesInChat(chat);
-        return roleService.getRolesNames();
+		// return chatService.getAllRolesInChat(chat);
+		return roleService.getRolesNames();
 	}
-    @GetMapping("chat/{chatId}/role/{role}")
+
+	@GetMapping("chat/{chatId}/role/{role}")
 	public Role getRoleConfig(@PathVariable Integer chatId, @PathVariable String role, Principal principal) {
 		Chat chat = chatService.getChat(chatId);
-        chatService.getUserInChat(userService.getUser(principal.getName()),chat);
+		chatService.getUserInChat(userService.getUser(principal.getName()), chat);
 		return roleService.getRole(role);
 	}
+
 }

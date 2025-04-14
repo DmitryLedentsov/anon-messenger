@@ -90,11 +90,8 @@ public class UserService {
 		return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
 	}
 
-	public Set<String> getUserStatusNames(User user){
-		return getUserStatusList(user)
-			.stream()
-			.map(s -> s.getName())
-			.collect(Collectors.toSet());
+	public Set<String> getUserStatusNames(User user) {
+		return getUserStatusList(user).stream().map(s -> s.getName()).collect(Collectors.toSet());
 	}
 
 	public boolean checkUserStatus(User user, String status) {

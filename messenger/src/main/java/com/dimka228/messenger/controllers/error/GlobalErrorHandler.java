@@ -107,5 +107,4 @@ public class GlobalErrorHandler {
 		return ErrorBuilder.createExceptionMessage(e, HttpStatus.INTERNAL_SERVER_ERROR, webRequest);
 	}
 
-
 }

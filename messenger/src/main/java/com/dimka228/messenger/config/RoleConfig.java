@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class RoleConfig {
-    private Set<String> permissions;
-    private Integer priority;
+
+	private Set<String> permissions;
+
+	private Integer priority;
+
 }

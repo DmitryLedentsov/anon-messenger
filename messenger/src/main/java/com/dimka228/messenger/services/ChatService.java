@@ -2,9 +2,15 @@ package com.dimka228.messenger.services;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +48,14 @@ public class ChatService {
 
 	private final UserInChatRepository userInChatRepository;
 
+	private ReentrantLock batchLock;
+
+	private LinkedList<Message> messageBatch;
+
+	private AtomicBoolean scheduled;
+
+	private Timer messageBatchTimer;
+
 	public List<Chat> getChatsForUser(User user) {
 		return chatRepository.getChatsForUser(user.getId());
 	}
@@ -56,6 +70,7 @@ public class ChatService {
 	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat, Pageable pageable) {
 		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId(), pageable);
 	}
+
 	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat) {
 		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId());
 	}
@@ -120,20 +135,23 @@ public class ChatService {
 		}
 		return true;
 	}
-	
+
 	public void addUserInChat(User user, Chat chat, Role role) {
-		if(isUserInChat(user,chat)) throw new UserAlreadyInChatException();
+		if (isUserInChat(user, chat))
+			throw new UserAlreadyInChatException();
 		UserInChat userInChat = new UserInChat();
 		userInChat.setUser(user);
 		userInChat.setChat(chat);
 		userInChat.setRole(role);
 		userInChatRepository.save(userInChat);
 	}
+
 	@Transactional
-	public void updateUserInChat(UserInChat userInChat, EntityChanger<UserInChat> callback){
+	public void updateUserInChat(UserInChat userInChat, EntityChanger<UserInChat> callback) {
 		callback.change(userInChat);
 		userInChatRepository.save(userInChat);
 	}
+
 	@Transactional
 	public void updateChat(Chat chat, EntityChanger<Chat> callback) {
 		callback.change(chat);
@@ -141,14 +159,38 @@ public class ChatService {
 	}
 
 	@Transactional
-	public Message addMessage(User sender, Chat chat, String text) {
+	public Message addMessage(User sender, Chat chat, String text) throws InterruptedException {
 		String cleaned = HtmlTagsRemover.clean(text);
 
 		Message message = new Message();
 		message.setChat(chat);
 		message.setSender(sender);
 		message.setData(cleaned);
-		return messageRepository.save(message);
+		batchLock.tryLock(5000, TimeUnit.MILLISECONDS);
+		messageBatch.add(message);
+		TimerTask task = new TimerTask() {
+			public void run() {
+				try {
+					batchLock.tryLock(5000, TimeUnit.MILLISECONDS);
+					LinkedList<Message> list = (LinkedList<Message>) messageBatch.clone();
+					messageBatch.clear();
+					batchLock.unlock();
+					messageRepository.saveAll(list);
+					scheduled.set(false);
+				}
+				catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					scheduled.set(false);
+				}
+			}
+		};
+		if (!scheduled.get()) {
+			messageBatchTimer.schedule(task, 1000);
+			scheduled.set(true);
+		}
+		batchLock.unlock();
+		return message;
 	}
 
 	private void deleteMessage(Integer id) {
@@ -162,11 +204,12 @@ public class ChatService {
 	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat, Pageable page) {
 		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat(), page);
 	}
+
 	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat) {
 		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat());
 	}
 
-	public Message addMessage(UserInChat sender, String text) {
+	public Message addMessage(UserInChat sender, String text) throws InterruptedException {
 		return addMessage(sender.getUser(), sender.getChat(), text);
 	}
 

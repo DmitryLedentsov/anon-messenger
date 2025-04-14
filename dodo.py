@@ -98,7 +98,7 @@ def task_container():
         return cmd
 
     def build():
-        cmd = f'bash -c "docker run --name dev -i -p 127.0.0.1:9087:9087 -p 127.0.0.1:8085:8085 -p 127.0.0.1:8086:8086 -p 127.0.0.1:8761:8761 -v .:/home/dev -t  development:latest /bin/bash"'
+        cmd = f'bash -c "docker run --name dev -i -p 127.0.0.1:9087:9087 -p 127.0.0.1:8085:8085 -p 127.0.0.1:8086:8086 -p 127.0.0.1:8761:8761 -v $(pwd):/home/dev -t  development:latest /bin/bash"'
         return cmd
     return {
         'actions': [

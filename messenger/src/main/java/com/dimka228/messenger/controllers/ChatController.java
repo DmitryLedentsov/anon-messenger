@@ -51,9 +51,9 @@ public class ChatController {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.addChat(chatDtoRequest.getName());
 		chatService.addUserInChat(user, chat, roleService.getRole(UserInChat.Roles.CREATOR));
-		
+
 		List<String> logins = chatDtoRequest.getUsers();
-		if(logins==null){
+		if (logins == null) {
 			ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
 			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 			notificationService.sendChatOperationToUser(user.getId(), data);
@@ -78,12 +78,13 @@ public class ChatController {
 		}
 		return new ChatDTO(chat.getId(), chat.getName(), chatService.getUserRoleInChat(user, chat).getName());
 	}
+
 	@PostMapping("/chat/create/{name}")
 	public ChatDTO createEmptyChat(@PathVariable String name, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.addChat(name);
 		chatService.addUserInChat(user, chat, roleService.getRole(UserInChat.Roles.CREATOR));
-		
+
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 		notificationService.sendChatOperationToUser(user.getId(), data);
@@ -91,32 +92,31 @@ public class ChatController {
 	}
 
 	@PutMapping("/chat/{chatId}")
-	public void editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId,
-			Principal principal) {
+	public void editChat(@RequestBody ChatCreateDTO chatDtoRequest, @PathVariable Integer chatId, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
-	
+
 		boolean chatNameChange = !chatDtoRequest.getName().equals(chat.getName());
 		if (chatNameChange) {
-			if (!userInChat.getRole().isEditChat()) throw new WrongPrivilegesException();
+			if (!userInChat.getRole().isEditChat())
+				throw new WrongPrivilegesException();
 			chatService.updateChat(chat, (c) -> c.setName(chatDtoRequest.getName()));
 		}
 		List<String> logins = chatDtoRequest.getUsers();
 		List<UserInChat> users = chatService.getUsersInChat(chat).stream().collect(Collectors.toList());
-		
-		if(logins==null){
-			if(chatNameChange){
+
+		if (logins == null) {
+			if (chatNameChange) {
 				for (UserInChat cur : users) {
-					ChatDTO chatDTO = new ChatDTO(chat.getId(),chatDtoRequest.getName(), cur.getRole().getName());
+					ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), cur.getRole().getName());
 					OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
 					notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
 				}
-					
+
 			}
 			return;
 		}
-		
 
 		logins = logins.stream().filter(userService::checkUser).collect(Collectors.toList());
 		List<User> updatedUsers = logins.stream().map(userService::getUser).collect(Collectors.toList());
@@ -124,7 +124,8 @@ public class ChatController {
 			if (Objects.equals(user.getId(), cur.getUser().getId()))
 				continue;
 			if (!updatedUsers.stream().filter(o -> o.getId().equals(cur.getUser().getId())).findFirst().isPresent()) {
-				if (!userInChat.getRole().isBanUser()) throw new WrongPrivilegesException();
+				if (!userInChat.getRole().isBanUser())
+					throw new WrongPrivilegesException();
 				chatService.deleteUserFromChat(cur);
 				ChatDTO chatDTO = new ChatDTO(chat.getId());
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.DELETE);
@@ -141,9 +142,11 @@ public class ChatController {
 				notificationService.sendChatOperationToUser(cur.getId(), data);
 			}
 			else {
-				if (!userInChat.getRole().isAddUser()) throw new WrongPrivilegesException();
+				if (!userInChat.getRole().isAddUser())
+					throw new WrongPrivilegesException();
 				chatService.addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
-				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(), roleService.getRole(UserInChat.Roles.REGULAR).getName());
+				ChatDTO chatDTO = new ChatDTO(chat.getId(), chatDtoRequest.getName(),
+						roleService.getRole(UserInChat.Roles.REGULAR).getName());
 				OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 				notificationService.sendChatOperationToUser(cur.getId(), data);
 			}
@@ -205,25 +208,25 @@ public class ChatController {
 		return new ChatDTO(chat.getId(), chat.getName(), userInChat.getRole().getName());
 	}
 
-
 	@PostMapping("/chat/{chatId}/set-name/{name}")
 	public void editChatName(@PathVariable Integer chatId, @PathVariable String name, Principal principal) {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(chatId);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
-		
+
 		boolean chatNameChange = !name.equals(chat.getName());
-		if(!chatNameChange) return;
-	
-		if (!userInChat.getRole().isEditChat()) throw new WrongPrivilegesException();
+		if (!chatNameChange)
+			return;
+
+		if (!userInChat.getRole().isEditChat())
+			throw new WrongPrivilegesException();
 		chatService.updateChat(chat, (c) -> c.setName(name));
-		
+
 		for (UserInChat cur : chatService.getUsersInChat(chat)) {
 			ChatDTO chatDTO = new ChatDTO(chat.getId(), name, cur.getRole().getName());
 			OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
 			notificationService.sendChatOperationToUser(cur.getUser().getId(), data);
-		}		
+		}
 	}
-
 
 }

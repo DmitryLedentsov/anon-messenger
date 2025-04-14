@@ -39,6 +39,7 @@ public class UsersController {
 	private final UserService userService;
 
 	private final ChatService chatService;
+
 	private final RoleService roleService;
 
 	@Qualifier("notificationService")
@@ -55,6 +56,7 @@ public class UsersController {
 
 		return profileDTO;
 	}
+
 	@DeleteMapping("/chat/{chatId}/user/{userId}")
 	public void banUser(@PathVariable Integer chatId, @PathVariable Integer userId, Principal principal) {
 		User cur = userService.getUser(principal.getName());
@@ -68,18 +70,20 @@ public class UsersController {
 			throw new WrongPrivilegesException();
 		if (Objects.equals(user.getId(), cur.getId()))
 			throw new CannotBanSelfException();
-	
-		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
-		notificationService.sendChatOperationToUser(userId, new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
-		/*List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
 
-		
-		for (MessageInfo messageInfo : messages) {
-			MessageDTO data = new MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId, user.getLogin(),
-					null);
-			OperationDTO<MessageDTO> op = new OperationDTO<>(data, OperationDTO.DELETE);
-			notificationService.sendMessageOperationToChat(chatId, op);
-		}*/
+		chatService.deleteOrLeaveChat(chatService.getUserInChat(user, chat));
+		notificationService.sendChatOperationToUser(userId,
+				new OperationDTO<>(new ChatDTO(chatId), OperationDTO.DELETE));
+		/*
+		 * List<MessageInfo> messages = chatService.getMessagesForUserInChat(user, chat);
+		 *
+		 *
+		 * for (MessageInfo messageInfo : messages) { MessageDTO data = new
+		 * MessageDTO(messageInfo.getId(), messageInfo.getMessage(), userId,
+		 * user.getLogin(), null); OperationDTO<MessageDTO> op = new OperationDTO<>(data,
+		 * OperationDTO.DELETE); notificationService.sendMessageOperationToChat(chatId,
+		 * op); }
+		 */
 	}
 
 	@PostMapping("/chat/{chatId}/user/{login}")
@@ -88,15 +92,17 @@ public class UsersController {
 		Chat chat = chatService.getChat(chatId);
 		User cur = userService.getUser(principal.getName());
 		UserInChat userInChat = chatService.getUserInChat(cur, chat);
-		if (!userInChat.getRole().isAddUser()) throw new WrongPrivilegesException();
+		if (!userInChat.getRole().isAddUser())
+			throw new WrongPrivilegesException();
 		chatService.addUserInChat(user, chat, roleService.getRole(UserInChat.Roles.REGULAR));
 
 		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
 		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.ADD);
 		notificationService.sendChatOperationToUser(user.getId(), data);
-		
+
 		return new UserProfileDTO(user.getLogin(), UserInChat.Roles.REGULAR, user.getId(),
-				userService.getUserStatusNames(user), DateConverter.format(chatService.getUserInChat(user, chat).getJoinTime()));
+				userService.getUserStatusNames(user),
+				DateConverter.format(chatService.getUserInChat(user, chat).getJoinTime()));
 	}
 
 	@GetMapping("/chat/{chatId}/users")
@@ -105,12 +111,14 @@ public class UsersController {
 		List<UserProfileDTO> profiles = new LinkedList<>();
 		Chat chat = chatService.getChat(chatId);
 		UserInChat curUserInChat = chatService.getUserInChat(userService.getUser(principal.getName()), chat);
-		
+
 		for (UserInChat userInChat : chatService.getUsersInChat(chat)) {
-			if (userInChat.getUser().equals(curUserInChat.getUser())) continue; //себя пропускаем
+			if (userInChat.getUser().equals(curUserInChat.getUser()))
+				continue; // себя пропускаем
 			Set<String> userStatuses = userService.getUserStatusNames(userInChat.getUser());
-			UserProfileDTO profileDTO = new UserProfileDTO(userInChat.getUser().getLogin(), userInChat.getRole().getName(),
-					userInChat.getUser().getId(), userStatuses, DateConverter.format(userInChat.getJoinTime()));
+			UserProfileDTO profileDTO = new UserProfileDTO(userInChat.getUser().getLogin(),
+					userInChat.getRole().getName(), userInChat.getUser().getId(), userStatuses,
+					DateConverter.format(userInChat.getJoinTime()));
 			profiles.add(profileDTO);
 
 		}

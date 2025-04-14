@@ -1,6 +1,6 @@
 package com.dimka228.messenger.config.properties;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,12 +15,15 @@ import lombok.Data;
 @Component
 @ConfigurationProperties(prefix = "messenger.security")
 public class RolesProperties {
-    private Map<String, RoleConfig> roles = new HashMap<>();
 
-    public Set<String> getPermissionsForRole(String roleName) {
-        return roles.getOrDefault(roleName, new RoleConfig()).getPermissions();
-    }
-    public RoleConfig getRoleConfig(String name){
-        return roles.getOrDefault(name, new RoleConfig());
-    }
+	private Map<String, RoleConfig> roles = new HashMap<>();
+
+	public Set<String> getPermissionsForRole(String roleName) {
+		return roles.getOrDefault(roleName, new RoleConfig()).getPermissions();
+	}
+
+	public RoleConfig getRoleConfig(String name) {
+		return roles.getOrDefault(name, new RoleConfig());
+	}
+
 }

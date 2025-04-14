@@ -1,5 +1,7 @@
 package com.dimka228.messenger.entities;
 
+import java.time.Instant;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,11 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import java.time.Instant;
-
 @Entity
 @Table(name = "m_message")
-public class Message {
+public class Message implements Cloneable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,6 +73,15 @@ public class Message {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Message msg = new Message();
+		msg.chat = this.chat;
+		msg.data = this.data;
+		msg.sender = this.sender;
+		return msg;
 	}
 
 }

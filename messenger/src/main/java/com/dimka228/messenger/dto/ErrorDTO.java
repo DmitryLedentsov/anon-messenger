@@ -17,11 +17,17 @@ import lombok.NoArgsConstructor;
 public class ErrorDTO {
 
 	String message;
+
 	int code;
+
 	String timestamp;
+
 	String reason;
+
 	String error;
+
 	String uri;
+
 	public ErrorDTO(Throwable e) {
 		message = e.getMessage();
 		error = e.getClass().getSimpleName();

@@ -50,11 +50,13 @@ public class MessageController {
 	private final RoleService roleService;
 
 	@PostMapping("/{id}/send")
-	public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal) {
+	public MessageDTO sendMessage(@PathVariable Integer id, @RequestBody MessageDTO chatMessage, Principal principal)
+			throws InterruptedException {
 		User user = userService.getUser(principal.getName());
 		Chat chat = chatService.getChat(id);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
-		if(!userInChat.getRole().isSendMessage()) throw new WrongPrivilegesException();
+		if (!userInChat.getRole().isSendMessage())
+			throw new WrongPrivilegesException();
 		Message added = chatService.addMessage(userInChat, chatMessage.getMessage());
 		MessageDTO fullMsg = new MessageDTO(added.getId(), added.getData(), user.getId(), user.getLogin(),
 				DateConverter.format(Instant.now()));
@@ -69,7 +71,8 @@ public class MessageController {
 		Chat chat = chatService.getChat(id);
 		UserInChat userInChat = chatService.getUserInChat(user, chat);
 		Message msg = chatService.getMessage(msgId);
-		if(!userInChat.getRole().isDeleteMessage() && !Objects.equals(user.getId(), msg.getSender().getId())) throw new WrongPrivilegesException();
+		if (!userInChat.getRole().isDeleteMessage() && !Objects.equals(user.getId(), msg.getSender().getId()))
+			throw new WrongPrivilegesException();
 		chatService.deleteMessageFromUserInChat(userInChat, msg);
 
 		OperationDTO<MessageDTO> data = new OperationDTO<>(new MessageDTO(msg.getId()), OperationDTO.DELETE);
@@ -78,18 +81,20 @@ public class MessageController {
 
 	@GetMapping("/{id}/messages")
 	@SuppressWarnings("unused")
-	List<MessageDTO> messages(@PathVariable Integer id, Principal principal, 
-	@RequestParam(defaultValue = "0", name="page") int pageNumber, @RequestParam(defaultValue = "100", name="count") int pageSize,@RequestParam(required= false ,value="filter") String filter) {
+	List<MessageDTO> messages(@PathVariable Integer id, Principal principal,
+			@RequestParam(defaultValue = "0", name = "page") int pageNumber,
+			@RequestParam(defaultValue = "100", name = "count") int pageSize,
+			@RequestParam(required = false, value = "filter") String filter) {
 		Chat chat = chatService.getChat(id);
 		User user = userService.getUser(principal.getName());
 		Pageable page = PageRequest.of(pageNumber, pageSize, Sort.by("SEND_TIME").descending());
 		List<MessageDTO> messages = chatService.getMessagesForUserInChat(chatService.getUserInChat(user, chat), page)
 			.stream()
-			.filter((m)->filter!=null?m.getMessage().contains(filter):true)
+			.filter((m) -> filter != null ? m.getMessage().contains(filter) : true)
 			.map(m -> MessageDTO.fromMessageInfo(m))
 			.toList();
-		//messages = new ArrayList<>(messages);
-		//Collections.reverse(messages);
+		// messages = new ArrayList<>(messages);
+		// Collections.reverse(messages);
 		return messages;
 	}
 

@@ -12,32 +12,34 @@ import lombok.Data;
 @Table(name = "m_user_role")
 @Data
 public class Role {
-    @Id
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
-    private Integer id;
+	private Integer id;
 
-    @Column(name = "priority", nullable = false)
-    private Integer priority;
+	@Column(name = "priority", nullable = false)
+	private Integer priority;
 
-    @Column(name = "name", nullable = false, length = 20)
+	@Column(name = "name", nullable = false, length = 20)
 	private String name;
 
-    @Column(name = "description", nullable = false, length = 20)
+	@Column(name = "description", nullable = false, length = 20)
 	private String description;
 
-    @Column(name = "send_message")
+	@Column(name = "send_message")
 	private boolean sendMessage;
 
-    @Column(name = "delete_message")
+	@Column(name = "delete_message")
 	private boolean deleteMessage;
 
-    @Column(name = "add_user")
+	@Column(name = "add_user")
 	private boolean addUser;
 
-    @Column(name = "ban_user")
+	@Column(name = "ban_user")
 	private boolean banUser;
 
-    @Column(name = "edit_chat")
+	@Column(name = "edit_chat")
 	private boolean editChat;
+
 }

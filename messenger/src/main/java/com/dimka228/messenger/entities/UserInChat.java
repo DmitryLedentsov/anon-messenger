@@ -45,7 +45,6 @@ public class UserInChat {
 	@JoinColumn(name = "role_id", nullable = false)
 	private Role role;
 
-
 	@Column(name = "join_time")
 	private Instant joinTime;
 

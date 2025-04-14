@@ -10,7 +10,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 public class ErrorBuilder {
-    public static Map<String, Object> createExceptionMessage(Throwable e, HttpStatus status, WebRequest webRequest) {
+
+	public static Map<String, Object> createExceptionMessage(Throwable e, HttpStatus status, WebRequest webRequest) {
 
 		Map<String, Object> error = new HashMap<>();
 		String timestamp = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
@@ -25,7 +26,8 @@ public class ErrorBuilder {
 		error.put("error", e.getClass().getSimpleName());
 		return error;
 	}
-    public static Map<String, Object> createExceptionMessage(Throwable e, HttpStatus status) {
+
+	public static Map<String, Object> createExceptionMessage(Throwable e, HttpStatus status) {
 
 		Map<String, Object> error = new HashMap<>();
 		String timestamp = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
@@ -38,7 +40,7 @@ public class ErrorBuilder {
 		return error;
 	}
 
-    public static Map<String, Object> createExceptionMessage(Throwable e) {
+	public static Map<String, Object> createExceptionMessage(Throwable e) {
 		Map<String, Object> error = new HashMap<>();
 		String timestamp = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
 		error.put("message", e.getMessage());
@@ -46,4 +48,5 @@ public class ErrorBuilder {
 		error.put("error", e.getClass().getSimpleName());
 		return error;
 	}
+
 }

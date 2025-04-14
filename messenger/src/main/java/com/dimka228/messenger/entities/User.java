@@ -107,13 +107,17 @@ public class User implements UserDetails, Cloneable, Comparable<User> {
 	public int compareTo(User user) {
 		return this.getId().compareTo(user.getId());
 	}
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof User)) return false;
-	
+		if (this == o)
+			return true;
+		if (!(o instanceof User))
+			return false;
+
 		User other = (User) o;
-	
-		return  Objects.equals(this.getId(), other.getId());
+
+		return Objects.equals(this.getId(), other.getId());
 	}
+
 }

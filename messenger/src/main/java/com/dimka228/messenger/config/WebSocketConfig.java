@@ -51,15 +51,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint(properties.getPath()).setAllowedOrigins("*");
-		registry.setErrorHandler(new StompSubProtocolErrorHandler() { //кастомный еррор хэндлер, который выставляет хидеры
+		registry.setErrorHandler(new StompSubProtocolErrorHandler() { // кастомный еррор
+																		// хэндлер,
+																		// который
+																		// выставляет
+																		// хидеры
 			public @Nullable Message<byte[]> customHandleError(@Nullable Message<byte[]> clientMessage, Throwable ex) {
 				StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
 				accessor.setMessage(ex.getMessage());
-				ErrorBuilder.createExceptionMessage(ex).forEach((key,value)->{
+				ErrorBuilder.createExceptionMessage(ex).forEach((key, value) -> {
 					accessor.setNativeHeader(key, value.toString());
 				});
 				accessor.setLeaveMutable(true);
-					
+
 				StompHeaderAccessor clientHeaderAccessor = null;
 				if (clientMessage != null) {
 					clientHeaderAccessor = MessageHeaderAccessor.getAccessor(clientMessage, StompHeaderAccessor.class);
@@ -70,9 +74,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 						}
 					}
 				}
-			
+
 				return handleInternal(accessor, new byte[0], ex, clientHeaderAccessor);
 			}
+
 			@Override
 			public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
 				return customHandleError(clientMessage, ex.getCause());

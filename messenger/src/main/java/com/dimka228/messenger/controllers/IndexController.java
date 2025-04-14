@@ -23,7 +23,7 @@ public class IndexController {
 	@GetMapping("/")
 	public String app(Model model, Principal principal) {
 		FrontendSettings settings = new FrontendSettings();
-		settings.setServerUrl(serverProperties.getPublicUrl());	
+		settings.setServerUrl(serverProperties.getPublicUrl());
 		model.addAttribute("settings", settings);
 		return "app";
 	}
