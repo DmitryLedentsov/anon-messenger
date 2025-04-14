@@ -285,7 +285,7 @@ function App() {
 
         if(!firstTime) return;
         this.token =getCookie('token');
-        if(!getCookie('settings')['remember']) this.token=null;
+        if(isNotEmpty(getCookie('settings')) &&isNotEmpty(getCookie('settings')['remember']) && !getCookie('settings')['remember']) this.token=null;
         if(this.token!=null){
             await this.api.init(this.token);
             this.api.socketClientConnect();
