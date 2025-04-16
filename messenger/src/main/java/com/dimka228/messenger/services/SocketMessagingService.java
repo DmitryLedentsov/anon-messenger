@@ -3,7 +3,6 @@ package com.dimka228.messenger.services;
 import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
 
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.dto.MessageDTO;
@@ -19,10 +18,12 @@ public class SocketMessagingService implements NotificationService {
 
 	private final SimpMessagingTemplate msgTemplate;
 
+	@Override
 	public void sendMessageOperationToChat(Integer chatId, OperationDTO<MessageDTO> operationDTO) {
 		msgTemplate.convertAndSend("/topic/chat/" + chatId + "/messages", operationDTO);
 	}
 
+	@Override
 	public void sendChatOperationToUser(Integer userId, OperationDTO<ChatDTO> operationDTO) {
 		msgTemplate.convertAndSend("/topic/user/" + userId + "/chats", operationDTO);
 	}

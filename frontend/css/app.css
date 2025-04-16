@@ -1,0 +1,151 @@
+.chat-list,
+.chat-messages-section {
+    padding: 1rem;
+    margin: 1.2rem 1rem 0 0;
+}
+
+.send-button,
+textarea {
+    max-height: min-content;
+}
+
+.messages-wrapper {
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.chats-section {
+    padding: 1rem;
+    margin: 1.2rem 1rem 0 0;
+    width: 30%;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    color: blue;
+}
+
+.chat-messages-section {
+    width: 100%;
+
+    color: blue;
+}
+
+.profile-section {
+    padding: 1rem;
+    width: 5vw;
+    height: 5vw;
+    top: 0;
+    right: 0;
+    position: fixed;
+}
+
+.icon-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.icon-wrapper img {
+    width: 50pt;
+    height: 50pt;
+    position: fixed;
+    right: 0;
+    filter: contrast(0.5);
+    filter: drop-shadow(1px 1px 1px red);
+}
+
+.icon-wrapper img:hover {
+    cursor: pointer;
+}
+
+.chat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.chat-item:hover {
+    border-color: var(--main-color);
+}
+.modal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+ 
+}
+
+
+
+.remove-btn {
+    margin-left: 0.5rem;
+    color: red;
+    cursor: pointer;
+}
+
+.edit-btn {
+    margin-left: 0.5rem;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: gray;
+}
+
+.message-item{
+    overflow-x: auto;
+}
+
+.add-chat-btn {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+fade.in {
+    opacity: 1;
+}
+
+.fade.show {
+    opacity: 1;
+}
+
+.modal.in .modal-dialog {
+    transform: translate(0, 0);
+}
+
+.modal.show .modal-dialog {
+    transform: translate(0, 0);
+}
+
+.modal-backdrop.in {
+    opacity: 0.5;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+
+.background {
+
+    /* background-image: url('../icons/background-4.jpg');  */
+    position: fixed;
+
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    z-index: -20;
+    opacity: 0.2;
+    background-size: cover;
+    background-color: var(--background-color);
+    filter: blur(5px)
+}
+
+.app-container, main{
+    overflow-x: hidden !important;
+}
+
+

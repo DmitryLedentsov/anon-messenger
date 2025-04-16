@@ -1,0 +1,28 @@
+<script id="settings-modal-template" type="x-tmpl-mustache">
+<div class="modal fade" id="settings-modal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true" data-bs-theme="dark">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Настройки</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="settings-form">
+                <div class="mb-3">
+                    <label for="host" class="form-label">Адрес сервера</label>
+                    <input type="text" class="form-control" name="serverUrl" value="{{serverUrl}}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="remember" class="form-label">Запомнить меня</label>
+                    <input type="checkbox"  name="remember" {{#remember}}checked="checked"{{/remember}}">
+                </div>
+               
+                <button class="btn btn-primary" onclick="app.saveSettings(getFormData($('#settings-form')))" data-bs-dismiss="modal" >Сохранить</button>
+                <button class="btn btn-danger" data-bs-dismiss="modal" >Отмена</button>
+            </div>
+         
+        </div>
+    </div>
+</div>
+</script>

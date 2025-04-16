@@ -1,6 +1,5 @@
 package com.dimka228.messenger.dto;
 
-import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.validation.Password;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,4 +18,5 @@ public class UserAuthDTO {
 
 	@Password(message = "password must be string containing characters and numbers")
 	private String password;
+
 }

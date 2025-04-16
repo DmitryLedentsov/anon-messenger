@@ -1,5 +1,14 @@
 package com.dimka228.messenger.services;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserProfile;
 import com.dimka228.messenger.entities.UserStatus;
@@ -10,15 +19,7 @@ import com.dimka228.messenger.repositories.UserRepository;
 import com.dimka228.messenger.repositories.UserStatusRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.AllArgsConstructor;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -50,6 +51,7 @@ public class UserService {
 		return repository.save(newUser);
 	}
 
+	@Transactional
 	public User registerUser(User newUser) {
 		if (checkUser(newUser.getLogin()))
 			throw new UserExistsException();
@@ -79,6 +81,7 @@ public class UserService {
 		}
 	}
 
+	@Transactional
 	public void deleteUser(Integer id) {
 		repository.deleteById(id);
 	}
@@ -87,19 +90,23 @@ public class UserService {
 		return statusRepository.findAllByUserId(user.getId()).orElse(Collections.emptySet());
 	}
 
+	public Set<String> getUserStatusNames(User user){
+		return getUserStatusList(user)
+			.stream()
+			.map(s -> s.getName())
+			.collect(Collectors.toSet());
+	}
+
 	public boolean checkUserStatus(User user, String status) {
 		return getUserStatusList(user).stream().anyMatch(s -> s.getName().equals(status));
 	}
 
+	@Transactional
 	public void addUserStatus(User u, String s) {
-		if (statusRepository.existsByUserIdAndName(u.getId(), s))
-			return;
-		UserStatus status = new UserStatus();
-		status.setName(s);
-		status.setUser(u);
-		statusRepository.save(status);
+		statusRepository.insertUnique(u.getId(), s);
 	}
 
+	@Transactional
 	public void removeUserStatus(User u, String s) {
 		if (!statusRepository.existsByUserIdAndName(u.getId(), s))
 			return;

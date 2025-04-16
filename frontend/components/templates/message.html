@@ -1,0 +1,6 @@
+<script id="message-template" type="x-tmpl-mustache">
+    <div class="message-item" data-id="{{id}}">
+        <span><span class="link" onclick="app.openUserInChat({{chatId}},{{senderId}})">{{sender}}</span>: {{{message}}}  {{#isOwned}}<span class="remove-btn" onclick="event.stopPropagation(); app.deleteMsg({{id}});"> <i class="bi bi-x"></i> </span> {{/isOwned}}</span>
+        <span class="message-time">{{sendTime}}</span>
+    </div>
+</script>

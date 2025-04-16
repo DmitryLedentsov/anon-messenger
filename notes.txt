@@ -41,3 +41,21 @@ public class RestResponseEntityExceptionHandler
 java -jar ./target/messenger-0.0.1.jar --server.port=8089 --messenger.multi-instance=true --messenger.public-url="http://localhost:8089" --messenger.websocket.url="ws://localhost:8089/ws"
 
 java -jar ./target/messenger-0.0.1.jar --server.port=9087 --messenger.multi-instance=true --messenger.public-url="http://localhost:9087" --messenger.websocket.url="ws://localhost:9087/ws"
+java -jar ./out/messenger-0.0.1.jar --server.port=9087
+java -jar ./out/messenger-0.0.1.jar --server.port=9087 --messenger.public-url=http://localhost:9087 --messenger.websocket.url=ws://localhost:9087/ws --eureka.client.fetch-registry=false --eureka.client.register-with-eureka=false --messenger.multi-instance=false
+добавить параметр /messages для количества и пагинации
+python script.py --users-count 10 --workers 30 --messages-count 10000 --min-interval 10 --random-interval 10  --admin aboba1
+ python visualizer.py response_times.csv --ignore-timestamp --real-time
+
+ taskkill /f /IM python.exe
+
+
+фронт сделать отдельно красиво по файлам раскидать
+api-notifier(?надо ли)
+отрефакторить контроллеры
+
+профиль с описанием(?) + время регистрации(?)
+картинка пользователя(?)
+удаление сообщений при выходе(?лучше опционально)
+!!пагинации сообщений(и чатов?)
+!!переделать управление пользователями. 

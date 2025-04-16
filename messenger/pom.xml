@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>3.4.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.dimka228</groupId>
@@ -161,6 +161,16 @@
 			<version>2.8.5</version>
 		</dependency>
 
+		<!--clean
+		html-->
+
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.11.3</version>
+		</dependency>
+
 
 		<!--validation-->
 		<dependency>
@@ -235,15 +245,13 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
 				<configuration>
-					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:all,-serial,-processing</compilerArgument>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.4.1</version>
 				<configuration>
 					<rules>
 						<bannedDependencies>
@@ -288,6 +296,98 @@
 				<artifactId>spring-javaformat-maven-plugin</artifactId>
 				<version>0.0.43</version>
 			</plugin>
+
+			
+			<plugin>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <version>3.0.1</version>
+			    <executions>
+			        <execution>
+			            <id>build-frontend-css</id>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <phase>prepare-package</phase>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/static/css</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>../frontend/css</directory>
+			                        <filtering>false</filtering>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+					<execution>
+			            <id>build-frontend-js</id>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <phase>prepare-package</phase>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/static/js</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>../frontend/js</directory>
+			                        <filtering>false</filtering>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+					<execution>
+			            <id>build-frontend-components</id>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <phase>prepare-package</phase>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/static/components</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>../frontend/components</directory>
+			                        <filtering>false</filtering>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+					<execution>
+			            <id>build-frontend-icons</id>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <phase>prepare-package</phase>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/static/icons</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>../frontend/icons</directory>
+			                        <filtering>false</filtering>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+					<execution>
+			            <id>build-frontend-html</id>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <phase>prepare-package</phase>
+			            <configuration>
+			                <outputDirectory>${project.build.outputDirectory}/templates</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>../frontend</directory>
+									<includes>
+                                    	<include>app.html</include>
+                                	</includes>
+			                        <filtering>false</filtering>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+
 		</plugins>
 	</build>
 

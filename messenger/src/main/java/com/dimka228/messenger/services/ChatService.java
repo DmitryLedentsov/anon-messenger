@@ -1,31 +1,37 @@
 package com.dimka228.messenger.services;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dimka228.messenger.dto.ChatDTO;
 import com.dimka228.messenger.entities.Chat;
 import com.dimka228.messenger.entities.Message;
+import com.dimka228.messenger.entities.Role;
 import com.dimka228.messenger.entities.User;
 import com.dimka228.messenger.entities.UserInChat;
 import com.dimka228.messenger.exceptions.ChatNotFoundException;
 import com.dimka228.messenger.exceptions.MessageNotFoundException;
 import com.dimka228.messenger.exceptions.MessageNotFromUserException;
 import com.dimka228.messenger.exceptions.MessageNotInChat;
+import com.dimka228.messenger.exceptions.UserAlreadyInChatException;
 import com.dimka228.messenger.exceptions.UserNotInChatException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.repositories.ChatRepository;
 import com.dimka228.messenger.repositories.MessageRepository;
 import com.dimka228.messenger.repositories.UserInChatRepository;
+import com.dimka228.messenger.services.interfaces.EntityChanger;
+import com.dimka228.messenger.utils.HtmlTagsRemover;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.AllArgsConstructor;
-
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -36,6 +42,10 @@ public class ChatService {
 	private final MessageRepository messageRepository;
 
 	private final UserInChatRepository userInChatRepository;
+
+	private final UserService userService;
+
+	private final RoleService roleService;
 
 	public List<Chat> getChatsForUser(User user) {
 		return chatRepository.getChatsForUser(user.getId());
@@ -48,6 +58,9 @@ public class ChatService {
 			.orElseThrow(ChatNotFoundException::new);
 	}
 
+	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat, Pageable pageable) {
+		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId(), pageable);
+	}
 	public List<MessageInfo> getMessagesForUserInChat(User user, Chat chat) {
 		return messageRepository.getMessagesForUserInChat(user.getId(), chat.getId());
 	}
@@ -103,7 +116,18 @@ public class ChatService {
 		return getUserInChat(user.getId(), chat.getId());
 	}
 
-	public void addUserInChat(User user, Chat chat, String role) {
+	public boolean isUserInChat(User user, Chat chat) {
+		try {
+			getUserInChat(user, chat);
+		}
+		catch (UserNotInChatException e) {
+			return false;
+		}
+		return true;
+	}
+	@Transactional
+	public void addUserInChat(User user, Chat chat, Role role) {
+		if(isUserInChat(user,chat)) throw new UserAlreadyInChatException();
 		UserInChat userInChat = new UserInChat();
 		userInChat.setUser(user);
 		userInChat.setChat(chat);
@@ -111,18 +135,74 @@ public class ChatService {
 		userInChatRepository.save(userInChat);
 	}
 
+	@Transactional
+	public void addUsersInChat(Chat chat, List<String> logins){
+		logins = logins.stream().distinct().filter(userService::checkUser).collect(Collectors.toList());
+		List<User> users = logins.stream().map(userService::getUser).collect(Collectors.toList());
+		for (User cur : users) {
+		
+			addUserInChat(cur, chat, roleService.getRole(UserInChat.Roles.REGULAR));
+		}
+
+	}
+	@Transactional
+	public void updateUserInChat(UserInChat userInChat, EntityChanger<UserInChat> callback){
+		callback.change(userInChat);
+		userInChatRepository.save(userInChat);
+	}
+	@Transactional
+	public void updateChat(Chat chat, EntityChanger<Chat> callback) {
+		callback.change(chat);
+		chatRepository.save(chat);
+	}
+
+	@Transactional
 	public Message addMessage(User sender, Chat chat, String text) {
+		String cleaned = HtmlTagsRemover.clean(text);
+
 		Message message = new Message();
 		message.setChat(chat);
 		message.setSender(sender);
-		message.setData(text);
+		message.setData(cleaned);
 		return messageRepository.save(message);
 	}
-
+	@Transactional
 	private void deleteMessage(Integer id) {
 		messageRepository.deleteById(id);
 	}
 
+	@Transactional
+	public void deleteMessagesFromUserInChat(User user, Chat chat) {
+		messageRepository.deleteAllMessages(user.getId(), chat.getId());
+	}
+
+	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat, Pageable page) {
+		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat(), page);
+	}
+	public List<MessageInfo> getMessagesForUserInChat(UserInChat userInChat) {
+		return getMessagesForUserInChat(userInChat.getUser(), userInChat.getChat());
+	}
+
+	public Message addMessage(UserInChat sender, String text) {
+		return addMessage(sender.getUser(), sender.getChat(), text);
+	}
+	@Transactional
+	public void deleteMessageFromUserInChat(UserInChat sender, Message msg) {
+		deleteMessageFromUserInChat(sender.getUser(), sender.getChat(), msg);
+	}
+	@Transactional
+	public void deleteMessagesFromUserInChat(UserInChat sender) {
+		deleteMessagesFromUserInChat(sender.getUser(), sender.getChat());
+	}
+
+	public List<MessageInfo> getMessagesFromUserInChat(User user, Chat chat) {
+		return messageRepository.getMessagesFromUserInChat(user.getId(), chat.getId());
+	}
+
+	public List<MessageInfo> getMessagesFromUserInChat(UserInChat userInChat) {
+		return getMessagesFromUserInChat(userInChat.getUser(), userInChat.getChat());
+	}
+	@Transactional
 	public void deleteMessageFromUserInChat(User user, Chat chat, Message msg) {
 		if (!Objects.equals(user.getId(), msg.getSender().getId())) {
 			throw new MessageNotFromUserException(msg.getId(), user.getId());
@@ -133,15 +213,15 @@ public class ChatService {
 		deleteMessage(msg.getId());
 	}
 
-	public String getUserRoleInChat(User user, Chat chat) {
+	public Role getUserRoleInChat(User user, Chat chat) {
 		return getUserInChat(user.getId(), chat.getId()).getRole();
 	}
 
-	public void deleteOrLeaveChat(User user, Chat chat) {
-		UserInChat userInChat = getUserInChat(user.getId(), chat.getId());
-		if (userInChat.getRole().equals(UserInChat.Roles.CREATOR)) {
+	public void deleteOrLeaveChat(UserInChat userInChat) {
 
-			deleteChat(chat.getId());
+		if (userInChat.getRole().getName().equals(UserInChat.Roles.CREATOR)) {
+
+			deleteChat(userInChat.getChat().getId());
 
 		}
 		else {
@@ -164,7 +244,7 @@ public class ChatService {
 	public Set<String> getAllRolesInChat(Chat chat) {
 		Set<String> list = new HashSet<>();
 		for (UserInChat userInChat : getUsersInChat(chat)) {
-			list.add(userInChat.getRole());
+			list.add(userInChat.getRole().getName());
 		}
 		return list;
 	}

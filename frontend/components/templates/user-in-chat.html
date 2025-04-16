@@ -1,0 +1,21 @@
+<script id="user-in-chat-template" type="x-tmpl-mustache">
+<tr data-id="{{id}}" class="user-item">
+    <td>
+        <a href="#" class="link" onclick="app.openUserInChat({{chatId}},{{id}}); return false;">
+            {{login}}
+        </a>
+    </td>
+    <td>
+        <select name="role" class="form-select form-select-sm" onchange="app.setUserRole({{chatId}},{{id}},this.value)">
+            {{#avaibleRoles}}
+                <option value="{{role}}" {{selected}}>{{role}}</option>
+            {{/avaibleRoles}}
+        </select>
+    </td>
+    <td>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); app.banUser({{chatId}},{{id}});">
+            <i class="bi bi-x"></i> Удалить
+        </button>
+    </td>
+</tr>
+</script>

@@ -16,6 +16,7 @@ public class UserProfile {
 
 	@Id
 	@Column(name = "user_id")
+	@SuppressWarnings("unused")
 	private Integer userId;
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)

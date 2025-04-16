@@ -19,7 +19,8 @@ public class ChatDTO {
 
 	String role;
 
-	public ChatDTO(Integer id){
+	public ChatDTO(Integer id) {
 		this.id = id;
 	}
+
 }

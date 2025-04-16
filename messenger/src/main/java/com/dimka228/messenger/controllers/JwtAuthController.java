@@ -1,5 +1,13 @@
 package com.dimka228.messenger.controllers;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dimka228.messenger.dto.TokenDTO;
 import com.dimka228.messenger.dto.UserAuthDTO;
 import com.dimka228.messenger.entities.User;
@@ -8,19 +16,7 @@ import com.dimka228.messenger.security.jwt.TokenProvider;
 import com.dimka228.messenger.services.UserService;
 
 import jakarta.validation.Valid;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -33,7 +29,6 @@ public class JwtAuthController {
 
 	private final TokenProvider jwtTokenUtil;
 
-	@Autowired
 	public JwtAuthController(UserService userService, AuthenticationManager authenticationManager,
 			TokenProvider jwtTokenUtil) {
 		this.userService = userService;
@@ -42,17 +37,17 @@ public class JwtAuthController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> signUp(@RequestBody @Valid UserAuthDTO userDto, BindingResult result) {
+	public void signUp(@RequestBody @Valid UserAuthDTO userDto, BindingResult result) {
 		result.failOnError((m) -> new WrongPasswordException("passwd must be 5 letters length"));
 		User user = User.fromAuth(userDto);
 
 		log.debug("POST request to register user {}", user.getUsername());
 		userService.registerUser(user);
-		return new ResponseEntity<>("User registered", HttpStatus.OK);
 	}
 
 	@PostMapping("/signin")
-	public ResponseEntity<TokenDTO> signIn(@RequestBody UserAuthDTO userDto) {
+	@SuppressWarnings("UseSpecificCatch")
+	public TokenDTO signIn(@RequestBody UserAuthDTO userDto) {
 
 		User user = userService.getUser(userDto.getLogin());
 		try {
@@ -60,9 +55,10 @@ public class JwtAuthController {
 			authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
 			final String token = jwtTokenUtil.generateToken(user);
-			return new ResponseEntity<>(new TokenDTO(token, user.getId()), HttpStatus.OK);
+			return new TokenDTO(token, user.getId());
 		}
 		catch (Exception e) {
+			log.info(e.getMessage());
 			throw new WrongPasswordException();
 		}
 	}

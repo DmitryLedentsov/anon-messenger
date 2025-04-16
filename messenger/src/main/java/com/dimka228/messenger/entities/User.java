@@ -1,5 +1,13 @@
 package com.dimka228.messenger.entities;
 
+import java.util.Collection;
+import java.util.Objects;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.dimka228.messenger.dto.UserAuthDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,16 +16,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.dimka228.messenger.dto.UserAuthDTO;
-
-import java.util.Collection;
-
 @Entity
 @Table(name = "m_user", indexes = { @Index(name = "m_user_login_key", columnList = "login", unique = true) })
-public class User implements UserDetails, Cloneable {
+public class User implements UserDetails, Cloneable, Comparable<User> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,7 @@ public class User implements UserDetails, Cloneable {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "login", nullable = false, length = 20)
+	@Column(name = "login", nullable = false, length = 20, unique = true)
 	private String login;
 
 	public String getLogin() {
@@ -38,6 +39,7 @@ public class User implements UserDetails, Cloneable {
 		this.login = login;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -54,7 +56,9 @@ public class User implements UserDetails, Cloneable {
 		this.id = id;
 	}
 
-	public User clone() {
+	@Override
+	public User clone() throws CloneNotSupportedException {
+		super.clone();
 		User newUser = new User();
 		newUser.setPassword(getPassword());
 		newUser.setLogin(getLogin());
@@ -92,11 +96,24 @@ public class User implements UserDetails, Cloneable {
 		return false;
 	}
 
-	public static User fromAuth(UserAuthDTO auth){	
+	public static User fromAuth(UserAuthDTO auth) {
 		User user = new User();
 		user.setLogin(auth.getLogin());
 		user.setPassword(auth.getPassword());
 		return user;
 	}
 
+	@Override
+	public int compareTo(User user) {
+		return this.getId().compareTo(user.getId());
+	}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof User)) return false;
+	
+		User other = (User) o;
+	
+		return  Objects.equals(this.getId(), other.getId());
+	}
 }

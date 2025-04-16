@@ -1,7 +1,6 @@
 package com.dimka228.messenger.config;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -59,14 +58,7 @@ public class SecurityConfig {
 				.permitAll()
 				.requestMatchers("/", "/test", "/app", "/welcome", websocketPath + "/**")
 				.permitAll()
-				.requestMatchers("/js/**", "/css/**", "/icons/**", "/fonts/**", "/favicon.ico")
-				.permitAll()
-				.requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**", "/api-docs-ui.html",
-						"/api-docs.yaml")
-				.permitAll()
-				.requestMatchers("/api-docs/**", "/api-docs-ui/*")
-				.permitAll()
-				.requestMatchers(enablePaths.toArray(new String[0]))
+				.requestMatchers(getEnablePaths().toArray(String[]::new))
 				.permitAll()
 				.requestMatchers("/endpoint", "/admin/**")
 				.hasRole("ADMIN")
@@ -94,6 +86,10 @@ public class SecurityConfig {
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
+	}
+
+	public ArrayList<String> getEnablePaths() {
+		return enablePaths;
 	}
 
 }

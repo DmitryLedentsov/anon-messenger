@@ -1,0 +1,69 @@
+<script id="edit-chat-modal-template" type="x-tmpl-mustache">
+    <!-- Модальное окно для добавления пользователей -->
+    <div class="modal fade" id="edit-chat-modal" tabindex="-1" aria-labelledby="edit-chat-modal" aria-hidden="true"
+        data-bs-theme="dark">
+        
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editChatModalLabel">Редактировать чат </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{#role.editChat}}
+                    <div class="mb-3">
+                        <label for="chatName" class="form-label">Название чата</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="chatName" value="{{name}}" required>
+                            <button class="btn btn-primary" data-bs-dismiss="modal" onclick="app.renameChat({{chatId}},$('#edit-chat-modal #chatName').val())">
+                                <i class="bi bi-check"></i> Сохранить
+                            </button>
+                        </div>
+                    </div>
+                    {{/role.editChat}}
+                    
+                    <div class="mb-4">
+                        <h6>Участники чата</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Логин</th>
+                                        <th>Роль</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="chat-users">
+                                    {{#users}}
+                                    {{> userInChat}}
+                                    {{/users}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  
+                    <div class="d-flex justify-content-between">
+                        {{#role.addUser}}
+                        <button class="btn btn-primary" onclick="app.addUserModal({{chatId}})">
+                            <i class="bi bi-plus"></i> Добавить пользователя
+                        </button>
+                        {{/role.addUser}}
+                        {{#isOwned}}
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">
+                            <i class="bi bi-trash"></i> Удалить чат
+                        </button>
+                        {{/isOwned}}
+                        {{^isOwned}}
+                        <button class="btn btn-danger" data-bs-dismiss="modal" onclick="app.deleteChat({{chatId}})">
+                            <i class="bi bi-trash"></i> Выйти
+                        </button>
+                        {{/isOwned}}
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+     
+    </div>
+</script>
