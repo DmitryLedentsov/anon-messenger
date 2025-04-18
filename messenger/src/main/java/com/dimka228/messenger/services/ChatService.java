@@ -23,6 +23,7 @@ import com.dimka228.messenger.exceptions.MessageNotFromUserException;
 import com.dimka228.messenger.exceptions.MessageNotInChat;
 import com.dimka228.messenger.exceptions.UserAlreadyInChatException;
 import com.dimka228.messenger.exceptions.UserNotInChatException;
+import com.dimka228.messenger.exceptions.WrongPrivilegesException;
 import com.dimka228.messenger.models.MessageInfo;
 import com.dimka228.messenger.repositories.ChatRepository;
 import com.dimka228.messenger.repositories.MessageRepository;
@@ -247,6 +248,22 @@ public class ChatService {
 			list.add(userInChat.getRole().getName());
 		}
 		return list;
+	}
+
+	@Transactional
+	public void transferOwnership(Chat chat, User owner, User newOwner){
+		UserInChat ownerInChat = getUserInChat(owner,chat);
+		UserInChat userInChat = getUserInChat(newOwner,chat);
+		if(!ownerInChat.getRole().getName().equals(UserInChat.Roles.CREATOR)) throw new WrongPrivilegesException();
+		if(owner.getId().equals(newOwner.getId())) return;
+		updateUserInChat(userInChat, (c)->{
+			c.setRole(roleService.getRole(UserInChat.Roles.CREATOR));
+		});
+		updateUserInChat(ownerInChat, (c)->{
+			c.setRole(roleService.getRole(UserInChat.Roles.REGULAR));
+		});
+
+
 	}
 
 }

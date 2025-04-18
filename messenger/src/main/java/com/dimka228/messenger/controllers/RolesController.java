@@ -56,6 +56,22 @@ public class RolesController {
         
 	}
 
+	@PostMapping("chat/{chatId}/user/{userId}/transfer-ownership")
+	public void transfer(@PathVariable Integer chatId, @PathVariable Integer userId, Principal principal) {
+		Chat chat = chatService.getChat(chatId);
+		User user = userService.getUser(userId);
+        User cur = userService.getUser(principal.getName());
+		chatService.transferOwnership(chat, cur, user);
+		ChatDTO chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.REGULAR);
+		OperationDTO<ChatDTO> data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
+		notificationService.sendChatOperationToUser(cur.getId(), data);
+
+		chatDTO = new ChatDTO(chat.getId(), chat.getName(), UserInChat.Roles.CREATOR);
+		data = new OperationDTO<>(chatDTO, OperationDTO.UPDATE);
+		notificationService.sendChatOperationToUser(user.getId(), data);
+        
+	}
+
     @GetMapping("chat/{chatId}/roles")
 	public Set<String> getRoles(@PathVariable Integer chatId, Principal principal) {
 		Chat chat = chatService.getChat(chatId);

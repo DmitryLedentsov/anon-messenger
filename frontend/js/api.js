@@ -157,7 +157,9 @@ function MessengerApi(options) {
         }
         this.editChat = async (chatId,chat) => {
             return this.query('put', `/chat/${chatId}`,chat);
-
+        }
+        this.transferChatOwnership = async (chatId, userId) => {
+            return this.query('post', `/chat/${chatId}/user/${userId}/transfer-ownership`);
         }
         this.renameChat = async (chatId,name) => {
             return this.query('post', `/chat/${chatId}/set-name/${name}`);
